@@ -1,0 +1,16 @@
+[package]
+name = "mackerel_client"
+version = "0.0.0"
+authors = ["itchyny <itchyny@hatena.ne.jp>"]
+description = "An API client library for Mackerel"
+repository = "https://github.com/itchyny/mackerel-client-rs"
+readme = "README.md"
+license = "MIT"
+keywords = ["api", "mackerel"]
+categories = ["api-bindings"]
+
+[dependencies]
+hyper = "0.10"
+serde = "0.9"
+serde_derive = "0.9"
+serde_json = "0.9"
