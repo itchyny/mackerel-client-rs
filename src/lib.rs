@@ -7,3 +7,4 @@ extern crate serde_json;
 pub mod organization;
 pub mod role;
 pub mod service;
+pub mod user;
