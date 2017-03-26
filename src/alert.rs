@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 use hyper::method::Method::*;
 use client;
 use errors::*;
@@ -34,6 +35,17 @@ pub enum AlertStatus {
     Critical,
     Warning,
     Unknown,
+}
+
+impl fmt::Display for AlertStatus {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            AlertStatus::Ok => write!(f, "OK"),
+            AlertStatus::Critical => write!(f, "CRITICAL"),
+            AlertStatus::Warning => write!(f, "WARNING"),
+            AlertStatus::Unknown => write!(f, "UNKNOWN"),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -120,6 +132,7 @@ mod tests {
             let str_value = serde_json::Value::String(status_str.to_string());
             assert_eq!(status, serde_json::from_value(str_value.clone()).unwrap());
             assert_eq!(str_value, serde_json::to_value(status).unwrap());
+            assert_eq!(str_value, format!("{}", status).as_str());
         }
     }
 }
