@@ -1,3 +1,9 @@
+use std::collections::HashMap;
+use hyper::method::Method::*;
+use client;
+use errors::*;
+use monitor::MonitorType;
+
 /// An alert
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct Alert {
@@ -109,5 +115,30 @@ mod tests {
                    serde_json::from_value(json_example1()).unwrap());
         assert_eq!(alert_example2(),
                    serde_json::from_value(json_example2()).unwrap());
+    }
+}
+
+impl client::Client {
+    /// Fetches all the open alerts.
+    ///
+    /// See https://mackerel.io/api-docs/entry/alerts#get.
+    pub fn list_alerts(&self) -> Result<Vec<Alert>> {
+        self.request(Get,
+                     "/api/v0/alerts",
+                     vec![],
+                     client::empty_body(),
+                     |res: ListAlertsResponse| res.alerts)
+    }
+
+    /// Closes the specified alert.
+    ///
+    /// See https://mackerel.io/api-docs/entry/alerts#close.
+    pub fn close_alert(&self, alert_id: &str, reason: &str) -> Result<Alert> {
+        let body: HashMap<&str, &str> = [("reason", reason)].iter().cloned().collect();
+        self.request(Post,
+                     format!("/api/v0/alerts/{}/close", alert_id),
+                     vec![],
+                     Some(body),
+                     |alert| alert)
     }
 }
