@@ -49,5 +49,4 @@ pub mod organization;
 pub mod role;
 pub mod service;
 pub mod user;
-/// Re-export client::Client
-pub type Client = client::Client;
+pub use client::Client;
