@@ -9,7 +9,7 @@
 //!
 //! # Example
 //!
-//! ```rust,no_run
+//! ```rust,no_run,ignore
 //! let client = Client::new("<Mackerel-API-KEY>");
 //!
 //! println!("{:?}", client.get_organization());
