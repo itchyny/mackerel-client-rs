@@ -1,3 +1,8 @@
+use hyper::method::Method::*;
+use client;
+use errors::*;
+
+/// An organization
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct Organization {
     pub name: String,
@@ -32,5 +37,13 @@ mod tests {
         assert_eq!(organization_example(),
                    serde_json::from_value(json_example()).unwrap());
     }
+}
 
+impl client::Client {
+    /// Retrieve the information on the organization.
+    ///
+    /// See https://mackerel.io/api-docs/entry/organizations#get.
+    pub fn get_organization(&self) -> Result<Organization> {
+        self.request(Get, "/api/v0/org", vec![], client::empty_body(), |org| org)
+    }
 }
