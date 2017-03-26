@@ -1,3 +1,8 @@
+use hyper::method::Method::*;
+use client;
+use errors::*;
+
+/// A service
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
     pub name: String,
@@ -45,4 +50,38 @@ mod tests {
                    serde_json::from_value(json_example()).unwrap());
     }
 
+}
+
+#[derive(Deserialize)]
+struct ListServiceResponse {
+    services: Vec<Service>,
+}
+
+#[derive(Deserialize)]
+struct ListMetricNamesResponse {
+    names: Vec<String>,
+}
+
+impl client::Client {
+    /// Fetches all the services.
+    ///
+    /// See https://mackerel.io/api-docs/entry/services#list.
+    pub fn list_services(&self) -> Result<Vec<Service>> {
+        self.request(Get,
+                     "/api/v0/services",
+                     vec![],
+                     client::empty_body(),
+                     |res: ListServiceResponse| res.services)
+    }
+
+    /// Fetches the names of the service metrics.
+    ///
+    /// See https://mackerel.io/api-docs/entry/services#metric-names.
+    pub fn list_service_metric_names(&self, service_name: &str) -> Result<Vec<String>> {
+        self.request(Get,
+                     format!("/api/v0/services/{}/metric-names", service_name),
+                     vec![],
+                     client::empty_body(),
+                     |res: ListMetricNamesResponse| res.names)
+    }
 }
