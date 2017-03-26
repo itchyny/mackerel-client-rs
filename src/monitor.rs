@@ -175,6 +175,15 @@ pub enum Operator {
     LessThan,
 }
 
+impl fmt::Display for Operator {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Operator::GreaterThan => write!(f, ">"),
+            Operator::LessThan => write!(f, "<"),
+        }
+    }
+}
+
 /// HTTP methods for external http monitors
 #[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -453,6 +462,7 @@ mod tests {
             let str_value = serde_json::Value::String(operator_str.to_string());
             assert_eq!(operator, serde_json::from_value(str_value.clone()).unwrap());
             assert_eq!(str_value, serde_json::to_value(operator).unwrap());
+            assert_eq!(str_value, format!("{}", operator).as_str());
         }
     }
 
