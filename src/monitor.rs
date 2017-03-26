@@ -194,6 +194,17 @@ pub enum ExternalMethod {
     Delete,
 }
 
+impl fmt::Display for ExternalMethod {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            ExternalMethod::Get => write!(f, "GET"),
+            ExternalMethod::Post => write!(f, "POST"),
+            ExternalMethod::Put => write!(f, "PUT"),
+            ExternalMethod::Delete => write!(f, "DELETE"),
+        }
+    }
+}
+
 /// HTTP headers for external http monitors
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternalHeader {
@@ -476,6 +487,7 @@ mod tests {
             let str_value = serde_json::Value::String(method_str.to_string());
             assert_eq!(method, serde_json::from_value(str_value.clone()).unwrap());
             assert_eq!(str_value, serde_json::to_value(method).unwrap());
+            assert_eq!(str_value, format!("{}", method).as_str());
         }
     }
 }
