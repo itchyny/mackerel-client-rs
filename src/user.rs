@@ -50,8 +50,8 @@ mod tests {
 }
 
 #[derive(Deserialize)]
-struct ListUsers {
-    pub users: Vec<User>,
+struct ListUsersResponse {
+    users: Vec<User>,
 }
 
 impl client::Client {
@@ -63,7 +63,7 @@ impl client::Client {
                      "/api/v0/users",
                      vec![],
                      client::empty_body(),
-                     |res: ListUsers| res.users)
+                     |res: ListUsersResponse| res.users)
     }
 
     /// Delete the user from the organization.
