@@ -112,6 +112,30 @@ pub enum Monitor {
     },
 }
 
+impl Monitor {
+    /// Returns the id of the monitor.
+    pub fn get_id(&self) -> Option<String> {
+        match *self {
+            Monitor::Host { ref id, .. } => id.clone(),
+            Monitor::Connectivity { ref id, .. } => id.clone(),
+            Monitor::Service { ref id, .. } => id.clone(),
+            Monitor::External { ref id, .. } => id.clone(),
+            Monitor::Expression { ref id, .. } => id.clone(),
+        }
+    }
+
+    /// Returns the name of the monitor.
+    pub fn get_name(&self) -> String {
+        match *self {
+            Monitor::Host { ref name, .. } => name.clone(),
+            Monitor::Connectivity { ref name, .. } => name.clone(),
+            Monitor::Service { ref name, .. } => name.clone(),
+            Monitor::External { ref name, .. } => name.clone(),
+            Monitor::Expression { ref name, .. } => name.clone(),
+        }
+    }
+}
+
 /// Monitor types
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
