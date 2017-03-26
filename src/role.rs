@@ -1,3 +1,8 @@
+use hyper::method::Method::*;
+use client;
+use errors::*;
+
+/// A role
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct Role {
     pub name: String,
@@ -38,4 +43,22 @@ mod tests {
                    serde_json::from_value(json_example()).unwrap());
     }
 
+}
+
+#[derive(Deserialize)]
+struct ListRolesResponse {
+    roles: Vec<Role>,
+}
+
+impl client::Client {
+    /// Fetches the roles in the specified service.
+    ///
+    /// See https://mackerel.io/api-docs/entry/services#rolelist.
+    pub fn list_roles(&self, service_name: &str) -> Result<Vec<Role>> {
+        self.request(Get,
+                     format!("/api/v0/services/{}/roles", service_name),
+                     vec![],
+                     client::empty_body(),
+                     |res: ListRolesResponse| res.roles)
+    }
 }
