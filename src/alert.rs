@@ -109,6 +109,19 @@ mod tests {
         assert_eq!(alert_example2(),
                    serde_json::from_value(json_example2()).unwrap());
     }
+
+    #[test]
+    fn alert_statuses() {
+        let test_cases = [(AlertStatus::Ok, "OK"),
+                          (AlertStatus::Critical, "CRITICAL"),
+                          (AlertStatus::Warning, "WARNING"),
+                          (AlertStatus::Unknown, "UNKNOWN")];
+        for &(status, status_str) in &test_cases {
+            let str_value = serde_json::Value::String(status_str.to_string());
+            assert_eq!(status, serde_json::from_value(str_value.clone()).unwrap());
+            assert_eq!(str_value, serde_json::to_value(status).unwrap());
+        }
+    }
 }
 
 #[derive(Deserialize)]
