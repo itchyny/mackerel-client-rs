@@ -6,14 +6,15 @@ use monitor::MonitorType;
 
 /// An alert
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Alert {
     pub id: String,
     pub status: AlertStatus,
-    #[serde(rename = "monitorId", skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub monitor_id: Option<String>,
     #[serde(rename = "type")]
     pub monitor_type: MonitorType,
-    #[serde(rename = "hostId", skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub host_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<f64>,
@@ -27,20 +28,12 @@ pub struct Alert {
 
 /// Alert statuses
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum AlertStatus {
-    #[serde(rename = "OK")]
     Ok,
-    #[serde(rename = "CRITICAL")]
     Critical,
-    #[serde(rename = "WARNING")]
     Warning,
-    #[serde(rename = "UNKNOWN")]
     Unknown,
-}
-
-#[derive(Deserialize)]
-struct ListAlertsResponse {
-    alerts: Vec<Alert>,
 }
 
 #[cfg(test)]
@@ -116,6 +109,11 @@ mod tests {
         assert_eq!(alert_example2(),
                    serde_json::from_value(json_example2()).unwrap());
     }
+}
+
+#[derive(Deserialize)]
+struct ListAlertsResponse {
+    alerts: Vec<Alert>,
 }
 
 impl client::Client {
