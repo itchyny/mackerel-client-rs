@@ -30,6 +30,8 @@ fn main() {
 }
 ```
 
+Refer to the [documentation](https://itchyny.github.io/mackerel-client-rs/mackerel_client/).
+
 ## Author
 itchyny <itchyny@hatena.ne.jp>
 
