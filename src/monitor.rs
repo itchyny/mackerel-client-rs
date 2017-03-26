@@ -416,6 +416,16 @@ mod tests {
     }
 
     #[test]
+    fn test_operators() {
+        let test_cases = vec![(Operator::GreaterThan, ">"), (Operator::LessThan, "<")];
+        for (operator, operator_str) in test_cases {
+            let str_value = serde_json::Value::String(operator_str.to_string());
+            assert_eq!(operator, serde_json::from_value(str_value.clone()).unwrap());
+            assert_eq!(str_value, serde_json::to_value(operator).unwrap());
+        }
+    }
+
+    #[test]
     fn external_monitor_methods() {
         let test_cases = vec![(ExternalMethod::Get, "GET"),
                               (ExternalMethod::Post, "POST"),
