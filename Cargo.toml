@@ -4,6 +4,7 @@ version = "0.0.0"
 authors = ["itchyny <itchyny@hatena.ne.jp>"]
 description = "An API client library for Mackerel"
 repository = "https://github.com/itchyny/mackerel-client-rs"
+documentation = "https://itchyny.github.io/mackerel-client-rs/mackerel_client/"
 readme = "README.md"
 license = "MIT"
 keywords = ["api", "mackerel"]
