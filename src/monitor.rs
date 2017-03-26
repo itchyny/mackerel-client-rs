@@ -1,3 +1,4 @@
+use std::fmt;
 use hyper::method::Method::*;
 use client;
 use errors::*;
@@ -425,6 +426,23 @@ mod tests {
     fn deserialize_monitor() {
         for (monitor, json) in monitor_examples() {
             assert_eq!(monitor, serde_json::from_value(json).unwrap());
+        }
+    }
+
+    #[test]
+    fn test_monitor_types() {
+        let test_cases = [(MonitorType::Connectivity, "connectivity"),
+                          (MonitorType::Host, "host"),
+                          (MonitorType::Service, "service"),
+                          (MonitorType::External, "external"),
+                          (MonitorType::Check, "check"),
+                          (MonitorType::Expression, "expression")];
+        for &(monitor_type, type_str) in &test_cases {
+            let str_value = serde_json::Value::String(type_str.to_string());
+            assert_eq!(monitor_type,
+                       serde_json::from_value(str_value.clone()).unwrap());
+            assert_eq!(str_value, serde_json::to_value(monitor_type).unwrap());
+            assert_eq!(str_value, format!("{}", monitor_type).as_str());
         }
     }
 
