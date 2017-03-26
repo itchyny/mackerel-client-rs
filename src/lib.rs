@@ -10,7 +10,12 @@ extern crate hyper_native_tls;
 #[macro_use]
 extern crate error_chain;
 pub mod errors {
-    error_chain!{}
+    use hyper;
+    error_chain!{
+        errors {
+            ApiError(status: hyper::status::StatusCode, message: String)
+        }
+    }
 }
 
 pub mod client;

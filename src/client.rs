@@ -103,17 +103,29 @@ impl Client {
     {
         let url = self.build_url(path.as_ref(), queries);
         let body_bytes = body_opt.map(|b| serde_json::to_vec(&b).unwrap()).unwrap_or(vec![]);
-        let res = self.new_client(url.scheme())
+        let response = self.new_client(url.scheme())
             .request(method, url.clone())
             .headers(self.new_headers())
             .body(body_bytes.as_slice())
             .send()
             .chain_err(|| format!("request failed {}", url.clone()))?;
-        if res.status != hyper::status::StatusCode::Ok {
-            bail!(format!("got {}", res.status));
+        if response.status != hyper::status::StatusCode::Ok {
+            bail!(self.api_error(response))
         }
-        serde_json::from_reader(res)
+        serde_json::from_reader(response)
             .map(converter)
             .chain_err(|| format!("JSON deserialization failed"))
+    }
+
+    fn api_error(&self, response: hyper::client::response::Response) -> ErrorKind {
+        let status = response.status;
+        let message_opt = serde_json::from_reader(response)
+            .ok()
+            .and_then(|value: serde_json::Value| {
+                value.get("error")
+                    .map(|err| err.get("message").unwrap_or(err))
+                    .and_then(|val| val.as_str().map(|s| s.to_string()))
+            });
+        ErrorKind::ApiError(status, message_opt.unwrap_or("".to_string()))
     }
 }
