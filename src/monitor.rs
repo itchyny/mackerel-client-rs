@@ -1,3 +1,7 @@
+use hyper::method::Method::*;
+use client;
+use errors::*;
+
 /// A monitor
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
@@ -409,5 +413,58 @@ mod tests {
         for (monitor, json) in monitor_examples() {
             assert_eq!(monitor, serde_json::from_value(json).unwrap());
         }
+    }
+}
+
+#[derive(Deserialize)]
+struct ListMonitorsResponse {
+    monitors: Vec<Monitor>,
+}
+
+impl client::Client {
+    /// Fetches all the open monitors.
+    ///
+    /// See https://mackerel.io/api-docs/entry/monitors#get.
+    pub fn list_monitors(&self) -> Result<Vec<Monitor>> {
+        self.request(Get,
+                     "/api/v0/monitors",
+                     vec![],
+                     client::empty_body(),
+                     |res: ListMonitorsResponse| res.monitors)
+    }
+
+    /// Registers a new monitor.
+    ///
+    /// See https://mackerel.io/api-docs/entry/monitors#create.
+    pub fn create_monitor(&self, monitor: Monitor) -> Result<Monitor> {
+        self.request(Post,
+                     "/api/v0/monitors",
+                     vec![],
+                     Some(monitor),
+                     |monitor| monitor)
+    }
+
+    /// Updates a monitor.
+    ///
+    /// See https://mackerel.io/api-docs/entry/monitors#update.
+    pub fn update_monitor(&self, monitor: Monitor) -> Result<Monitor> {
+        let monitor_id: String = try!(monitor.get_id()
+            .ok_or("specify the id to update a monitor"));
+        self.request(Put,
+                     format!("/api/v0/monitors/{}", monitor_id),
+                     vec![],
+                     Some(monitor),
+                     |monitor| monitor)
+    }
+
+    /// Deletes a monitor.
+    ///
+    /// See https://mackerel.io/api-docs/entry/monitors#delete.
+    pub fn delete_monitor(&self, monitor_id: String) -> Result<Monitor> {
+        self.request(Delete,
+                     format!("/api/v0/monitors/{}", monitor_id),
+                     vec![],
+                     client::empty_body(),
+                     |monitor| monitor)
     }
 }
