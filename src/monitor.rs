@@ -168,7 +168,7 @@ pub enum ExternalMethod {
     Get,
     Post,
     Put,
-    DELETE,
+    Delete,
 }
 
 /// HTTP headers for external http monitors
