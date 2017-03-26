@@ -414,6 +414,19 @@ mod tests {
             assert_eq!(monitor, serde_json::from_value(json).unwrap());
         }
     }
+
+    #[test]
+    fn external_monitor_methods() {
+        let test_cases = vec![(ExternalMethod::Get, "GET"),
+                              (ExternalMethod::Post, "POST"),
+                              (ExternalMethod::Put, "PUT"),
+                              (ExternalMethod::Delete, "DELETE")];
+        for (method, method_str) in test_cases {
+            let str_value = serde_json::Value::String(method_str.to_string());
+            assert_eq!(method, serde_json::from_value(str_value.clone()).unwrap());
+            assert_eq!(str_value, serde_json::to_value(method).unwrap());
+        }
+    }
 }
 
 #[derive(Deserialize)]
