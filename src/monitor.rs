@@ -422,7 +422,7 @@ struct ListMonitorsResponse {
 }
 
 impl client::Client {
-    /// Fetches all the open monitors.
+    /// Fetches all the monitors.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#get.
     pub fn list_monitors(&self) -> Result<Vec<Monitor>> {
