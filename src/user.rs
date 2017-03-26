@@ -4,9 +4,9 @@ use errors::*;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct User {
     pub id: String,
-    #[serde(rename = "screenName")]
     pub screen_name: String,
     pub email: String,
 }
