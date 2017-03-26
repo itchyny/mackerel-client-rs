@@ -1,3 +1,8 @@
+use hyper::method::Method::*;
+use client;
+use errors::*;
+
+/// A user
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
     pub id: String,
@@ -42,4 +47,33 @@ mod tests {
                    serde_json::from_value(json_example()).unwrap());
     }
 
+}
+
+#[derive(Deserialize)]
+struct ListUsers {
+    pub users: Vec<User>,
+}
+
+impl client::Client {
+    /// Fetches all the services.
+    ///
+    /// See https://mackerel.io/api-docs/entry/users#list.
+    pub fn list_users(&self) -> Result<Vec<User>> {
+        self.request(Get,
+                     "/api/v0/users",
+                     vec![],
+                     client::empty_body(),
+                     |res: ListUsers| res.users)
+    }
+
+    /// Delete the user from the organization.
+    ///
+    /// See https://mackerel.io/api-docs/entry/users#delete.
+    pub fn delete_user(&self, user_name: &str) -> Result<User> {
+        self.request(Delete,
+                     format!("/api/v0/users/{}", user_name),
+                     vec![],
+                     client::empty_body(),
+                     |user| user)
+    }
 }
