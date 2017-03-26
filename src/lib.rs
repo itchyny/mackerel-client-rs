@@ -20,6 +20,8 @@ pub mod errors {
 
 pub mod client;
 
+pub mod alert;
+pub mod monitor;
 pub mod organization;
 pub mod role;
 pub mod service;
