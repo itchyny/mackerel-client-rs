@@ -27,7 +27,7 @@ pub struct Alert {
 }
 
 /// Alert statuses
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum AlertStatus {
     Ok,

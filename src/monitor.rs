@@ -141,7 +141,7 @@ impl Monitor {
 }
 
 /// Monitor types
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum MonitorType {
     Connectivity,
@@ -153,7 +153,7 @@ pub enum MonitorType {
 }
 
 /// Monitor operators
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum Operator {
     #[serde(rename = ">")]
     GreaterThan,
@@ -162,7 +162,7 @@ pub enum Operator {
 }
 
 /// HTTP methods for external http monitors
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ExternalMethod {
     Get,
