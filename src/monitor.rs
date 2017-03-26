@@ -152,6 +152,19 @@ pub enum MonitorType {
     Expression,
 }
 
+impl fmt::Display for MonitorType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            MonitorType::Connectivity => write!(f, "connectivity"),
+            MonitorType::Host => write!(f, "host"),
+            MonitorType::Service => write!(f, "service"),
+            MonitorType::External => write!(f, "external"),
+            MonitorType::Check => write!(f, "check"),
+            MonitorType::Expression => write!(f, "expression"),
+        }
+    }
+}
+
 /// Monitor operators
 #[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum Operator {
