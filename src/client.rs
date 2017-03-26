@@ -6,7 +6,7 @@ use hyper;
 use hyper_native_tls;
 use serde;
 use serde_json;
-use ::errors::*;
+use errors::*;
 
 /// Represents an API client for Mackerel.
 #[derive(Debug)]
