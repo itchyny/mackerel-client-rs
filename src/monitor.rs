@@ -371,6 +371,33 @@ mod tests {
     }
 
     #[test]
+    fn monitor_id() {
+        assert_eq!(host_monitor_example().get_id(), Some("abcde1".to_string()));
+        assert_eq!(connectivity_monitor_example().get_id(),
+                   Some("abcde2".to_string()));
+        assert_eq!(service_monitor_example().get_id(),
+                   Some("abcde3".to_string()));
+        assert_eq!(external_monitor_example().get_id(),
+                   Some("abcde4".to_string()));
+        assert_eq!(expression_monitor_example().get_id(),
+                   Some("abcde5".to_string()));
+    }
+
+    #[test]
+    fn monitor_name() {
+        assert_eq!(host_monitor_example().get_name(),
+                   "Monitor custom.foo.bar".to_string());
+        assert_eq!(connectivity_monitor_example().get_name(),
+                   "connectivity".to_string());
+        assert_eq!(service_monitor_example().get_name(),
+                   "Service count".to_string());
+        assert_eq!(external_monitor_example().get_name(),
+                   "Example external monitor".to_string());
+        assert_eq!(expression_monitor_example().get_name(),
+                   "Example expression monitor".to_string());
+    }
+
+    #[test]
     fn serialize_monitor() {
         for (monitor, json) in monitor_examples() {
             assert_eq!(json, serde_json::to_value(monitor).unwrap());
