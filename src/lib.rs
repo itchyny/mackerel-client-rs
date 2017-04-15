@@ -44,6 +44,7 @@ pub mod errors {
 pub mod client;
 
 pub mod alert;
+pub mod dashboard;
 pub mod monitor;
 pub mod organization;
 pub mod role;
