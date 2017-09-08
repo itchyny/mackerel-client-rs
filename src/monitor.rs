@@ -1,5 +1,5 @@
 use std::fmt;
-use hyper::method::Method::*;
+use hyper::Method::*;
 use client;
 use errors::*;
 

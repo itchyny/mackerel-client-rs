@@ -90,7 +90,7 @@ impl Client {
     /// The entire response body is deserialized as `R`, converted by `converter`
     /// and returns `S`.
     pub fn request<P, B, R, F, S>(&self,
-                                  method: hyper::method::Method,
+                                  method: hyper::Method,
                                   path: P,
                                   queries: Vec<(&str, Vec<&str>)>,
                                   body_opt: Option<B>,
