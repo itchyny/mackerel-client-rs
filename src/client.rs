@@ -3,6 +3,7 @@ use std::default;
 use std::str::FromStr;
 use std::convert::Into;
 use hyper;
+use hyper_tls;
 use hyper_native_tls;
 use serde;
 use serde_json;
@@ -61,7 +62,7 @@ impl Client {
         match scheme {
             "https" => {
                 let ssl = hyper_native_tls::NativeTlsClient::new().unwrap();
-                let connector = hyper::net::HttpsConnector::new(ssl);
+                let connector = hyper_tls::HttpsConnector::new(ssl);
                 hyper::Client::with_connector(connector)
             }
             "http" => hyper::Client::new(),

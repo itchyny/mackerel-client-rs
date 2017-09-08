@@ -28,6 +28,7 @@ extern crate serde;
 extern crate serde_json;
 
 extern crate hyper;
+extern crate hyper_tls;
 extern crate hyper_native_tls;
 
 #[macro_use]
