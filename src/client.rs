@@ -110,7 +110,7 @@ impl Client {
             .body(body_bytes.as_slice())
             .send()
             .chain_err(|| format!("request failed {}", url.clone()))?;
-        if response.status != hyper::status::StatusCode::Ok {
+        if response.status != hyper::StatusCode::Ok {
             bail!(self.api_error(response))
         }
         serde_json::from_reader(response)
@@ -118,7 +118,7 @@ impl Client {
             .chain_err(|| format!("JSON deserialization failed"))
     }
 
-    fn api_error(&self, response: hyper::client::response::Response) -> ErrorKind {
+    fn api_error(&self, response: hyper::client::Response) -> ErrorKind {
         let status = response.status;
         let message_opt = serde_json::from_reader(response)
             .ok()

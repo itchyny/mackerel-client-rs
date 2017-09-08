@@ -37,7 +37,7 @@ pub mod errors {
     use hyper;
     error_chain!{
         errors {
-            ApiError(status: hyper::status::StatusCode, message: String)
+            ApiError(status: hyper::StatusCode, message: String)
         }
     }
 }
