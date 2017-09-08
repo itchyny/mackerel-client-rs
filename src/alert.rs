@@ -108,18 +108,14 @@ mod tests {
 
     #[test]
     fn serialize_alert() {
-        assert_eq!(json_example1(),
-                   serde_json::to_value(&alert_example1()).unwrap());
-        assert_eq!(json_example2(),
-                   serde_json::to_value(&alert_example2()).unwrap());
+        assert_eq!(json_example1(), serde_json::to_value(&alert_example1()).unwrap());
+        assert_eq!(json_example2(), serde_json::to_value(&alert_example2()).unwrap());
     }
 
     #[test]
     fn deserialize_alert() {
-        assert_eq!(alert_example1(),
-                   serde_json::from_value(json_example1()).unwrap());
-        assert_eq!(alert_example2(),
-                   serde_json::from_value(json_example2()).unwrap());
+        assert_eq!(alert_example1(), serde_json::from_value(json_example1()).unwrap());
+        assert_eq!(alert_example2(), serde_json::from_value(json_example2()).unwrap());
     }
 
     #[test]
@@ -147,11 +143,7 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/alerts#get.
     pub fn list_alerts(&self) -> Result<Vec<Alert>> {
-        self.request(Get,
-                     "/api/v0/alerts",
-                     vec![],
-                     client::empty_body(),
-                     |res: ListAlertsResponse| res.alerts)
+        self.request(Get, "/api/v0/alerts", vec![], client::empty_body(), |res: ListAlertsResponse| res.alerts)
     }
 
     /// Closes the specified alert.
@@ -159,10 +151,6 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/alerts#close.
     pub fn close_alert(&self, alert_id: String, reason: &str) -> Result<Alert> {
         let body: HashMap<&str, &str> = [("reason", reason)].iter().cloned().collect();
-        self.request(Post,
-                     format!("/api/v0/alerts/{}/close", alert_id),
-                     vec![],
-                     Some(body),
-                     |alert| alert)
+        self.request(Post, format!("/api/v0/alerts/{}/close", alert_id), vec![], Some(body), |alert| alert)
     }
 }

@@ -33,14 +33,12 @@ mod tests {
 
     #[test]
     fn serialize_role() {
-        assert_eq!(json_example(),
-                   serde_json::to_value(&role_example()).unwrap());
+        assert_eq!(json_example(), serde_json::to_value(&role_example()).unwrap());
     }
 
     #[test]
     fn deserialize_role() {
-        assert_eq!(role_example(),
-                   serde_json::from_value(json_example()).unwrap());
+        assert_eq!(role_example(), serde_json::from_value(json_example()).unwrap());
     }
 
 }

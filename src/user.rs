@@ -37,14 +37,12 @@ mod tests {
 
     #[test]
     fn serialize_user() {
-        assert_eq!(json_example(),
-                   serde_json::to_value(&user_example()).unwrap());
+        assert_eq!(json_example(), serde_json::to_value(&user_example()).unwrap());
     }
 
     #[test]
     fn deserialize_user() {
-        assert_eq!(user_example(),
-                   serde_json::from_value(json_example()).unwrap());
+        assert_eq!(user_example(), serde_json::from_value(json_example()).unwrap());
     }
 
 }
@@ -59,21 +57,13 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/users#list.
     pub fn list_users(&self) -> Result<Vec<User>> {
-        self.request(Get,
-                     "/api/v0/users",
-                     vec![],
-                     client::empty_body(),
-                     |res: ListUsersResponse| res.users)
+        self.request(Get, "/api/v0/users", vec![], client::empty_body(), |res: ListUsersResponse| res.users)
     }
 
     /// Delete the user from the organization.
     ///
     /// See https://mackerel.io/api-docs/entry/users#delete.
     pub fn delete_user(&self, user_name: &str) -> Result<User> {
-        self.request(Delete,
-                     format!("/api/v0/users/{}", user_name),
-                     vec![],
-                     client::empty_body(),
-                     |user| user)
+        self.request(Delete, format!("/api/v0/users/{}", user_name), vec![], client::empty_body(), |user| user)
     }
 }

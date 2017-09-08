@@ -40,14 +40,12 @@ mod tests {
 
     #[test]
     fn serialize_dashboard() {
-        assert_eq!(json_example(),
-                   serde_json::to_value(&dashboard_example()).unwrap());
+        assert_eq!(json_example(), serde_json::to_value(&dashboard_example()).unwrap());
     }
 
     #[test]
     fn deserialize_dashboard() {
-        assert_eq!(dashboard_example(),
-                   serde_json::from_value(json_example()).unwrap());
+        assert_eq!(dashboard_example(), serde_json::from_value(json_example()).unwrap());
     }
 
 }
@@ -73,11 +71,7 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#create.
     pub fn create_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
-        self.request(Post,
-                     "/api/v0/dashboards",
-                     vec![],
-                     Some(dashboard),
-                     |dashboard| dashboard)
+        self.request(Post, "/api/v0/dashboards", vec![], Some(dashboard), |dashboard| dashboard)
     }
 
     /// Gets a dashboard.
