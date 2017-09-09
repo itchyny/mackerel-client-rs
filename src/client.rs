@@ -2,9 +2,10 @@
 use std::default;
 use std::str::FromStr;
 use std::convert::Into;
+use url::Url;
+use tokio_core;
 use hyper;
 use hyper_tls;
-use hyper_native_tls;
 use serde;
 use serde_json;
 use errors::*;
@@ -47,25 +48,28 @@ impl Client {
         }
     }
 
-    fn build_url(&self, path: &str, queries: Vec<(&str, Vec<&str>)>) -> hyper::Url {
+    fn build_uri(&self, path: &str, queries: Vec<(&str, Vec<&str>)>) -> hyper::Uri {
         let url_str = self.api_base.clone() + path;
-        let mut url = hyper::Url::from_str(&url_str).unwrap();
+        let mut url = Url::parse(url_str.as_str()).unwrap();
         for (name, values) in queries {
             for value in values {
                 url.query_pairs_mut().append_pair(name, value);
             }
         }
-        url
+        hyper::Uri::from_str(url.as_str()).unwrap()
     }
 
-    fn new_client(&self, scheme: &str) -> hyper::Client {
+    fn new_client(&self, scheme: &str) -> hyper::Client<hyper_tls::HttpsConnector<hyper::client::HttpConnector>> {
+        let mut core = tokio_core::reactor::Core::new().unwrap();
+        let handle = core.handle();
         match scheme {
             "https" => {
-                let ssl = hyper_native_tls::NativeTlsClient::new().unwrap();
-                let connector = hyper_tls::HttpsConnector::new(ssl);
-                hyper::Client::with_connector(connector)
+                hyper::Client::configure()
+                    .connector(hyper_tls::HttpsConnector::new(4, &handle).unwrap())
+                    .build(&handle)
             }
-            "http" => hyper::Client::new(),
+            // "http" => hyper::Client::new(&handle),
+            "http" => panic!("http not supported"),
             _ => panic!("unknown scheme: {}", scheme),
         }
     }
@@ -74,7 +78,7 @@ impl Client {
         let mut headers = hyper::header::Headers::new();
         headers.set_raw("X-Api-Key", vec![self.api_key.clone().into_bytes()]);
         headers.set(hyper::header::ContentType::json());
-        let url = hyper::Url::from_str(self.api_base.clone().as_str()).unwrap();
+        let url = Url::from_str(self.api_base.clone().as_str()).unwrap();
         if let (username, Some(password)) = (url.username(), url.password()) {
             if username != "" {
                 headers.set(hyper::header::Authorization(hyper::header::Basic {
@@ -102,14 +106,14 @@ impl Client {
               R: serde::de::Deserialize,
               F: FnOnce(R) -> S
     {
-        let url = self.build_url(path.as_ref(), queries);
-        let body_bytes = body_opt.map(|b| serde_json::to_vec(&b).unwrap()).unwrap_or(vec![]);
-        let response = self.new_client(url.scheme())
-            .request(method, url.clone())
+        let uri = self.build_uri(path.as_ref(), queries);
+        let mut req = hyper::Request::new(method, uri);
+        req.set_body(body_opt.map(|b| serde_json::to_vec(&b).unwrap()).unwrap_or(vec![]).as_slice());
+        let response = self.new_client(uri.scheme().unwrap())
+            .request(req)
             .headers(self.new_headers())
-            .body(body_bytes.as_slice())
             .send()
-            .chain_err(|| format!("request failed {}", url.clone()))?;
+            .chain_err(|| format!("request failed {}", uri.clone()))?;
         if response.status != hyper::StatusCode::Ok {
             bail!(self.api_error(response))
         }
