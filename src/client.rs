@@ -2,10 +2,8 @@
 use std::default;
 use std::str::FromStr;
 use std::convert::Into;
-use url::Url;
-use tokio_core;
-use hyper;
-use hyper_tls;
+use url;
+use reqwest;
 use serde;
 use serde_json;
 use errors::*;
@@ -48,44 +46,31 @@ impl Client {
         }
     }
 
-    fn build_uri(&self, path: &str, queries: Vec<(&str, Vec<&str>)>) -> hyper::Uri {
+    fn build_url(&self, path: &str, queries: Vec<(&str, Vec<&str>)>) -> url::Url {
         let url_str = self.api_base.clone() + path;
-        let mut url = Url::parse(url_str.as_str()).unwrap();
+        let mut url = url::Url::parse(url_str.as_str()).unwrap();
         for (name, values) in queries {
             for value in values {
                 url.query_pairs_mut().append_pair(name, value);
             }
         }
-        hyper::Uri::from_str(url.as_str()).unwrap()
+        url
     }
 
-    fn new_client(&self, scheme: &str) -> hyper::Client<hyper_tls::HttpsConnector<hyper::client::HttpConnector>> {
-        let mut core = tokio_core::reactor::Core::new().unwrap();
-        let handle = core.handle();
-        match scheme {
-            "https" => {
-                hyper::Client::configure()
-                    .connector(hyper_tls::HttpsConnector::new(4, &handle).unwrap())
-                    .build(&handle)
-            }
-            // "http" => hyper::Client::new(&handle),
-            "http" => panic!("http not supported"),
-            _ => panic!("unknown scheme: {}", scheme),
-        }
-    }
-
-    fn set_headers(&self, headers: &mut hyper::header::Headers) {
+    fn new_headers(&self) -> reqwest::header::Headers {
+        let mut headers = reqwest::header::Headers::new();
         headers.set_raw("X-Api-Key", vec![self.api_key.clone().into_bytes()]);
-        headers.set(hyper::header::ContentType::json());
-        let url = Url::from_str(self.api_base.clone().as_str()).unwrap();
+        headers.set(reqwest::header::ContentType::json());
+        let url = url::Url::from_str(self.api_base.clone().as_str()).unwrap();
         if let (username, Some(password)) = (url.username(), url.password()) {
             if username != "" {
-                headers.set(hyper::header::Authorization(hyper::header::Basic {
+                headers.set(reqwest::header::Authorization(reqwest::header::Basic {
                     username: username.to_string(),
                     password: Some(password.to_string()),
                 }))
             }
         };
+        headers
     }
 
     /// Sends a request to the API.
@@ -93,7 +78,7 @@ impl Client {
     /// The entire response body is deserialized as `R`, converted by `converter`
     /// and returns `S`.
     pub fn request<P, B, R, F, S>(&self,
-                                  method: hyper::Method,
+                                  method: reqwest::Method,
                                   path: P,
                                   queries: Vec<(&str, Vec<&str>)>,
                                   body_opt: Option<B>,
@@ -104,15 +89,13 @@ impl Client {
               R: serde::de::Deserialize,
               F: FnOnce(R) -> S
     {
-        let uri = self.build_uri(path.as_ref(), queries);
-        let mut req = hyper::Request::new(method, uri);
-        self.set_headers(req.headers_mut());
-        req.set_body(body_opt.map(|b| serde_json::to_vec(&b).unwrap()).unwrap_or(vec![]).as_slice());
-        let response = self.new_client(uri.scheme().unwrap())
-            .request(req)
-            .send()
-            .chain_err(|| format!("request failed {}", uri.clone()))?;
-        if response.status != hyper::StatusCode::Ok {
+        let client = reqwest::Client::new().chain_err(|| format!("failed to create a client"))?;
+        let url = self.build_url(path.as_ref(), queries);
+        let body_bytes = body_opt.map(|b| serde_json::to_vec(&b).unwrap()).unwrap_or(vec![]);
+        let response = client.request(method, url)
+            .and_then(|mut req| req.headers(self.new_headers()).body(body_bytes).send())
+            .map_err(|e| format!("failed to send request: {}", e))?;
+        if !response.status().is_success() {
             bail!(self.api_error(response))
         }
         serde_json::from_reader(response)
@@ -120,8 +103,8 @@ impl Client {
             .chain_err(|| format!("JSON deserialization failed"))
     }
 
-    fn api_error(&self, response: hyper::client::Response) -> ErrorKind {
-        let status = response.status;
+    fn api_error(&self, response: reqwest::Response) -> ErrorKind {
+        let status = response.status();
         let message_opt = serde_json::from_reader(response)
             .ok()
             .and_then(|value: serde_json::Value| {

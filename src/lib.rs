@@ -28,17 +28,15 @@ extern crate serde;
 extern crate serde_json;
 
 extern crate url;
-extern crate tokio_core;
-extern crate hyper;
-extern crate hyper_tls;
+extern crate reqwest;
 
 #[macro_use]
 extern crate error_chain;
 pub mod errors {
-    use hyper;
+    use reqwest;
     error_chain!{
         errors {
-            ApiError(status: hyper::StatusCode, message: String)
+            ApiError(status: reqwest::StatusCode, message: String)
         }
     }
 }

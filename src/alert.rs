@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::fmt;
-use hyper::Method::*;
+use reqwest::Method::*;
 use client;
 use errors::*;
 use monitor::MonitorType;
