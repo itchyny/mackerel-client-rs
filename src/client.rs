@@ -74,8 +74,7 @@ impl Client {
         }
     }
 
-    fn new_headers(&self) -> hyper::header::Headers {
-        let mut headers = hyper::header::Headers::new();
+    fn set_headers(&self, headers: &mut hyper::header::Headers) {
         headers.set_raw("X-Api-Key", vec![self.api_key.clone().into_bytes()]);
         headers.set(hyper::header::ContentType::json());
         let url = Url::from_str(self.api_base.clone().as_str()).unwrap();
@@ -86,8 +85,7 @@ impl Client {
                     password: Some(password.to_string()),
                 }))
             }
-        }
-        headers
+        };
     }
 
     /// Sends a request to the API.
@@ -108,10 +106,10 @@ impl Client {
     {
         let uri = self.build_uri(path.as_ref(), queries);
         let mut req = hyper::Request::new(method, uri);
+        self.set_headers(req.headers_mut());
         req.set_body(body_opt.map(|b| serde_json::to_vec(&b).unwrap()).unwrap_or(vec![]).as_slice());
         let response = self.new_client(uri.scheme().unwrap())
             .request(req)
-            .headers(self.new_headers())
             .send()
             .chain_err(|| format!("request failed {}", uri.clone()))?;
         if response.status != hyper::StatusCode::Ok {
