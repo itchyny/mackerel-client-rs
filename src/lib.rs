@@ -47,6 +47,7 @@ pub mod alert;
 pub mod dashboard;
 pub mod graph_annotation;
 pub mod invitation;
+pub mod metadata;
 pub mod monitor;
 pub mod organization;
 pub mod role;
