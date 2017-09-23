@@ -22,13 +22,13 @@
 //! println!("{:?}", client.delete_monitor("<Monitor-ID>"));
 //! ```
 //!
+extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
 extern crate serde_json;
 
-extern crate url;
 extern crate reqwest;
+extern crate url;
 
 #[macro_use]
 extern crate error_chain;

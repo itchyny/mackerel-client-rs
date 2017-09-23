@@ -22,7 +22,7 @@ pub struct Alert {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reason: Option<String>, 
+    pub reason: Option<String>,
     // pub openedAt: DateTime, // TODO
     // pub closedAt: Option<DateTime>, // TODO
 }
@@ -67,16 +67,15 @@ mod tests {
     }
 
     fn json_example1() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "id": "abcde0",
                 "status": "CRITICAL",
                 "monitorId": "abcde2",
                 "type": "connectivity",
                 "hostId": "abcde1"
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     fn alert_example2() -> Alert {
@@ -93,7 +92,8 @@ mod tests {
     }
 
     fn json_example2() -> serde_json::Value {
-        serde_json::from_str(r##"
+        serde_json::from_str(
+            r##"
             {
                 "id": "abcde0",
                 "status": "WARNING",
@@ -102,8 +102,8 @@ mod tests {
                 "hostId": "abcde1",
                 "value": 25.0
             }
-        "##)
-            .unwrap()
+        "##,
+        ).unwrap()
     }
 
     #[test]
@@ -120,10 +120,12 @@ mod tests {
 
     #[test]
     fn alert_statuses() {
-        let test_cases = [(AlertStatus::Ok, "OK"),
-                          (AlertStatus::Critical, "CRITICAL"),
-                          (AlertStatus::Warning, "WARNING"),
-                          (AlertStatus::Unknown, "UNKNOWN")];
+        let test_cases = [
+            (AlertStatus::Ok, "OK"),
+            (AlertStatus::Critical, "CRITICAL"),
+            (AlertStatus::Warning, "WARNING"),
+            (AlertStatus::Unknown, "UNKNOWN"),
+        ];
         for &(status, status_str) in &test_cases {
             let str_value = serde_json::Value::String(status_str.to_string());
             assert_eq!(status, serde_json::from_value(str_value.clone()).unwrap());
@@ -143,7 +145,9 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/alerts#get.
     pub fn list_alerts(&self) -> Result<Vec<Alert>> {
-        self.request(Get, "/api/v0/alerts", vec![], client::empty_body(), |res: ListAlertsResponse| res.alerts)
+        self.request(Get, "/api/v0/alerts", vec![], client::empty_body(), |res: ListAlertsResponse| {
+            res.alerts
+        })
     }
 
     /// Closes the specified alert.
@@ -151,6 +155,12 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/alerts#close.
     pub fn close_alert(&self, alert_id: String, reason: &str) -> Result<Alert> {
         let body: HashMap<&str, &str> = [("reason", reason)].iter().cloned().collect();
-        self.request(Post, format!("/api/v0/alerts/{}/close", alert_id), vec![], Some(body), |alert| alert)
+        self.request(
+            Post,
+            format!("/api/v0/alerts/{}/close", alert_id),
+            vec![],
+            Some(body),
+            |alert| alert,
+        )
     }
 }

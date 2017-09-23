@@ -14,16 +14,17 @@ mod tests {
     use organization::*;
 
     fn organization_example() -> Organization {
-        Organization { name: "FooOrganization".to_string() }
+        Organization {
+            name: "FooOrganization".to_string(),
+        }
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "name": "FooOrganization"
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     #[test]

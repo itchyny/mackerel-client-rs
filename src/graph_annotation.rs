@@ -32,8 +32,8 @@ mod tests {
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "id": "abcde1",
                 "title": "Deploy application",
                 "description": "Graph Annotation Example\nhttps://example.com",
@@ -41,9 +41,8 @@ mod tests {
                 "to": 1484000030,
                 "service": "ExampleService",
                 "roles": ["ExampleRole1", "ExampleRole2"]
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     #[test]
@@ -69,46 +68,56 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#get.
     pub fn list_graph_annotations(&self, service: &str, from: u64, to: u64) -> Result<Vec<GraphAnnotation>> {
-        self.request(Get,
-                     "/api/v0/graph-annotations",
-                     vec![("service", vec![service]), ("from", vec![&from.to_string()]), ("to", vec![&to.to_string()])],
-                     client::empty_body(),
-                     |res: ListGraphAnnotationsResponse| res.graph_annotations)
+        self.request(
+            Get,
+            "/api/v0/graph-annotations",
+            vec![
+                ("service", vec![service]),
+                ("from", vec![&from.to_string()]),
+                ("to", vec![&to.to_string()]),
+            ],
+            client::empty_body(),
+            |res: ListGraphAnnotationsResponse| res.graph_annotations,
+        )
     }
 
     /// Creates a new graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#create.
     pub fn create_graph_annotation(&self, graph_annotation: GraphAnnotation) -> Result<GraphAnnotation> {
-        self.request(Post,
-                     "/api/v0/graph-annotations",
-                     vec![],
-                     Some(graph_annotation),
-                     |graph_annotation| graph_annotation)
+        self.request(
+            Post,
+            "/api/v0/graph-annotations",
+            vec![],
+            Some(graph_annotation),
+            |graph_annotation| graph_annotation,
+        )
     }
 
     /// Updates a graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
     pub fn update_graph_annotation(&self, graph_annotation: GraphAnnotation) -> Result<GraphAnnotation> {
-        let graph_annotation_id: String = try!(graph_annotation.clone()
-            .id
-            .ok_or("specify the id to update a graph_annotation"));
-        self.request(Put,
-                     format!("/api/v0/graph-annotations/{}", graph_annotation_id),
-                     vec![],
-                     Some(graph_annotation),
-                     |graph_annotation| graph_annotation)
+        let graph_annotation_id: String = graph_annotation.clone().id.ok_or("specify the id to update a graph_annotation")?;
+        self.request(
+            Put,
+            format!("/api/v0/graph-annotations/{}", graph_annotation_id),
+            vec![],
+            Some(graph_annotation),
+            |graph_annotation| graph_annotation,
+        )
     }
 
     /// Deletes a graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#delete.
     pub fn delete_graph_annotation(&self, graph_annotation_id: String) -> Result<GraphAnnotation> {
-        self.request(Delete,
-                     format!("/api/v0/graph-annotations/{}", graph_annotation_id),
-                     vec![],
-                     client::empty_body(),
-                     |graph_annotation| graph_annotation)
+        self.request(
+            Delete,
+            format!("/api/v0/graph-annotations/{}", graph_annotation_id),
+            vec![],
+            client::empty_body(),
+            |graph_annotation| graph_annotation,
+        )
     }
 }

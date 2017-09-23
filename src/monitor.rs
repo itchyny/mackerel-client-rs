@@ -235,8 +235,8 @@ mod tests {
     }
 
     fn host_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "type": "host",
                 "id": "abcde1",
                 "name": "Monitor custom.foo.bar",
@@ -250,9 +250,8 @@ mod tests {
                 "notificationInterval": 30,
                 "scopes": ["service0"],
                 "excludeScopes": ["service0:role3"]
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     fn connectivity_monitor_example() -> Monitor {
@@ -268,16 +267,15 @@ mod tests {
     }
 
     fn connectivity_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "type": "connectivity",
                 "id": "abcde2",
                 "name": "connectivity",
                 "memo": "Monitor memo",
                 "isMute": false
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     fn service_monitor_example() -> Monitor {
@@ -297,8 +295,8 @@ mod tests {
     }
 
     fn service_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "type": "service",
                 "id": "abcde3",
                 "name": "Service count",
@@ -311,9 +309,8 @@ mod tests {
                 "critical": 200.0,
                 "isMute": false,
                 "notificationInterval": 30
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     fn external_monitor_example() -> Monitor {
@@ -324,10 +321,12 @@ mod tests {
             method: Some(ExternalMethod::Get),
             url: "https://example.com".to_string(),
             request_body: Some("Request Body".to_string()),
-            headers: Some(vec![ExternalHeader {
-                                   name: "Cache-Control".to_string(),
-                                   value: "no-cache".to_string(),
-                               }]),
+            headers: Some(vec![
+                ExternalHeader {
+                    name: "Cache-Control".to_string(),
+                    value: "no-cache".to_string(),
+                },
+            ]),
             service: Some("service1".to_string()),
             response_time_duration: Some(5),
             response_time_warning: Some(3000.0),
@@ -343,8 +342,8 @@ mod tests {
     }
 
     fn external_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "type": "external",
                 "id": "abcde4",
                 "name": "Example external monitor",
@@ -364,9 +363,8 @@ mod tests {
                 "skipCertificateVerification": true,
                 "isMute": true,
                 "notificationInterval": 60
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     fn expression_monitor_example() -> Monitor {
@@ -384,8 +382,8 @@ mod tests {
     }
 
     fn expression_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "type": "expression",
                 "id": "abcde5",
                 "name": "Example expression monitor",
@@ -395,17 +393,18 @@ mod tests {
                 "warning": 10.0,
                 "critical": 20.0,
                 "isMute": false
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     fn monitor_examples() -> Vec<(Monitor, serde_json::Value)> {
-        vec![(host_monitor_example(), host_monitor_json_example()),
-             (connectivity_monitor_example(), connectivity_monitor_json_example()),
-             (service_monitor_example(), service_monitor_json_example()),
-             (external_monitor_example(), external_monitor_json_example()),
-             (expression_monitor_example(), expression_monitor_json_example())]
+        vec![
+            (host_monitor_example(), host_monitor_json_example()),
+            (connectivity_monitor_example(), connectivity_monitor_json_example()),
+            (service_monitor_example(), service_monitor_json_example()),
+            (external_monitor_example(), external_monitor_json_example()),
+            (expression_monitor_example(), expression_monitor_json_example()),
+        ]
     }
 
     #[test]
@@ -423,7 +422,10 @@ mod tests {
         assert_eq!(connectivity_monitor_example().get_name(), "connectivity".to_string());
         assert_eq!(service_monitor_example().get_name(), "Service count".to_string());
         assert_eq!(external_monitor_example().get_name(), "Example external monitor".to_string());
-        assert_eq!(expression_monitor_example().get_name(), "Example expression monitor".to_string());
+        assert_eq!(
+            expression_monitor_example().get_name(),
+            "Example expression monitor".to_string()
+        );
     }
 
     #[test]
@@ -442,12 +444,14 @@ mod tests {
 
     #[test]
     fn test_monitor_types() {
-        let test_cases = [(MonitorType::Connectivity, "connectivity"),
-                          (MonitorType::Host, "host"),
-                          (MonitorType::Service, "service"),
-                          (MonitorType::External, "external"),
-                          (MonitorType::Check, "check"),
-                          (MonitorType::Expression, "expression")];
+        let test_cases = [
+            (MonitorType::Connectivity, "connectivity"),
+            (MonitorType::Host, "host"),
+            (MonitorType::Service, "service"),
+            (MonitorType::External, "external"),
+            (MonitorType::Check, "check"),
+            (MonitorType::Expression, "expression"),
+        ];
         for &(monitor_type, type_str) in &test_cases {
             let str_value = serde_json::Value::String(type_str.to_string());
             assert_eq!(monitor_type, serde_json::from_value(str_value.clone()).unwrap());
@@ -469,10 +473,12 @@ mod tests {
 
     #[test]
     fn external_monitor_methods() {
-        let test_cases = [(ExternalMethod::Get, "GET"),
-                          (ExternalMethod::Post, "POST"),
-                          (ExternalMethod::Put, "PUT"),
-                          (ExternalMethod::Delete, "DELETE")];
+        let test_cases = [
+            (ExternalMethod::Get, "GET"),
+            (ExternalMethod::Post, "POST"),
+            (ExternalMethod::Put, "PUT"),
+            (ExternalMethod::Delete, "DELETE"),
+        ];
         for &(method, method_str) in &test_cases {
             let str_value = serde_json::Value::String(method_str.to_string());
             assert_eq!(method, serde_json::from_value(str_value.clone()).unwrap());
@@ -492,11 +498,13 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#get.
     pub fn list_monitors(&self) -> Result<Vec<Monitor>> {
-        self.request(Get,
-                     "/api/v0/monitors",
-                     vec![],
-                     client::empty_body(),
-                     |res: ListMonitorsResponse| res.monitors)
+        self.request(
+            Get,
+            "/api/v0/monitors",
+            vec![],
+            client::empty_body(),
+            |res: ListMonitorsResponse| res.monitors,
+        )
     }
 
     /// Registers a new monitor.
@@ -510,19 +518,26 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#update.
     pub fn update_monitor(&self, monitor: Monitor) -> Result<Monitor> {
-        let monitor_id: String = try!(monitor.get_id()
-            .ok_or("specify the id to update a monitor"));
-        self.request(Put, format!("/api/v0/monitors/{}", monitor_id), vec![], Some(monitor), |monitor| monitor)
+        let monitor_id: String = monitor.get_id().ok_or("specify the id to update a monitor")?;
+        self.request(
+            Put,
+            format!("/api/v0/monitors/{}", monitor_id),
+            vec![],
+            Some(monitor),
+            |monitor| monitor,
+        )
     }
 
     /// Deletes a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#delete.
     pub fn delete_monitor(&self, monitor_id: String) -> Result<Monitor> {
-        self.request(Delete,
-                     format!("/api/v0/monitors/{}", monitor_id),
-                     vec![],
-                     client::empty_body(),
-                     |monitor| monitor)
+        self.request(
+            Delete,
+            format!("/api/v0/monitors/{}", monitor_id),
+            vec![],
+            client::empty_body(),
+            |monitor| monitor,
+        )
     }
 }

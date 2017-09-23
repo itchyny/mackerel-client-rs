@@ -19,13 +19,17 @@ mod tests {
         Service {
             name: "FooService".to_string(),
             memo: "service memo".to_string(),
-            roles: vec!["role0".to_string(), "role1".to_string(), "role2".to_string()],
+            roles: vec![
+                "role0".to_string(),
+                "role1".to_string(),
+                "role2".to_string(),
+            ],
         }
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "name": "FooService",
                 "memo": "service memo",
                 "roles": [
@@ -33,9 +37,8 @@ mod tests {
                     "role1",
                     "role2"
                 ]
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     #[test]
@@ -65,21 +68,25 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/services#list.
     pub fn list_services(&self) -> Result<Vec<Service>> {
-        self.request(Get,
-                     "/api/v0/services",
-                     vec![],
-                     client::empty_body(),
-                     |res: ListServiceResponse| res.services)
+        self.request(
+            Get,
+            "/api/v0/services",
+            vec![],
+            client::empty_body(),
+            |res: ListServiceResponse| res.services,
+        )
     }
 
     /// Fetches the names of the service metrics.
     ///
     /// See https://mackerel.io/api-docs/entry/services#metric-names.
     pub fn list_service_metric_names(&self, service_name: &str) -> Result<Vec<String>> {
-        self.request(Get,
-                     format!("/api/v0/services/{}/metric-names", service_name),
-                     vec![],
-                     client::empty_body(),
-                     |res: ListMetricNamesResponse| res.names)
+        self.request(
+            Get,
+            format!("/api/v0/services/{}/metric-names", service_name),
+            vec![],
+            client::empty_body(),
+            |res: ListMetricNamesResponse| res.names,
+        )
     }
 }

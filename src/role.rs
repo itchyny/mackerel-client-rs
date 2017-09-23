@@ -22,13 +22,12 @@ mod tests {
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "name": "FooRole",
                 "memo": "role memo"
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     #[test]
@@ -53,10 +52,12 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/services#rolelist.
     pub fn list_roles(&self, service_name: &str) -> Result<Vec<Role>> {
-        self.request(Get,
-                     format!("/api/v0/services/{}/roles", service_name),
-                     vec![],
-                     client::empty_body(),
-                     |res: ListRolesResponse| res.roles)
+        self.request(
+            Get,
+            format!("/api/v0/services/{}/roles", service_name),
+            vec![],
+            client::empty_body(),
+            |res: ListRolesResponse| res.roles,
+        )
     }
 }

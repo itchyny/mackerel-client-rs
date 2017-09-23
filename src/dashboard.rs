@@ -27,15 +27,14 @@ mod tests {
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "id": "abcde1",
                 "title": "This is a dashboard",
                 "bodyMarkdown": "# Example\n[example](https://example.com)",
                 "urlPath": "example"
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     #[test]
@@ -60,11 +59,13 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#list.
     pub fn list_dashboards(&self) -> Result<Vec<Dashboard>> {
-        self.request(Get,
-                     "/api/v0/dashboards",
-                     vec![],
-                     client::empty_body(),
-                     |res: ListDashboardsResponse| res.dashboards)
+        self.request(
+            Get,
+            "/api/v0/dashboards",
+            vec![],
+            client::empty_body(),
+            |res: ListDashboardsResponse| res.dashboards,
+        )
     }
 
     /// Creates a new dashboard.
@@ -78,35 +79,39 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#get.
     pub fn get_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
-        self.request(Get,
-                     format!("/api/v0/dashboards/{}", dashboard_id),
-                     vec![],
-                     client::empty_body(),
-                     |dashboard| dashboard)
+        self.request(
+            Get,
+            format!("/api/v0/dashboards/{}", dashboard_id),
+            vec![],
+            client::empty_body(),
+            |dashboard| dashboard,
+        )
     }
 
     /// Updates a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#update.
     pub fn update_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
-        let dashboard_id: String = try!(dashboard.clone()
-            .id
-            .ok_or("specify the id to update a dashboard"));
-        self.request(Put,
-                     format!("/api/v0/dashboards/{}", dashboard_id),
-                     vec![],
-                     Some(dashboard),
-                     |dashboard| dashboard)
+        let dashboard_id: String = dashboard.clone().id.ok_or("specify the id to update a dashboard")?;
+        self.request(
+            Put,
+            format!("/api/v0/dashboards/{}", dashboard_id),
+            vec![],
+            Some(dashboard),
+            |dashboard| dashboard,
+        )
     }
 
     /// Deletes a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#delete.
     pub fn delete_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
-        self.request(Delete,
-                     format!("/api/v0/dashboards/{}", dashboard_id),
-                     vec![],
-                     client::empty_body(),
-                     |dashboard| dashboard)
+        self.request(
+            Delete,
+            format!("/api/v0/dashboards/{}", dashboard_id),
+            vec![],
+            client::empty_body(),
+            |dashboard| dashboard,
+        )
     }
 }

@@ -25,14 +25,13 @@ mod tests {
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(r##"
-            {
+        serde_json::from_str(
+            r##"{
                 "id": "abcde",
                 "screenName": "Example Mackerel",
                 "email": "mackerel@example.com"
-            }
-        "##)
-            .unwrap()
+            }"##,
+        ).unwrap()
     }
 
     #[test]
@@ -57,13 +56,25 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/users#list.
     pub fn list_users(&self) -> Result<Vec<User>> {
-        self.request(Get, "/api/v0/users", vec![], client::empty_body(), |res: ListUsersResponse| res.users)
+        self.request(
+            Get,
+            "/api/v0/users",
+            vec![],
+            client::empty_body(),
+            |res: ListUsersResponse| res.users,
+        )
     }
 
     /// Delete the user from the organization.
     ///
     /// See https://mackerel.io/api-docs/entry/users#delete.
     pub fn delete_user(&self, user_name: &str) -> Result<User> {
-        self.request(Delete, format!("/api/v0/users/{}", user_name), vec![], client::empty_body(), |user| user)
+        self.request(
+            Delete,
+            format!("/api/v0/users/{}", user_name),
+            vec![],
+            client::empty_body(),
+            |user| user,
+        )
     }
 }
