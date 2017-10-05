@@ -20,7 +20,7 @@ impl default::Default for Client {
     fn default() -> Client {
         Client {
             api_key: "".to_string(),
-            api_base: "https://mackerel.io".to_string(),
+            api_base: "https://api.mackerelio.com".to_string(),
             user_agent: "mackerel-client-rs".to_string(),
         }
     }
