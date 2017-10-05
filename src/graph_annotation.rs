@@ -32,17 +32,15 @@ mod tests {
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "id": "abcde1",
-                "title": "Deploy application",
-                "description": "Graph Annotation Example\nhttps://example.com",
-                "from": 1484000000,
-                "to": 1484000030,
-                "service": "ExampleService",
-                "roles": ["ExampleRole1", "ExampleRole2"]
-            }"##,
-        ).unwrap()
+        json!({
+            "id": "abcde1",
+            "title": "Deploy application",
+            "description": "Graph Annotation Example\nhttps://example.com",
+            "from": 1484000000,
+            "to": 1484000030,
+            "service": "ExampleService",
+            "roles": ["ExampleRole1", "ExampleRole2"]
+        })
     }
 
     #[test]

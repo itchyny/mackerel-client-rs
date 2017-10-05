@@ -67,15 +67,13 @@ mod tests {
     }
 
     fn json_example1() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "id": "abcde0",
-                "status": "CRITICAL",
-                "monitorId": "abcde2",
-                "type": "connectivity",
-                "hostId": "abcde1"
-            }"##,
-        ).unwrap()
+        json!({
+            "id": "abcde0",
+            "status": "CRITICAL",
+            "monitorId": "abcde2",
+            "type": "connectivity",
+            "hostId": "abcde1"
+        })
     }
 
     fn alert_example2() -> Alert {
@@ -92,18 +90,14 @@ mod tests {
     }
 
     fn json_example2() -> serde_json::Value {
-        serde_json::from_str(
-            r##"
-            {
-                "id": "abcde0",
-                "status": "WARNING",
-                "monitorId": "abcde2",
-                "type": "host",
-                "hostId": "abcde1",
-                "value": 25.0
-            }
-        "##,
-        ).unwrap()
+        json!({
+            "id": "abcde0",
+            "status": "WARNING",
+            "monitorId": "abcde2",
+            "type": "host",
+            "hostId": "abcde1",
+            "value": 25.0
+        })
     }
 
     #[test]

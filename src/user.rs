@@ -25,13 +25,11 @@ mod tests {
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "id": "abcde",
-                "screenName": "Example Mackerel",
-                "email": "mackerel@example.com"
-            }"##,
-        ).unwrap()
+        json!({
+            "id": "abcde",
+            "screenName": "Example Mackerel",
+            "email": "mackerel@example.com"
+        })
     }
 
     #[test]

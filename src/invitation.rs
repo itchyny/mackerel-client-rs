@@ -44,12 +44,10 @@ mod tests {
     }
 
     fn json_example1() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "email": "example1@example.com",
-                "authority": "manager"
-            }"##,
-        ).unwrap()
+        json!({
+            "email": "example1@example.com",
+            "authority": "manager"
+        })
     }
 
     fn invitation_example2() -> Invitation {
@@ -60,12 +58,10 @@ mod tests {
     }
 
     fn json_example2() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "email": "example2@example.com",
-                "authority": "collaborator"
-            }"##,
-        ).unwrap()
+        json!({
+            "email": "example2@example.com",
+            "authority": "collaborator"
+        })
     }
 
     fn invitation_example3() -> Invitation {
@@ -76,12 +72,10 @@ mod tests {
     }
 
     fn json_example3() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "email": "example3@example.com",
-                "authority": "viewer"
-            }"##,
-        ).unwrap()
+        json!({
+            "email": "example3@example.com",
+            "authority": "viewer"
+        })
     }
 
     #[test]

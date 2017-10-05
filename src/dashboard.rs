@@ -27,14 +27,12 @@ mod tests {
     }
 
     fn json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "id": "abcde1",
-                "title": "This is a dashboard",
-                "bodyMarkdown": "# Example\n[example](https://example.com)",
-                "urlPath": "example"
-            }"##,
-        ).unwrap()
+        json!({
+            "id": "abcde1",
+            "title": "This is a dashboard",
+            "bodyMarkdown": "# Example\n[example](https://example.com)",
+            "urlPath": "example"
+        })
     }
 
     #[test]

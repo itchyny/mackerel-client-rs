@@ -235,23 +235,21 @@ mod tests {
     }
 
     fn host_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "type": "host",
-                "id": "abcde1",
-                "name": "Monitor custom.foo.bar",
-                "memo": "Monitor memo",
-                "duration": 5,
-                "metric": "custom.foo.bar",
-                "operator": ">",
-                "warning": 10.0,
-                "critical": 20.0,
-                "isMute": false,
-                "notificationInterval": 30,
-                "scopes": ["service0"],
-                "excludeScopes": ["service0:role3"]
-            }"##,
-        ).unwrap()
+        json!({
+            "type": "host",
+            "id": "abcde1",
+            "name": "Monitor custom.foo.bar",
+            "memo": "Monitor memo",
+            "duration": 5,
+            "metric": "custom.foo.bar",
+            "operator": ">",
+            "warning": 10.0,
+            "critical": 20.0,
+            "isMute": false,
+            "notificationInterval": 30,
+            "scopes": ["service0"],
+            "excludeScopes": ["service0:role3"]
+        })
     }
 
     fn connectivity_monitor_example() -> Monitor {
@@ -267,15 +265,13 @@ mod tests {
     }
 
     fn connectivity_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "type": "connectivity",
-                "id": "abcde2",
-                "name": "connectivity",
-                "memo": "Monitor memo",
-                "isMute": false
-            }"##,
-        ).unwrap()
+        json!({
+            "type": "connectivity",
+            "id": "abcde2",
+            "name": "connectivity",
+            "memo": "Monitor memo",
+            "isMute": false
+        })
     }
 
     fn service_monitor_example() -> Monitor {
@@ -295,22 +291,20 @@ mod tests {
     }
 
     fn service_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "type": "service",
-                "id": "abcde3",
-                "name": "Service count",
-                "memo": "Monitor memo",
-                "service": "service1",
-                "duration": 5,
-                "metric": "custom.service.count",
-                "operator": ">",
-                "warning": 100.0,
-                "critical": 200.0,
-                "isMute": false,
-                "notificationInterval": 30
-            }"##,
-        ).unwrap()
+        json!({
+            "type": "service",
+            "id": "abcde3",
+            "name": "Service count",
+            "memo": "Monitor memo",
+            "service": "service1",
+            "duration": 5,
+            "metric": "custom.service.count",
+            "operator": ">",
+            "warning": 100.0,
+            "critical": 200.0,
+            "isMute": false,
+            "notificationInterval": 30
+        })
     }
 
     fn external_monitor_example() -> Monitor {
@@ -342,29 +336,27 @@ mod tests {
     }
 
     fn external_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "type": "external",
-                "id": "abcde4",
-                "name": "Example external monitor",
-                "memo": "Monitor memo",
-                "method": "GET",
-                "url": "https://example.com",
-                "requestBody": "Request Body",
-                "headers": [{ "name": "Cache-Control", "value": "no-cache" }],
-                "service": "service1",
-                "responseTimeDuration": 5,
-                "responseTimeWarning": 3000.0,
-                "responseTimeCritical": 5000.0,
-                "containsString": "Example Domain",
-                "maxCheckAttempts": 5,
-                "certificationExpirationWarning": 1200,
-                "certificationExpirationCritical": 60,
-                "skipCertificateVerification": true,
-                "isMute": true,
-                "notificationInterval": 60
-            }"##,
-        ).unwrap()
+        json!({
+            "type": "external",
+            "id": "abcde4",
+            "name": "Example external monitor",
+            "memo": "Monitor memo",
+            "method": "GET",
+            "url": "https://example.com",
+            "requestBody": "Request Body",
+            "headers": [{ "name": "Cache-Control", "value": "no-cache" }],
+            "service": "service1",
+            "responseTimeDuration": 5,
+            "responseTimeWarning": 3000.0,
+            "responseTimeCritical": 5000.0,
+            "containsString": "Example Domain",
+            "maxCheckAttempts": 5,
+            "certificationExpirationWarning": 1200,
+            "certificationExpirationCritical": 60,
+            "skipCertificateVerification": true,
+            "isMute": true,
+            "notificationInterval": 60
+        })
     }
 
     fn expression_monitor_example() -> Monitor {
@@ -382,19 +374,17 @@ mod tests {
     }
 
     fn expression_monitor_json_example() -> serde_json::Value {
-        serde_json::from_str(
-            r##"{
-                "type": "expression",
-                "id": "abcde5",
-                "name": "Example expression monitor",
-                "memo": "Monitor memo",
-                "expression": "min(role(\"foo:bar\", \"custom.foo.bar\"))",
-                "operator": "<",
-                "warning": 10.0,
-                "critical": 20.0,
-                "isMute": false
-            }"##,
-        ).unwrap()
+        json!({
+            "type": "expression",
+            "id": "abcde5",
+            "name": "Example expression monitor",
+            "memo": "Monitor memo",
+            "expression": "min(role(\"foo:bar\", \"custom.foo.bar\"))",
+            "operator": "<",
+            "warning": 10.0,
+            "critical": 20.0,
+            "isMute": false
+        })
     }
 
     fn monitor_examples() -> Vec<(Monitor, serde_json::Value)> {
