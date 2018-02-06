@@ -169,10 +169,8 @@ impl fmt::Display for MonitorType {
 /// Monitor operators
 #[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum Operator {
-    #[serde(rename = ">")]
-    GreaterThan,
-    #[serde(rename = "<")]
-    LessThan,
+    #[serde(rename = ">")] GreaterThan,
+    #[serde(rename = "<")] LessThan,
 }
 
 impl fmt::Display for Operator {
@@ -390,28 +388,58 @@ mod tests {
     fn monitor_examples() -> Vec<(Monitor, serde_json::Value)> {
         vec![
             (host_monitor_example(), host_monitor_json_example()),
-            (connectivity_monitor_example(), connectivity_monitor_json_example()),
+            (
+                connectivity_monitor_example(),
+                connectivity_monitor_json_example(),
+            ),
             (service_monitor_example(), service_monitor_json_example()),
             (external_monitor_example(), external_monitor_json_example()),
-            (expression_monitor_example(), expression_monitor_json_example()),
+            (
+                expression_monitor_example(),
+                expression_monitor_json_example(),
+            ),
         ]
     }
 
     #[test]
     fn monitor_id() {
         assert_eq!(host_monitor_example().get_id(), Some("abcde1".to_string()));
-        assert_eq!(connectivity_monitor_example().get_id(), Some("abcde2".to_string()));
-        assert_eq!(service_monitor_example().get_id(), Some("abcde3".to_string()));
-        assert_eq!(external_monitor_example().get_id(), Some("abcde4".to_string()));
-        assert_eq!(expression_monitor_example().get_id(), Some("abcde5".to_string()));
+        assert_eq!(
+            connectivity_monitor_example().get_id(),
+            Some("abcde2".to_string())
+        );
+        assert_eq!(
+            service_monitor_example().get_id(),
+            Some("abcde3".to_string())
+        );
+        assert_eq!(
+            external_monitor_example().get_id(),
+            Some("abcde4".to_string())
+        );
+        assert_eq!(
+            expression_monitor_example().get_id(),
+            Some("abcde5".to_string())
+        );
     }
 
     #[test]
     fn monitor_name() {
-        assert_eq!(host_monitor_example().get_name(), "Monitor custom.foo.bar".to_string());
-        assert_eq!(connectivity_monitor_example().get_name(), "connectivity".to_string());
-        assert_eq!(service_monitor_example().get_name(), "Service count".to_string());
-        assert_eq!(external_monitor_example().get_name(), "Example external monitor".to_string());
+        assert_eq!(
+            host_monitor_example().get_name(),
+            "Monitor custom.foo.bar".to_string()
+        );
+        assert_eq!(
+            connectivity_monitor_example().get_name(),
+            "connectivity".to_string()
+        );
+        assert_eq!(
+            service_monitor_example().get_name(),
+            "Service count".to_string()
+        );
+        assert_eq!(
+            external_monitor_example().get_name(),
+            "Example external monitor".to_string()
+        );
         assert_eq!(
             expression_monitor_example().get_name(),
             "Example expression monitor".to_string()
@@ -444,7 +472,10 @@ mod tests {
         ];
         for &(monitor_type, type_str) in &test_cases {
             let str_value = serde_json::Value::String(type_str.to_string());
-            assert_eq!(monitor_type, serde_json::from_value(str_value.clone()).unwrap());
+            assert_eq!(
+                monitor_type,
+                serde_json::from_value(str_value.clone()).unwrap()
+            );
             assert_eq!(str_value, serde_json::to_value(monitor_type).unwrap());
             assert_eq!(str_value, format!("{}", monitor_type).as_str());
         }
@@ -501,14 +532,18 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#create.
     pub fn create_monitor(&self, monitor: Monitor) -> Result<Monitor> {
-        self.request(Post, "/api/v0/monitors", vec![], Some(monitor), |monitor| monitor)
+        self.request(Post, "/api/v0/monitors", vec![], Some(monitor), |monitor| {
+            monitor
+        })
     }
 
     /// Updates a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#update.
     pub fn update_monitor(&self, monitor: Monitor) -> Result<Monitor> {
-        let monitor_id: String = monitor.get_id().ok_or("specify the id to update a monitor")?;
+        let monitor_id: String = monitor
+            .get_id()
+            .ok_or("specify the id to update a monitor")?;
         self.request(
             Put,
             format!("/api/v0/monitors/{}", monitor_id),

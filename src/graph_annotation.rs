@@ -45,12 +45,18 @@ mod tests {
 
     #[test]
     fn serialize_graph_annotation() {
-        assert_eq!(json_example(), serde_json::to_value(&graph_annotation_example()).unwrap());
+        assert_eq!(
+            json_example(),
+            serde_json::to_value(&graph_annotation_example()).unwrap()
+        );
     }
 
     #[test]
     fn deserialize_graph_annotation() {
-        assert_eq!(graph_annotation_example(), serde_json::from_value(json_example()).unwrap());
+        assert_eq!(
+            graph_annotation_example(),
+            serde_json::from_value(json_example()).unwrap()
+        );
     }
 
 }
@@ -96,7 +102,10 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
     pub fn update_graph_annotation(&self, graph_annotation: GraphAnnotation) -> Result<GraphAnnotation> {
-        let graph_annotation_id: String = graph_annotation.clone().id.ok_or("specify the id to update a graph_annotation")?;
+        let graph_annotation_id: String = graph_annotation
+            .clone()
+            .id
+            .ok_or("specify the id to update a graph_annotation")?;
         self.request(
             Put,
             format!("/api/v0/graph-annotations/{}", graph_annotation_id),

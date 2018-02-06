@@ -34,12 +34,18 @@ mod tests {
 
     #[test]
     fn serialize_user() {
-        assert_eq!(json_example(), serde_json::to_value(&user_example()).unwrap());
+        assert_eq!(
+            json_example(),
+            serde_json::to_value(&user_example()).unwrap()
+        );
     }
 
     #[test]
     fn deserialize_user() {
-        assert_eq!(user_example(), serde_json::from_value(json_example()).unwrap());
+        assert_eq!(
+            user_example(),
+            serde_json::from_value(json_example()).unwrap()
+        );
     }
 
 }

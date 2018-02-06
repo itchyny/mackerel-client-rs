@@ -27,12 +27,18 @@ mod tests {
 
     #[test]
     fn serialize_organization() {
-        assert_eq!(json_example(), serde_json::to_value(&organization_example()).unwrap());
+        assert_eq!(
+            json_example(),
+            serde_json::to_value(&organization_example()).unwrap()
+        );
     }
 
     #[test]
     fn deserialize_organization() {
-        assert_eq!(organization_example(), serde_json::from_value(json_example()).unwrap());
+        assert_eq!(
+            organization_example(),
+            serde_json::from_value(json_example()).unwrap()
+        );
     }
 }
 

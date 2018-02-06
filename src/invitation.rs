@@ -80,16 +80,34 @@ mod tests {
 
     #[test]
     fn serialize_invitation() {
-        assert_eq!(json_example1(), serde_json::to_value(&invitation_example1()).unwrap());
-        assert_eq!(json_example2(), serde_json::to_value(&invitation_example2()).unwrap());
-        assert_eq!(json_example3(), serde_json::to_value(&invitation_example3()).unwrap());
+        assert_eq!(
+            json_example1(),
+            serde_json::to_value(&invitation_example1()).unwrap()
+        );
+        assert_eq!(
+            json_example2(),
+            serde_json::to_value(&invitation_example2()).unwrap()
+        );
+        assert_eq!(
+            json_example3(),
+            serde_json::to_value(&invitation_example3()).unwrap()
+        );
     }
 
     #[test]
     fn deserialize_invitation() {
-        assert_eq!(invitation_example1(), serde_json::from_value(json_example1()).unwrap());
-        assert_eq!(invitation_example2(), serde_json::from_value(json_example2()).unwrap());
-        assert_eq!(invitation_example3(), serde_json::from_value(json_example3()).unwrap());
+        assert_eq!(
+            invitation_example1(),
+            serde_json::from_value(json_example1()).unwrap()
+        );
+        assert_eq!(
+            invitation_example2(),
+            serde_json::from_value(json_example2()).unwrap()
+        );
+        assert_eq!(
+            invitation_example3(),
+            serde_json::from_value(json_example3()).unwrap()
+        );
     }
 }
 
@@ -98,7 +116,13 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/invitations#create.
     pub fn create_invitation(&self, invitation: Invitation) -> Result<Invitation> {
-        self.request(Post, "/api/v0/invitations", vec![], Some(invitation), |res: Invitation| res)
+        self.request(
+            Post,
+            "/api/v0/invitations",
+            vec![],
+            Some(invitation),
+            |res: Invitation| res,
+        )
     }
 
     /// Revokes an invitation.

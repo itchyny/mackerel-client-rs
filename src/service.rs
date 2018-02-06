@@ -41,12 +41,18 @@ mod tests {
 
     #[test]
     fn serialize_service() {
-        assert_eq!(json_example(), serde_json::to_value(&service_example()).unwrap());
+        assert_eq!(
+            json_example(),
+            serde_json::to_value(&service_example()).unwrap()
+        );
     }
 
     #[test]
     fn deserialize_service() {
-        assert_eq!(service_example(), serde_json::from_value(json_example()).unwrap());
+        assert_eq!(
+            service_example(),
+            serde_json::from_value(json_example()).unwrap()
+        );
     }
 
 }
