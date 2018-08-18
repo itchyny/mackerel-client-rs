@@ -81,6 +81,28 @@ impl client::Client {
         )
     }
 
+    /// Creates a new service.
+    ///
+    /// See https://mackerel.io/api-docs/entry/services#create.
+    pub fn create_services(&self, service: Service) -> Result<Service> {
+        self.request(Post, "/api/v0/services", vec![], Some(service), |service| {
+            service
+        })
+    }
+
+    /// Deletes a service.
+    ///
+    /// See https://mackerel.io/api-docs/entry/services#delete.
+    pub fn delete_service(&self, service_name: String) -> Result<Service> {
+        self.request(
+            Delete,
+            format!("/api/v0/services/{}", service_name),
+            vec![],
+            client::empty_body(),
+            |service| service,
+        )
+    }
+
     /// Fetches the names of the service metrics.
     ///
     /// See https://mackerel.io/api-docs/entry/services#metric-names.
