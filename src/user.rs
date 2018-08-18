@@ -1,6 +1,7 @@
 use reqwest::Method::*;
 use client;
 use errors::*;
+use invitation::Authority;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -9,6 +10,7 @@ pub struct User {
     pub id: String,
     pub screen_name: String,
     pub email: String,
+    pub authority: Authority,
 }
 
 #[cfg(test)]
@@ -21,6 +23,7 @@ mod tests {
             id: "abcde".to_string(),
             screen_name: "Example Mackerel".to_string(),
             email: "mackerel@example.com".to_string(),
+            authority: Authority::Collaborator,
         }
     }
 
@@ -28,7 +31,8 @@ mod tests {
         json!({
             "id": "abcde",
             "screenName": "Example Mackerel",
-            "email": "mackerel@example.com"
+            "email": "mackerel@example.com",
+            "authority": "collaborator"
         })
     }
 
