@@ -1,8 +1,9 @@
 use std::collections::HashMap;
-use std::fmt;
 use reqwest::Method::*;
 use client;
 use errors::*;
+
+use authority::Authority;
 
 /// An invitation
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -10,27 +11,6 @@ use errors::*;
 pub struct Invitation {
     pub email: String,
     pub authority: Authority,
-}
-
-/// Invitation authority
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub enum Authority {
-    Owner,
-    Manager,
-    Collaborator,
-    Viewer,
-}
-
-impl fmt::Display for Authority {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Authority::Owner => write!(f, "owner"),
-            Authority::Manager => write!(f, "manager"),
-            Authority::Collaborator => write!(f, "collaborator"),
-            Authority::Viewer => write!(f, "viewer"),
-        }
-    }
 }
 
 #[cfg(test)]

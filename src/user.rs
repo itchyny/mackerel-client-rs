@@ -1,7 +1,8 @@
 use reqwest::Method::*;
 use client;
 use errors::*;
-use invitation::Authority;
+
+use authority::Authority;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
