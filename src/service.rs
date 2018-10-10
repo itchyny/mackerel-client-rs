@@ -106,7 +106,7 @@ impl client::Client {
     /// Fetches the names of the service metrics.
     ///
     /// See https://mackerel.io/api-docs/entry/services#metric-names.
-    pub fn list_service_metric_names(&self, service_name: &str) -> Result<Vec<String>> {
+    pub fn list_service_metric_names(&self, service_name: String) -> Result<Vec<String>> {
         self.request(
             Get,
             format!("/api/v0/services/{}/metric-names", service_name),

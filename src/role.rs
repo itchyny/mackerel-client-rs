@@ -55,7 +55,7 @@ impl client::Client {
     /// Fetches the roles in the specified service.
     ///
     /// See https://mackerel.io/api-docs/entry/services#rolelist.
-    pub fn list_roles(&self, service_name: &str) -> Result<Vec<Role>> {
+    pub fn list_roles(&self, service_name: String) -> Result<Vec<Role>> {
         self.request(
             Get,
             format!("/api/v0/services/{}/roles", service_name),
