@@ -64,4 +64,30 @@ impl client::Client {
             |res: ListRolesResponse| res.roles,
         )
     }
+
+    /// Creates a new role.
+    ///
+    /// See https://mackerel.io/api-docs/entry/services#rolecreate.
+    pub fn create_role(&self, service_name: String, role: Role) -> Result<Role> {
+        self.request(
+            Post,
+            format!("/api/v0/services/{}/roles", service_name),
+            vec![],
+            Some(role),
+            |role| role,
+        )
+    }
+
+    /// Deletes a role.
+    ///
+    /// See https://mackerel.io/api-docs/entry/services#roledelete.
+    pub fn delete_role(&self, service_name: String, role_name: String) -> Result<Role> {
+        self.request(
+            Delete,
+            format!("/api/v0/services/{}/roles/{}", service_name, role_name),
+            vec![],
+            client::empty_body(),
+            |role| role,
+        )
+    }
 }
