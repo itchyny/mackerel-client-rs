@@ -84,7 +84,7 @@ impl client::Client {
     /// Creates a new service.
     ///
     /// See https://mackerel.io/api-docs/entry/services#create.
-    pub fn create_services(&self, service: Service) -> Result<Service> {
+    pub fn create_service(&self, service: Service) -> Result<Service> {
         self.request(Post, "/api/v0/services", vec![], Some(service), |service| {
             service
         })
