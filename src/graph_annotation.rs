@@ -71,7 +71,12 @@ impl client::Client {
     /// Fetches graph annotations.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#get.
-    pub fn list_graph_annotations(&self, service: &str, from: u64, to: u64) -> Result<Vec<GraphAnnotation>> {
+    pub fn list_graph_annotations(
+        &self,
+        service: &str,
+        from: u64,
+        to: u64,
+    ) -> Result<Vec<GraphAnnotation>> {
         self.request(
             Get,
             "/api/v0/graph-annotations",
@@ -88,7 +93,10 @@ impl client::Client {
     /// Creates a new graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#create.
-    pub fn create_graph_annotation(&self, graph_annotation: GraphAnnotation) -> Result<GraphAnnotation> {
+    pub fn create_graph_annotation(
+        &self,
+        graph_annotation: GraphAnnotation,
+    ) -> Result<GraphAnnotation> {
         self.request(
             Post,
             "/api/v0/graph-annotations",
@@ -101,7 +109,10 @@ impl client::Client {
     /// Updates a graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
-    pub fn update_graph_annotation(&self, graph_annotation: GraphAnnotation) -> Result<GraphAnnotation> {
+    pub fn update_graph_annotation(
+        &self,
+        graph_annotation: GraphAnnotation,
+    ) -> Result<GraphAnnotation> {
         let graph_annotation_id: String = graph_annotation
             .clone()
             .id

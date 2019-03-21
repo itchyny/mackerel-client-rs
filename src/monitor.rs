@@ -169,8 +169,10 @@ impl fmt::Display for MonitorType {
 /// Monitor operators
 #[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum Operator {
-    #[serde(rename = ">")] GreaterThan,
-    #[serde(rename = "<")] LessThan,
+    #[serde(rename = ">")]
+    GreaterThan,
+    #[serde(rename = "<")]
+    LessThan,
 }
 
 impl fmt::Display for Operator {

@@ -113,14 +113,14 @@ impl Client {
 
     fn api_error(&self, response: reqwest::Response) -> ErrorKind {
         let status = response.status();
-        let message_opt = serde_json::from_reader(response)
-            .ok()
-            .and_then(|value: serde_json::Value| {
+        let message_opt = serde_json::from_reader(response).ok().and_then(
+            |value: serde_json::Value| {
                 value
                     .get("error")
                     .map(|err| err.get("message").unwrap_or(err))
                     .and_then(|val| val.as_str().map(|s| s.to_string()))
-            });
+            },
+        );
         ErrorKind::ApiError(status, message_opt.unwrap_or("".to_string()))
     }
 }

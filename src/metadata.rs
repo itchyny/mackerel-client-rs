@@ -32,7 +32,12 @@ impl client::Client {
     /// Creates/Updatates a host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#put.
-    pub fn put_metadata(&self, host_id: &str, namespace: &str, metadata: serde_json::Value) -> Result<()> {
+    pub fn put_metadata(
+        &self,
+        host_id: &str,
+        namespace: &str,
+        metadata: serde_json::Value,
+    ) -> Result<()> {
         self.request(
             Put,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
