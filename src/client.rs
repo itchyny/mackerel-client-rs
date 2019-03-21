@@ -91,7 +91,7 @@ impl Client {
     where
         P: AsRef<str>,
         B: serde::ser::Serialize,
-        R: serde::de::Deserialize,
+        for<'de> R: serde::de::Deserialize<'de>,
         F: FnOnce(R) -> S,
     {
         let client = reqwest::Client::new().chain_err(|| format!("failed to create a client"))?;
