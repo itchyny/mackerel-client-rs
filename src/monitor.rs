@@ -17,8 +17,10 @@ pub enum Monitor {
         duration: u64,
         metric: String,
         operator: Operator,
-        warning: f64,
-        critical: f64,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        warning: Option<f64>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        critical: Option<f64>,
         #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,8 +57,10 @@ pub enum Monitor {
         duration: u64,
         metric: String,
         operator: Operator,
-        warning: f64,
-        critical: f64,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        warning: Option<f64>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        critical: Option<f64>,
         #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -108,8 +112,10 @@ pub enum Monitor {
         memo: Option<String>,
         expression: String,
         operator: Operator,
-        warning: f64,
-        critical: f64,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        warning: Option<f64>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        critical: Option<f64>,
         #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -225,8 +231,8 @@ mod tests {
             duration: 5,
             metric: "custom.foo.bar".to_string(),
             operator: Operator::GreaterThan,
-            warning: 10.0,
-            critical: 20.0,
+            warning: Some(10.0),
+            critical: Some(20.0),
             is_mute: Some(false),
             notification_interval: Some(30),
             scopes: Some(vec!["service0".to_string()]),
@@ -283,8 +289,8 @@ mod tests {
             duration: 5,
             metric: "custom.service.count".to_string(),
             operator: Operator::GreaterThan,
-            warning: 100.0,
-            critical: 200.0,
+            warning: Some(100.0),
+            critical: Some(200.0),
             is_mute: Some(false),
             notification_interval: Some(30),
         }
@@ -366,8 +372,8 @@ mod tests {
             memo: Some("Monitor memo".to_string()),
             expression: "min(role(\"foo:bar\", \"custom.foo.bar\"))".to_string(),
             operator: Operator::LessThan,
-            warning: 10.0,
-            critical: 20.0,
+            warning: Some(10.0),
+            critical: None,
             is_mute: Some(false),
             notification_interval: None,
         }
@@ -382,7 +388,6 @@ mod tests {
             "expression": "min(role(\"foo:bar\", \"custom.foo.bar\"))",
             "operator": "<",
             "warning": 10.0,
-            "critical": 20.0,
             "isMute": false
         })
     }
