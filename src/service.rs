@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -73,7 +73,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/services#list.
     pub fn list_services(&self) -> Result<Vec<Service>> {
         self.request(
-            Get,
+            Method::GET,
             "/api/v0/services",
             vec![],
             client::empty_body(),
@@ -85,9 +85,13 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/services#create.
     pub fn create_service(&self, service: Service) -> Result<Service> {
-        self.request(Post, "/api/v0/services", vec![], Some(service), |service| {
-            service
-        })
+        self.request(
+            Method::POST,
+            "/api/v0/services",
+            vec![],
+            Some(service),
+            |service| service,
+        )
     }
 
     /// Deletes a service.
@@ -95,7 +99,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/services#delete.
     pub fn delete_service(&self, service_name: String) -> Result<Service> {
         self.request(
-            Delete,
+            Method::DELETE,
             format!("/api/v0/services/{}", service_name),
             vec![],
             client::empty_body(),
@@ -108,7 +112,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/services#metric-names.
     pub fn list_service_metric_names(&self, service_name: String) -> Result<Vec<String>> {
         self.request(
-            Get,
+            Method::GET,
             format!("/api/v0/services/{}/metric-names", service_name),
             vec![],
             client::empty_body(),

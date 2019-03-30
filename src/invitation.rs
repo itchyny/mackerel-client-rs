@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -99,7 +99,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/invitations#create.
     pub fn create_invitation(&self, invitation: Invitation) -> Result<Invitation> {
         self.request(
-            Post,
+            Method::POST,
             "/api/v0/invitations",
             vec![],
             Some(invitation),
@@ -113,7 +113,7 @@ impl client::Client {
     pub fn revoke_invitation(&self, email: &str) -> Result<()> {
         let body: HashMap<&str, &str> = [("email", email)].iter().cloned().collect();
         self.request(
-            Post,
+            Method::POST,
             "/api/v0/invitations/revoke",
             vec![],
             Some(body),

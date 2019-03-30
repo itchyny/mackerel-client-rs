@@ -1,5 +1,5 @@
 use std::fmt;
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -522,7 +522,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/monitors#get.
     pub fn list_monitors(&self) -> Result<Vec<Monitor>> {
         self.request(
-            Get,
+            Method::GET,
             "/api/v0/monitors",
             vec![],
             client::empty_body(),
@@ -534,9 +534,13 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#create.
     pub fn create_monitor(&self, monitor: Monitor) -> Result<Monitor> {
-        self.request(Post, "/api/v0/monitors", vec![], Some(monitor), |monitor| {
-            monitor
-        })
+        self.request(
+            Method::POST,
+            "/api/v0/monitors",
+            vec![],
+            Some(monitor),
+            |monitor| monitor,
+        )
     }
 
     /// Updates a monitor.
@@ -547,7 +551,7 @@ impl client::Client {
             .get_id()
             .ok_or("specify the id to update a monitor")?;
         self.request(
-            Put,
+            Method::PUT,
             format!("/api/v0/monitors/{}", monitor_id),
             vec![],
             Some(monitor),
@@ -560,7 +564,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/monitors#delete.
     pub fn delete_monitor(&self, monitor_id: String) -> Result<Monitor> {
         self.request(
-            Delete,
+            Method::DELETE,
             format!("/api/v0/monitors/{}", monitor_id),
             vec![],
             client::empty_body(),

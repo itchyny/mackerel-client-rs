@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 use serde_json;
@@ -21,7 +21,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#get.
     pub fn get_metadata(&self, host_id: &str, namespace: &str) -> Result<serde_json::Value> {
         self.request(
-            Get,
+            Method::GET,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
             vec![],
             client::empty_body(),
@@ -39,7 +39,7 @@ impl client::Client {
         metadata: serde_json::Value,
     ) -> Result<()> {
         self.request(
-            Put,
+            Method::PUT,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
             vec![],
             Some(metadata),
@@ -52,7 +52,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#delete.
     pub fn delete_metadata(&self, host_id: &str, namespace: &str) -> Result<()> {
         self.request(
-            Delete,
+            Method::DELETE,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
             vec![],
             client::empty_body(),
@@ -65,7 +65,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#list.
     pub fn list_metadata(&self, host_id: &str) -> Result<Vec<Metadata>> {
         self.request(
-            Get,
+            Method::GET,
             format!("/api/v0/hosts/{}/metadata", host_id),
             vec![],
             client::empty_body(),

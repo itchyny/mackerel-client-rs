@@ -1,7 +1,6 @@
 //! Mackerel API client
-use std::default;
-use std::str::FromStr;
 use std::convert::Into;
+use std::default;
 use url;
 use reqwest;
 use serde;
@@ -60,19 +59,16 @@ impl Client {
         url
     }
 
-    fn new_headers(&self) -> reqwest::header::Headers {
-        let mut headers = reqwest::header::Headers::new();
-        headers.set_raw("X-Api-Key", vec![self.api_key.clone().into_bytes()]);
-        headers.set(reqwest::header::ContentType::json());
-        let url = url::Url::from_str(self.api_base.clone().as_str()).unwrap();
-        if let (username, Some(password)) = (url.username(), url.password()) {
-            if username != "" {
-                headers.set(reqwest::header::Authorization(reqwest::header::Basic {
-                    username: username.to_string(),
-                    password: Some(password.to_string()),
-                }))
-            }
-        };
+    fn new_headers(&self) -> reqwest::header::HeaderMap {
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            "X-Api-Key",
+            reqwest::header::HeaderValue::from_bytes(self.api_key.as_bytes()).unwrap(),
+        );
+        headers.insert(
+            reqwest::header::CONTENT_TYPE,
+            reqwest::header::HeaderValue::from_static("application/json"),
+        );
         headers
     }
 
@@ -82,7 +78,7 @@ impl Client {
     /// and returns `S`.
     pub fn request<P, B, R, F, S>(
         &self,
-        method: reqwest::Method,
+        method: http::Method,
         path: P,
         queries: Vec<(&str, Vec<&str>)>,
         body_opt: Option<B>,
@@ -94,14 +90,22 @@ impl Client {
         for<'de> R: serde::de::Deserialize<'de>,
         F: FnOnce(R) -> S,
     {
-        let client = reqwest::Client::new().chain_err(|| format!("failed to create a client"))?;
+        let client = reqwest::Client::new();
         let url = self.build_url(path.as_ref(), queries);
         let body_bytes = body_opt
             .map(|b| serde_json::to_vec(&b).unwrap())
             .unwrap_or(vec![]);
-        let response = client
-            .request(method, url)
-            .and_then(|mut req| req.headers(self.new_headers()).body(body_bytes).send())
+        let response = {
+            let request = client
+                .request(method, url.clone())
+                .headers(self.new_headers())
+                .body(body_bytes);
+            if url.username() != "" {
+                request.basic_auth(url.username(), url.password())
+            } else {
+                request
+            }
+        }.send()
             .map_err(|e| format!("failed to send request: {}", e))?;
         if !response.status().is_success() {
             bail!(self.api_error(response))

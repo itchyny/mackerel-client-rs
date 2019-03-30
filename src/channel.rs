@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -85,7 +85,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/channels#get.
     pub fn list_channels(&self) -> Result<Vec<Channel>> {
         self.request(
-            Get,
+            Method::GET,
             "/api/v0/channels",
             vec![],
             client::empty_body(),

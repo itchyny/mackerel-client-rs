@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -64,7 +64,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/dashboards#list.
     pub fn list_dashboards(&self) -> Result<Vec<Dashboard>> {
         self.request(
-            Get,
+            Method::GET,
             "/api/v0/dashboards",
             vec![],
             client::empty_body(),
@@ -77,7 +77,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/dashboards#create.
     pub fn create_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
         self.request(
-            Post,
+            Method::POST,
             "/api/v0/dashboards",
             vec![],
             Some(dashboard),
@@ -90,7 +90,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/dashboards#get.
     pub fn get_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
         self.request(
-            Get,
+            Method::GET,
             format!("/api/v0/dashboards/{}", dashboard_id),
             vec![],
             client::empty_body(),
@@ -107,7 +107,7 @@ impl client::Client {
             .id
             .ok_or("specify the id to update a dashboard")?;
         self.request(
-            Put,
+            Method::PUT,
             format!("/api/v0/dashboards/{}", dashboard_id),
             vec![],
             Some(dashboard),
@@ -120,7 +120,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/dashboards#delete.
     pub fn delete_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
         self.request(
-            Delete,
+            Method::DELETE,
             format!("/api/v0/dashboards/{}", dashboard_id),
             vec![],
             client::empty_body(),

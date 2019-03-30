@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -78,7 +78,7 @@ impl client::Client {
         to: u64,
     ) -> Result<Vec<GraphAnnotation>> {
         self.request(
-            Get,
+            Method::GET,
             "/api/v0/graph-annotations",
             vec![
                 ("service", vec![service]),
@@ -98,7 +98,7 @@ impl client::Client {
         graph_annotation: GraphAnnotation,
     ) -> Result<GraphAnnotation> {
         self.request(
-            Post,
+            Method::POST,
             "/api/v0/graph-annotations",
             vec![],
             Some(graph_annotation),
@@ -118,7 +118,7 @@ impl client::Client {
             .id
             .ok_or("specify the id to update a graph_annotation")?;
         self.request(
-            Put,
+            Method::PUT,
             format!("/api/v0/graph-annotations/{}", graph_annotation_id),
             vec![],
             Some(graph_annotation),
@@ -131,7 +131,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#delete.
     pub fn delete_graph_annotation(&self, graph_annotation_id: String) -> Result<GraphAnnotation> {
         self.request(
-            Delete,
+            Method::DELETE,
             format!("/api/v0/graph-annotations/{}", graph_annotation_id),
             vec![],
             client::empty_body(),

@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -47,6 +47,12 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/organizations#get.
     pub fn get_organization(&self) -> Result<Organization> {
-        self.request(Get, "/api/v0/org", vec![], client::empty_body(), |org| org)
+        self.request(
+            Method::GET,
+            "/api/v0/org",
+            vec![],
+            client::empty_body(),
+            |org| org,
+        )
     }
 }

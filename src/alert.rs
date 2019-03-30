@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::fmt;
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 use monitor::MonitorType;
@@ -152,7 +152,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/alerts#get.
     pub fn list_alerts(&self) -> Result<Vec<Alert>> {
         self.request(
-            Get,
+            Method::GET,
             "/api/v0/alerts",
             vec![],
             client::empty_body(),
@@ -166,7 +166,7 @@ impl client::Client {
     pub fn close_alert(&self, alert_id: String, reason: &str) -> Result<Alert> {
         let body: HashMap<&str, &str> = [("reason", reason)].iter().cloned().collect();
         self.request(
-            Post,
+            Method::POST,
             format!("/api/v0/alerts/{}/close", alert_id),
             vec![],
             Some(body),

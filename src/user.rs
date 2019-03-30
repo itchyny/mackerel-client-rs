@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -66,7 +66,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/users#list.
     pub fn list_users(&self) -> Result<Vec<User>> {
         self.request(
-            Get,
+            Method::GET,
             "/api/v0/users",
             vec![],
             client::empty_body(),
@@ -79,7 +79,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/users#delete.
     pub fn delete_user(&self, user_name: &str) -> Result<User> {
         self.request(
-            Delete,
+            Method::DELETE,
             format!("/api/v0/users/{}", user_name),
             vec![],
             client::empty_body(),

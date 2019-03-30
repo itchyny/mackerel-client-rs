@@ -1,4 +1,4 @@
-use reqwest::Method::*;
+use http::Method;
 use client;
 use errors::*;
 
@@ -57,7 +57,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/services#rolelist.
     pub fn list_roles(&self, service_name: String) -> Result<Vec<Role>> {
         self.request(
-            Get,
+            Method::GET,
             format!("/api/v0/services/{}/roles", service_name),
             vec![],
             client::empty_body(),
@@ -70,7 +70,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/services#rolecreate.
     pub fn create_role(&self, service_name: String, role: Role) -> Result<Role> {
         self.request(
-            Post,
+            Method::POST,
             format!("/api/v0/services/{}/roles", service_name),
             vec![],
             Some(role),
@@ -83,7 +83,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/services#roledelete.
     pub fn delete_role(&self, service_name: String, role_name: String) -> Result<Role> {
         self.request(
-            Delete,
+            Method::DELETE,
             format!("/api/v0/services/{}/roles/{}", service_name, role_name),
             vec![],
             client::empty_body(),
