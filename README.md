@@ -1,5 +1,5 @@
 # mackerel-client-rs
-[![Travis Build Status](https://travis-ci.org/itchyny/mackerel-client-rs.svg?branch=master)](https://travis-ci.org/itchyny/mackerel-client-rs)
+[![CI Status](https://github.com/itchyny/mackerel-client-rs/workflows/CI/badge.svg)](https://github.com/itchyny/mackerel-client-rs/actions)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![crates.io](https://img.shields.io/crates/v/mackerel_client.svg)](https://crates.io/crates/mackerel_client)
 
