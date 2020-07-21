@@ -1,6 +1,6 @@
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 
 /// An organization
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -10,8 +10,8 @@ pub struct Organization {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use organization::*;
+    use serde_json;
 
     fn organization_example() -> Organization {
         Organization {

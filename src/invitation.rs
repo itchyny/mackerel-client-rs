@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
+use std::collections::HashMap;
 
 use authority::Authority;
 
@@ -15,8 +15,8 @@ pub struct Invitation {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use invitation::*;
+    use serde_json;
 
     fn invitation_example1() -> Invitation {
         Invitation {

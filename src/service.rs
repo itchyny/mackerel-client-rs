@@ -1,6 +1,6 @@
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 
 /// A service
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -54,7 +54,6 @@ mod tests {
             serde_json::from_value(json_example()).unwrap()
         );
     }
-
 }
 
 #[derive(Deserialize)]

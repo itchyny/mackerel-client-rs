@@ -1,6 +1,6 @@
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 
 /// A channel
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -13,8 +13,8 @@ pub struct Channel {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use channel::*;
+    use serde_json;
 
     fn channel_example1() -> Channel {
         Channel {
@@ -71,7 +71,6 @@ mod tests {
             serde_json::from_value(json_example2()).unwrap()
         );
     }
-
 }
 
 #[derive(Deserialize)]
