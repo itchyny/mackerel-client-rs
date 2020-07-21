@@ -1,9 +1,9 @@
-use std::collections::HashMap;
-use std::fmt;
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 use monitor::MonitorType;
+use std::collections::HashMap;
+use std::fmt;
 
 /// An alert
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -50,8 +50,8 @@ impl fmt::Display for AlertStatus {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use alert::*;
+    use serde_json;
 
     fn alert_example1() -> Alert {
         Alert {

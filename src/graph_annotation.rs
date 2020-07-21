@@ -1,6 +1,6 @@
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 
 /// A graph annotation
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -16,8 +16,8 @@ pub struct GraphAnnotation {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use graph_annotation::*;
+    use serde_json;
 
     fn graph_annotation_example() -> GraphAnnotation {
         GraphAnnotation {
@@ -58,7 +58,6 @@ mod tests {
             serde_json::from_value(json_example()).unwrap()
         );
     }
-
 }
 
 #[derive(Deserialize)]

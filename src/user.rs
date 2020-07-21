@@ -1,6 +1,6 @@
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 
 use authority::Authority;
 
@@ -52,7 +52,6 @@ mod tests {
             serde_json::from_value(json_example()).unwrap()
         );
     }
-
 }
 
 #[derive(Deserialize)]

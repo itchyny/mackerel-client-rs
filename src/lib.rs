@@ -36,7 +36,7 @@ extern crate url;
 extern crate error_chain;
 pub mod errors {
     use reqwest;
-    error_chain!{
+    error_chain! {
         errors {
             ApiError(status: reqwest::StatusCode, message: String)
         }

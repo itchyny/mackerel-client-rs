@@ -1,6 +1,6 @@
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 
 /// A dashboard
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -14,8 +14,8 @@ pub struct Dashboard {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use dashboard::*;
+    use serde_json;
 
     fn dashboard_example() -> Dashboard {
         Dashboard {
@@ -50,7 +50,6 @@ mod tests {
             serde_json::from_value(json_example()).unwrap()
         );
     }
-
 }
 
 #[derive(Deserialize)]

@@ -1,6 +1,6 @@
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
 
 /// A role
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -11,8 +11,8 @@ pub struct Role {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use role::*;
+    use serde_json;
 
     fn role_example() -> Role {
         Role {
@@ -43,7 +43,6 @@ mod tests {
             serde_json::from_value(json_example()).unwrap()
         );
     }
-
 }
 
 #[derive(Deserialize)]

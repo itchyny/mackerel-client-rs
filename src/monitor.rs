@@ -1,7 +1,7 @@
-use std::fmt;
-use http::Method;
 use client;
 use errors::*;
+use http::Method;
+use std::fmt;
 
 /// A monitor
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -220,8 +220,8 @@ pub struct ExternalHeader {
 
 #[cfg(test)]
 mod tests {
-    use serde_json;
     use monitor::*;
+    use serde_json;
 
     fn host_monitor_example() -> Monitor {
         Monitor::Host {
@@ -321,12 +321,10 @@ mod tests {
             method: Some(ExternalMethod::Get),
             url: "https://example.com".to_string(),
             request_body: Some("Request Body".to_string()),
-            headers: Some(vec![
-                ExternalHeader {
-                    name: "Cache-Control".to_string(),
-                    value: "no-cache".to_string(),
-                },
-            ]),
+            headers: Some(vec![ExternalHeader {
+                name: "Cache-Control".to_string(),
+                value: "no-cache".to_string(),
+            }]),
             service: Some("service1".to_string()),
             response_time_duration: Some(5),
             response_time_warning: Some(3000.0),

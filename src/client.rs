@@ -1,11 +1,11 @@
 //! Mackerel API client
-use std::convert::Into;
-use std::default;
-use url;
+use errors::*;
 use reqwest;
 use serde;
 use serde_json;
-use errors::*;
+use std::convert::Into;
+use std::default;
+use url;
 
 /// Represents an API client for Mackerel.
 #[derive(Debug)]
@@ -105,8 +105,9 @@ impl Client {
             } else {
                 request
             }
-        }.send()
-            .map_err(|e| format!("failed to send request: {}", e))?;
+        }
+        .send()
+        .map_err(|e| format!("failed to send request: {}", e))?;
         if !response.status().is_success() {
             bail!(self.api_error(response))
         }
@@ -117,14 +118,15 @@ impl Client {
 
     fn api_error(&self, response: reqwest::Response) -> ErrorKind {
         let status = response.status();
-        let message_opt = serde_json::from_reader(response).ok().and_then(
-            |value: serde_json::Value| {
-                value
-                    .get("error")
-                    .map(|err| err.get("message").unwrap_or(err))
-                    .and_then(|val| val.as_str().map(|s| s.to_string()))
-            },
-        );
+        let message_opt =
+            serde_json::from_reader(response)
+                .ok()
+                .and_then(|value: serde_json::Value| {
+                    value
+                        .get("error")
+                        .map(|err| err.get("message").unwrap_or(err))
+                        .and_then(|val| val.as_str().map(|s| s.to_string()))
+                });
         ErrorKind::ApiError(status, message_opt.unwrap_or("".to_string()))
     }
 }
