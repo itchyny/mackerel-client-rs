@@ -43,6 +43,9 @@ pub mod errors {
     }
 }
 
+#[macro_use]
+mod macros;
+
 pub mod client;
 
 pub mod alert;
@@ -50,6 +53,7 @@ pub mod authority;
 pub mod channel;
 pub mod dashboard;
 pub mod graph_annotation;
+pub mod host;
 pub mod invitation;
 pub mod metadata;
 pub mod monitor;
