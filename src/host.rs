@@ -1,6 +1,6 @@
 use client;
 use errors::*;
-use http::Method;
+use reqwest::Method;
 use serde_json::{map::Map, Value};
 use std::default;
 

@@ -28,7 +28,6 @@ extern crate serde_derive;
 #[cfg_attr(test, macro_use)]
 extern crate serde_json;
 
-extern crate http;
 extern crate reqwest;
 extern crate url;
 

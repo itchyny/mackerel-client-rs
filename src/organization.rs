@@ -1,6 +1,6 @@
 use client;
 use errors::*;
-use http::Method;
+use reqwest::Method;
 
 /// An organization
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]

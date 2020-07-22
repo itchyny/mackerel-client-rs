@@ -1,6 +1,6 @@
 use client;
 use errors::*;
-use http::Method;
+use reqwest::Method;
 
 /// A service
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]

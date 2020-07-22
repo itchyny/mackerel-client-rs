@@ -1,7 +1,7 @@
 use client;
 use errors::*;
-use http::Method;
 use monitor::MonitorType;
+use reqwest::Method;
 use std::collections::HashMap;
 use std::fmt;
 

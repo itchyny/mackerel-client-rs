@@ -1,6 +1,6 @@
 use client;
 use errors::*;
-use http::Method;
+use reqwest::Method;
 
 /// A channel
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]

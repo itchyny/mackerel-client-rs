@@ -78,7 +78,7 @@ impl Client {
     /// and returns `S`.
     pub fn request<P, B, R, F, S>(
         &self,
-        method: http::Method,
+        method: reqwest::Method,
         path: P,
         queries: Vec<(&str, Vec<&str>)>,
         body_opt: Option<B>,
@@ -90,7 +90,7 @@ impl Client {
         for<'de> R: serde::de::Deserialize<'de>,
         F: FnOnce(R) -> S,
     {
-        let client = reqwest::Client::new();
+        let client = reqwest::blocking::Client::new();
         let url = self.build_url(path.as_ref(), queries);
         let body_bytes = body_opt
             .map(|b| serde_json::to_vec(&b).unwrap())
@@ -116,7 +116,7 @@ impl Client {
             .chain_err(|| format!("JSON deserialization failed"))
     }
 
-    fn api_error(&self, response: reqwest::Response) -> ErrorKind {
+    fn api_error(&self, response: reqwest::blocking::Response) -> ErrorKind {
         let status = response.status();
         let message_opt =
             serde_json::from_reader(response)
