@@ -121,6 +121,27 @@ pub enum Monitor {
         #[serde(skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
     },
+    #[serde(rename_all = "camelCase")]
+    AnomalyDetection {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        id: Option<String>,
+        name: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        memo: Option<String>,
+        scopes: Vec<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        warning_sensitivity: Option<Sensitivity>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        critical_sensitivity: Option<Sensitivity>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        max_check_attempts: Option<u64>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        training_period_from: Option<u64>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        is_mute: Option<bool>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        notification_interval: Option<u64>,
+    },
 }
 
 impl Monitor {
@@ -132,6 +153,7 @@ impl Monitor {
             Monitor::Service { ref id, .. } => id.clone(),
             Monitor::External { ref id, .. } => id.clone(),
             Monitor::Expression { ref id, .. } => id.clone(),
+            Monitor::AnomalyDetection { ref id, .. } => id.clone(),
         }
     }
 
@@ -143,6 +165,7 @@ impl Monitor {
             Monitor::Service { ref name, .. } => name.clone(),
             Monitor::External { ref name, .. } => name.clone(),
             Monitor::Expression { ref name, .. } => name.clone(),
+            Monitor::AnomalyDetection { ref name, .. } => name.clone(),
         }
     }
 }
@@ -157,6 +180,7 @@ pub enum MonitorType {
     External,
     Check,
     Expression,
+    AnomalyDetection,
 }
 
 impl fmt::Display for MonitorType {
@@ -168,6 +192,7 @@ impl fmt::Display for MonitorType {
             MonitorType::External => write!(f, "external"),
             MonitorType::Check => write!(f, "check"),
             MonitorType::Expression => write!(f, "expression"),
+            MonitorType::AnomalyDetection => write!(f, "anomalyDetection"),
         }
     }
 }
@@ -216,6 +241,25 @@ impl fmt::Display for ExternalMethod {
 pub struct ExternalHeader {
     name: String,
     value: String,
+}
+
+/// Anomaly detection sensitivity
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Sensitivity {
+    Insensitive,
+    Normal,
+    Sensitive,
+}
+
+impl fmt::Display for Sensitivity {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Sensitivity::Insensitive => write!(f, "insensitive"),
+            Sensitivity::Normal => write!(f, "normal"),
+            Sensitivity::Sensitive => write!(f, "sensitive"),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -390,6 +434,36 @@ mod tests {
         })
     }
 
+    fn anomaly_detection_monitor_example() -> Monitor {
+        Monitor::AnomalyDetection {
+            id: Some("abcde6".to_string()),
+            name: "Example Anomaly Detection monitor".to_string(),
+            memo: Some("Monitor memo".to_string()),
+            scopes: vec!["service0:role0".to_string()],
+            warning_sensitivity: Some(Sensitivity::Normal),
+            critical_sensitivity: Some(Sensitivity::Insensitive),
+            max_check_attempts: Some(3),
+            training_period_from: Some(1580000000),
+            is_mute: Some(false),
+            notification_interval: None,
+        }
+    }
+
+    fn anomaly_detection_monitor_json_example() -> serde_json::Value {
+        json!({
+            "type": "anomalyDetection",
+            "id": "abcde6",
+            "name": "Example Anomaly Detection monitor",
+            "memo": "Monitor memo",
+            "scopes": ["service0:role0"],
+            "warningSensitivity": "normal",
+            "criticalSensitivity": "insensitive",
+            "maxCheckAttempts": 3,
+            "trainingPeriodFrom": 1580000000,
+            "isMute": false
+        })
+    }
+
     fn monitor_examples() -> Vec<(Monitor, serde_json::Value)> {
         vec![
             (host_monitor_example(), host_monitor_json_example()),
@@ -402,6 +476,10 @@ mod tests {
             (
                 expression_monitor_example(),
                 expression_monitor_json_example(),
+            ),
+            (
+                anomaly_detection_monitor_example(),
+                anomaly_detection_monitor_json_example(),
             ),
         ]
     }
@@ -424,6 +502,10 @@ mod tests {
         assert_eq!(
             expression_monitor_example().get_id(),
             Some("abcde5".to_string())
+        );
+        assert_eq!(
+            anomaly_detection_monitor_example().get_id(),
+            Some("abcde6".to_string())
         );
     }
 
@@ -448,6 +530,10 @@ mod tests {
         assert_eq!(
             expression_monitor_example().get_name(),
             "Example expression monitor".to_string()
+        );
+        assert_eq!(
+            anomaly_detection_monitor_example().get_name(),
+            "Example Anomaly Detection monitor".to_string()
         );
     }
 
@@ -474,6 +560,7 @@ mod tests {
             (MonitorType::External, "external"),
             (MonitorType::Check, "check"),
             (MonitorType::Expression, "expression"),
+            (MonitorType::AnomalyDetection, "anomalyDetection"),
         ];
         for &(monitor_type, type_str) in &test_cases {
             let str_value = serde_json::Value::String(type_str.to_string());
@@ -510,6 +597,21 @@ mod tests {
             assert_eq!(method, serde_json::from_value(str_value.clone()).unwrap());
             assert_eq!(str_value, serde_json::to_value(method).unwrap());
             assert_eq!(str_value, format!("{}", method).as_str());
+        }
+    }
+
+    #[test]
+    fn anomaly_detection_sensitivities() {
+        let test_cases = [
+            (Sensitivity::Insensitive, "insensitive"),
+            (Sensitivity::Normal, "normal"),
+            (Sensitivity::Sensitive, "sensitive"),
+        ];
+        for &(sensitivity, sensitivity_str) in &test_cases {
+            let str_value = serde_json::Value::String(sensitivity_str.to_string());
+            assert_eq!(sensitivity, serde_json::from_value(str_value.clone()).unwrap());
+            assert_eq!(str_value, serde_json::to_value(sensitivity).unwrap());
+            assert_eq!(str_value, format!("{}", sensitivity).as_str());
         }
     }
 }
