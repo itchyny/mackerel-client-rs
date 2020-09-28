@@ -1,5 +1,4 @@
-use client;
-use errors::*;
+use crate::{client, errors::*};
 use reqwest::Method;
 
 /// A channel
@@ -13,7 +12,7 @@ pub struct Channel {
 
 #[cfg(test)]
 mod tests {
-    use channel::*;
+    use crate::channel::*;
     use serde_json;
 
     fn channel_example1() -> Channel {

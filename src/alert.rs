@@ -1,6 +1,4 @@
-use client;
-use errors::*;
-use monitor::MonitorType;
+use crate::{client, errors::*, monitor::MonitorType};
 use reqwest::Method;
 use std::collections::HashMap;
 use std::fmt;
@@ -50,7 +48,7 @@ impl fmt::Display for AlertStatus {
 
 #[cfg(test)]
 mod tests {
-    use alert::*;
+    use crate::alert::*;
     use serde_json;
 
     fn alert_example1() -> Alert {

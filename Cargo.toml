@@ -8,6 +8,7 @@ readme = "README.md"
 license = "MIT"
 keywords = ["api", "mackerel"]
 categories = ["api-bindings"]
+edition = "2018"
 
 [dependencies]
 url = "2.1.1"

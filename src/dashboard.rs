@@ -1,5 +1,4 @@
-use client;
-use errors::*;
+use crate::{client, errors::*};
 use reqwest::Method;
 
 /// A dashboard
@@ -14,7 +13,7 @@ pub struct Dashboard {
 
 #[cfg(test)]
 mod tests {
-    use dashboard::*;
+    use crate::dashboard::*;
     use serde_json;
 
     fn dashboard_example() -> Dashboard {

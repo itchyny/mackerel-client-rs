@@ -1,5 +1,4 @@
-use client;
-use errors::*;
+use crate::{client, errors::*};
 use reqwest::Method;
 use serde_json::{map::Map, Value};
 use std::default;
@@ -53,7 +52,7 @@ impl default::Default for CreateHostParam {
 #[cfg(test)]
 mod tests {
 
-    use host::*;
+    use crate::host::*;
 
     fn json_example() -> serde_json::Value {
         json!({

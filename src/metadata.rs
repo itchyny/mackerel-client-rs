@@ -1,5 +1,4 @@
-use client;
-use errors::*;
+use crate::{client, errors::*};
 use reqwest::Method;
 use serde_json;
 

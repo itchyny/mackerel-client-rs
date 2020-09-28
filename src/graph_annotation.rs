@@ -1,5 +1,4 @@
-use client;
-use errors::*;
+use crate::{client, errors::*};
 use reqwest::Method;
 
 /// A graph annotation
@@ -16,7 +15,7 @@ pub struct GraphAnnotation {
 
 #[cfg(test)]
 mod tests {
-    use graph_annotation::*;
+    use crate::graph_annotation::*;
     use serde_json;
 
     fn graph_annotation_example() -> GraphAnnotation {

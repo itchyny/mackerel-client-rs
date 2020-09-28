@@ -1,5 +1,5 @@
-use client;
-use errors::*;
+use crate::client;
+use crate::errors::*;
 use reqwest::Method;
 use std::fmt;
 
@@ -264,7 +264,7 @@ impl fmt::Display for Sensitivity {
 
 #[cfg(test)]
 mod tests {
-    use monitor::*;
+    use crate::monitor::*;
     use serde_json;
 
     fn host_monitor_example() -> Monitor {
@@ -609,7 +609,10 @@ mod tests {
         ];
         for &(sensitivity, sensitivity_str) in &test_cases {
             let str_value = serde_json::Value::String(sensitivity_str.to_string());
-            assert_eq!(sensitivity, serde_json::from_value(str_value.clone()).unwrap());
+            assert_eq!(
+                sensitivity,
+                serde_json::from_value(str_value.clone()).unwrap()
+            );
             assert_eq!(str_value, serde_json::to_value(sensitivity).unwrap());
             assert_eq!(str_value, format!("{}", sensitivity).as_str());
         }

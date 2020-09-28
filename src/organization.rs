@@ -1,5 +1,5 @@
-use client;
-use errors::*;
+use crate::client;
+use crate::errors::*;
 use reqwest::Method;
 
 /// An organization
@@ -10,7 +10,7 @@ pub struct Organization {
 
 #[cfg(test)]
 mod tests {
-    use organization::*;
+    use crate::organization::*;
     use serde_json;
 
     fn organization_example() -> Organization {
