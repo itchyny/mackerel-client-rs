@@ -118,7 +118,7 @@ impl client::Client {
             "/api/v0/invitations/revoke",
             vec![],
             Some(HashMap::<_, _>::from_iter([("email", email)])),
-            |_: HashMap<String, bool>| (),
+            |_: serde_json::Value| (),
         )
         .await
     }

@@ -192,13 +192,13 @@ impl client::Client {
     /// Updates a host.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-information.
-    pub async fn update_host(&self, id: HostId, host: HostValue) -> Result<HostId> {
+    pub async fn update_host(&self, id: HostId, host: HostValue) -> Result<()> {
         self.request(
             Method::PUT,
             format!("/api/v0/hosts/{}", id),
             vec![],
             Some(host),
-            |res: CreateHostResponse| res.id,
+            |_: serde_json::Value| (),
         )
         .await
     }
@@ -212,7 +212,7 @@ impl client::Client {
             format!("/api/v0/hosts/{}/status", id),
             vec![],
             Some(HashMap::<_, _>::from_iter([("status", status)])),
-            |_: HashMap<String, bool>| (),
+            |_: serde_json::Value| (),
         )
         .await
     }
@@ -229,7 +229,7 @@ impl client::Client {
                 "roleFullnames",
                 role_fullnames,
             )])),
-            |_: HashMap<String, bool>| (),
+            |_: serde_json::Value| (),
         )
         .await
     }
@@ -243,7 +243,7 @@ impl client::Client {
             format!("/api/v0/hosts/{}/retire", id),
             vec![],
             client::empty_body(),
-            |_: HashMap<String, bool>| (),
+            |_: serde_json::Value| (),
         )
         .await
     }
