@@ -2,8 +2,10 @@ use crate::client;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 /// A dashboard
+#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Dashboard {

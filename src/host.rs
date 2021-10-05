@@ -3,6 +3,7 @@ use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::{map::Map, Value};
+use serde_with::skip_serializing_none;
 use std::default;
 
 #[derive(Debug, Deserialize)]
@@ -20,20 +21,16 @@ pub type Meta = Map<String, Value>;
 pub type Checks = Map<String, Value>;
 
 // Input type for POST /api/v0/hosts
+#[skip_serializing_none]
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateHostParam {
     pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_identifier: Option<String>,
     pub meta: Meta,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub interfaces: Option<Vec<Interface>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub role_fullnames: Option<Vec<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub checks: Option<Checks>,
 }
 

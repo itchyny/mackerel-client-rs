@@ -2,145 +2,97 @@ use crate::client;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use std::fmt;
 
 /// A monitor
+#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum Monitor {
     #[serde(rename_all = "camelCase")]
     Host {
-        #[serde(skip_serializing_if = "Option::is_none")]
         id: Option<String>,
         name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         memo: Option<String>,
         duration: u64,
         metric: String,
         operator: Operator,
-        #[serde(skip_serializing_if = "Option::is_none")]
         warning: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         scopes: Option<Vec<String>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         exclude_scopes: Option<Vec<String>>,
     },
     #[serde(rename_all = "camelCase")]
     Connectivity {
-        #[serde(skip_serializing_if = "Option::is_none")]
         id: Option<String>,
         name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         memo: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         scopes: Option<Vec<String>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         exclude_scopes: Option<Vec<String>>,
     },
     #[serde(rename_all = "camelCase")]
     Service {
-        #[serde(skip_serializing_if = "Option::is_none")]
         id: Option<String>,
         name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         memo: Option<String>,
         service: String,
         duration: u64,
         metric: String,
         operator: Operator,
-        #[serde(skip_serializing_if = "Option::is_none")]
         warning: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
     },
     #[serde(rename_all = "camelCase")]
     External {
-        #[serde(skip_serializing_if = "Option::is_none")]
         id: Option<String>,
         name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         memo: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         method: Option<ExternalMethod>,
         url: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         request_body: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         headers: Option<Vec<ExternalHeader>>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         service: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         response_time_duration: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         response_time_warning: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         response_time_critical: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         contains_string: Option<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         certification_expiration_warning: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         certification_expiration_critical: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         skip_certificate_verification: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
     },
     #[serde(rename_all = "camelCase")]
     Expression {
-        #[serde(skip_serializing_if = "Option::is_none")]
         id: Option<String>,
         name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         memo: Option<String>,
         expression: String,
         operator: Operator,
-        #[serde(skip_serializing_if = "Option::is_none")]
         warning: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
     },
     #[serde(rename_all = "camelCase")]
     AnomalyDetection {
-        #[serde(skip_serializing_if = "Option::is_none")]
         id: Option<String>,
         name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
         memo: Option<String>,
         scopes: Vec<String>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         warning_sensitivity: Option<Sensitivity>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         critical_sensitivity: Option<Sensitivity>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         training_period_from: Option<u64>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         is_mute: Option<bool>,
-        #[serde(skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
     },
 }

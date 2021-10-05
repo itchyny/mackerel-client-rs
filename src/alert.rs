@@ -3,26 +3,23 @@ use crate::errors::*;
 use crate::monitor::MonitorType;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 use std::fmt;
 
 /// An alert
+#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Alert {
     pub id: String,
     pub status: AlertStatus,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub monitor_id: Option<String>,
     #[serde(rename = "type")]
     pub monitor_type: MonitorType,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub host_id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
     // pub openedAt: DateTime, // TODO
     // pub closedAt: Option<DateTime>, // TODO

@@ -2,8 +2,10 @@ use crate::client;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 /// A graph annotation
+#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct GraphAnnotation {
     pub id: Option<String>,
