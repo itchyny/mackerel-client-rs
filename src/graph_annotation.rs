@@ -1,14 +1,17 @@
 use crate::client;
+use crate::entity::Entity;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 /// A graph annotation
+pub type GraphAnnotation = Entity<GraphAnnotationValue>;
+
+/// A graph annotation value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-pub struct GraphAnnotation {
-    pub id: Option<String>,
+pub struct GraphAnnotationValue {
     pub title: String,
     pub description: String,
     pub from: u64,
@@ -24,13 +27,15 @@ mod tests {
 
     fn graph_annotation_example() -> GraphAnnotation {
         GraphAnnotation {
-            id: Some("abcde1".to_string()),
-            title: "Deploy application".to_string(),
-            description: "Graph Annotation Example\nhttps://example.com".to_string(),
-            from: 1484000000,
-            to: 1484000030,
-            service: "ExampleService".to_string(),
-            roles: Some(vec!["ExampleRole1".to_string(), "ExampleRole2".to_string()]),
+            id: "abcde1".to_string(),
+            value: GraphAnnotationValue {
+                title: "Deploy application".to_string(),
+                description: "Graph Annotation Example\nhttps://example.com".to_string(),
+                from: 1484000000,
+                to: 1484000030,
+                service: "ExampleService".to_string(),
+                roles: Some(vec!["ExampleRole1".to_string(), "ExampleRole2".to_string()]),
+            },
         }
     }
 
@@ -115,15 +120,12 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
     pub async fn update_graph_annotation(
         &self,
-        graph_annotation: GraphAnnotation,
+        id: String,
+        graph_annotation: GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
-        let graph_annotation_id: String = graph_annotation
-            .clone()
-            .id
-            .ok_or("specify the id to update a graph_annotation")?;
         self.request(
             Method::PUT,
-            format!("/api/v0/graph-annotations/{}", graph_annotation_id),
+            format!("/api/v0/graph-annotations/{}", id),
             vec![],
             Some(graph_annotation),
             |graph_annotation| graph_annotation,
@@ -134,13 +136,10 @@ impl client::Client {
     /// Deletes a graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#delete.
-    pub async fn delete_graph_annotation(
-        &self,
-        graph_annotation_id: String,
-    ) -> Result<GraphAnnotation> {
+    pub async fn delete_graph_annotation(&self, id: String) -> Result<GraphAnnotation> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/graph-annotations/{}", graph_annotation_id),
+            format!("/api/v0/graph-annotations/{}", id),
             vec![],
             client::empty_body(),
             |graph_annotation| graph_annotation,

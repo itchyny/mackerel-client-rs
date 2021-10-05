@@ -1,12 +1,15 @@
 use crate::client;
+use crate::entity::Entity;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
 /// A channel
+pub type Channel = Entity<ChannelValue>;
+
+/// A channel value
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-pub struct Channel {
-    pub id: String,
+pub struct ChannelValue {
     pub name: String,
     #[serde(rename = "type")]
     pub channel_type: String,
@@ -20,8 +23,10 @@ mod tests {
     fn channel_example1() -> Channel {
         Channel {
             id: "abcde1".to_string(),
-            name: "Example Channel 1".to_string(),
-            channel_type: "slack".to_string(),
+            value: ChannelValue {
+                name: "Example Channel 1".to_string(),
+                channel_type: "slack".to_string(),
+            },
         }
     }
 
@@ -36,8 +41,10 @@ mod tests {
     fn channel_example2() -> Channel {
         Channel {
             id: "abcde2".to_string(),
-            name: "Example Channel 2".to_string(),
-            channel_type: "email".to_string(),
+            value: ChannelValue {
+                name: "Example Channel 2".to_string(),
+                channel_type: "email".to_string(),
+            },
         }
     }
 

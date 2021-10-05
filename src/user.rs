@@ -1,14 +1,17 @@
 use crate::authority::Authority;
 use crate::client;
+use crate::entity::Entity;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
 /// A user
+pub type User = Entity<UserValue>;
+
+/// A user value
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct User {
-    pub id: String,
+pub struct UserValue {
     pub screen_name: String,
     pub email: String,
     pub authority: Authority,
@@ -22,9 +25,11 @@ mod tests {
     fn user_example() -> User {
         User {
             id: "abcde".to_string(),
-            screen_name: "Example Mackerel".to_string(),
-            email: "mackerel@example.com".to_string(),
-            authority: Authority::Collaborator,
+            value: UserValue {
+                screen_name: "Example Mackerel".to_string(),
+                email: "mackerel@example.com".to_string(),
+                authority: Authority::Collaborator,
+            },
         }
     }
 

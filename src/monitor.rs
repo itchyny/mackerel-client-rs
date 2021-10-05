@@ -1,4 +1,5 @@
 use crate::client;
+use crate::entity::Entity;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -6,13 +7,15 @@ use serde_with::skip_serializing_none;
 use std::fmt;
 
 /// A monitor
+pub type Monitor = Entity<MonitorValue>;
+
+/// A monitor value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
-pub enum Monitor {
+pub enum MonitorValue {
     #[serde(rename_all = "camelCase")]
     Host {
-        id: Option<String>,
         name: String,
         memo: Option<String>,
         duration: u64,
@@ -27,7 +30,6 @@ pub enum Monitor {
     },
     #[serde(rename_all = "camelCase")]
     Connectivity {
-        id: Option<String>,
         name: String,
         memo: Option<String>,
         is_mute: Option<bool>,
@@ -37,7 +39,6 @@ pub enum Monitor {
     },
     #[serde(rename_all = "camelCase")]
     Service {
-        id: Option<String>,
         name: String,
         memo: Option<String>,
         service: String,
@@ -51,7 +52,6 @@ pub enum Monitor {
     },
     #[serde(rename_all = "camelCase")]
     External {
-        id: Option<String>,
         name: String,
         memo: Option<String>,
         method: Option<ExternalMethod>,
@@ -72,7 +72,6 @@ pub enum Monitor {
     },
     #[serde(rename_all = "camelCase")]
     Expression {
-        id: Option<String>,
         name: String,
         memo: Option<String>,
         expression: String,
@@ -84,7 +83,6 @@ pub enum Monitor {
     },
     #[serde(rename_all = "camelCase")]
     AnomalyDetection {
-        id: Option<String>,
         name: String,
         memo: Option<String>,
         scopes: Vec<String>,
@@ -97,28 +95,16 @@ pub enum Monitor {
     },
 }
 
-impl Monitor {
-    /// Returns the id of the monitor.
-    pub fn get_id(&self) -> Option<String> {
-        match *self {
-            Monitor::Host { ref id, .. } => id.clone(),
-            Monitor::Connectivity { ref id, .. } => id.clone(),
-            Monitor::Service { ref id, .. } => id.clone(),
-            Monitor::External { ref id, .. } => id.clone(),
-            Monitor::Expression { ref id, .. } => id.clone(),
-            Monitor::AnomalyDetection { ref id, .. } => id.clone(),
-        }
-    }
-
+impl MonitorValue {
     /// Returns the name of the monitor.
     pub fn get_name(&self) -> String {
         match *self {
-            Monitor::Host { ref name, .. } => name.clone(),
-            Monitor::Connectivity { ref name, .. } => name.clone(),
-            Monitor::Service { ref name, .. } => name.clone(),
-            Monitor::External { ref name, .. } => name.clone(),
-            Monitor::Expression { ref name, .. } => name.clone(),
-            Monitor::AnomalyDetection { ref name, .. } => name.clone(),
+            MonitorValue::Host { ref name, .. } => name.clone(),
+            MonitorValue::Connectivity { ref name, .. } => name.clone(),
+            MonitorValue::Service { ref name, .. } => name.clone(),
+            MonitorValue::External { ref name, .. } => name.clone(),
+            MonitorValue::Expression { ref name, .. } => name.clone(),
+            MonitorValue::AnomalyDetection { ref name, .. } => name.clone(),
         }
     }
 }
@@ -221,19 +207,21 @@ mod tests {
     use serde_json::json;
 
     fn host_monitor_example() -> Monitor {
-        Monitor::Host {
-            id: Some("abcde1".to_string()),
-            name: "Monitor custom.foo.bar".to_string(),
-            memo: Some("Monitor memo".to_string()),
-            duration: 5,
-            metric: "custom.foo.bar".to_string(),
-            operator: Operator::GreaterThan,
-            warning: Some(10.0),
-            critical: Some(20.0),
-            is_mute: Some(false),
-            notification_interval: Some(30),
-            scopes: Some(vec!["service0".to_string()]),
-            exclude_scopes: Some(vec!["service0:role3".to_string()]),
+        Monitor {
+            id: "abcde1".to_string(),
+            value: MonitorValue::Host {
+                name: "Monitor custom.foo.bar".to_string(),
+                memo: Some("Monitor memo".to_string()),
+                duration: 5,
+                metric: "custom.foo.bar".to_string(),
+                operator: Operator::GreaterThan,
+                warning: Some(10.0),
+                critical: Some(20.0),
+                is_mute: Some(false),
+                notification_interval: Some(30),
+                scopes: Some(vec!["service0".to_string()]),
+                exclude_scopes: Some(vec!["service0:role3".to_string()]),
+            },
         }
     }
 
@@ -256,14 +244,16 @@ mod tests {
     }
 
     fn connectivity_monitor_example() -> Monitor {
-        Monitor::Connectivity {
-            id: Some("abcde2".to_string()),
-            name: "connectivity".to_string(),
-            memo: Some("Monitor memo".to_string()),
-            is_mute: Some(false),
-            notification_interval: None,
-            scopes: None,
-            exclude_scopes: None,
+        Monitor {
+            id: "abcde2".to_string(),
+            value: MonitorValue::Connectivity {
+                name: "connectivity".to_string(),
+                memo: Some("Monitor memo".to_string()),
+                is_mute: Some(false),
+                notification_interval: None,
+                scopes: None,
+                exclude_scopes: None,
+            },
         }
     }
 
@@ -278,18 +268,20 @@ mod tests {
     }
 
     fn service_monitor_example() -> Monitor {
-        Monitor::Service {
-            id: Some("abcde3".to_string()),
-            name: "Service count".to_string(),
-            memo: Some("Monitor memo".to_string()),
-            service: "service1".to_string(),
-            duration: 5,
-            metric: "custom.service.count".to_string(),
-            operator: Operator::GreaterThan,
-            warning: Some(100.0),
-            critical: Some(200.0),
-            is_mute: Some(false),
-            notification_interval: Some(30),
+        Monitor {
+            id: "abcde3".to_string(),
+            value: MonitorValue::Service {
+                name: "Service count".to_string(),
+                memo: Some("Monitor memo".to_string()),
+                service: "service1".to_string(),
+                duration: 5,
+                metric: "custom.service.count".to_string(),
+                operator: Operator::GreaterThan,
+                warning: Some(100.0),
+                critical: Some(200.0),
+                is_mute: Some(false),
+                notification_interval: Some(30),
+            },
         }
     }
 
@@ -311,28 +303,30 @@ mod tests {
     }
 
     fn external_monitor_example() -> Monitor {
-        Monitor::External {
-            id: Some("abcde4".to_string()),
-            name: "Example external monitor".to_string(),
-            memo: Some("Monitor memo".to_string()),
-            method: Some(ExternalMethod::Get),
-            url: "https://example.com".to_string(),
-            request_body: Some("Request Body".to_string()),
-            headers: Some(vec![ExternalHeader {
-                name: "Cache-Control".to_string(),
-                value: "no-cache".to_string(),
-            }]),
-            service: Some("service1".to_string()),
-            response_time_duration: Some(5),
-            response_time_warning: Some(3000.0),
-            response_time_critical: Some(5000.0),
-            contains_string: Some("Example Domain".to_string()),
-            max_check_attempts: Some(5),
-            certification_expiration_warning: Some(1200),
-            certification_expiration_critical: Some(60),
-            skip_certificate_verification: Some(true),
-            is_mute: Some(true),
-            notification_interval: Some(60),
+        Monitor {
+            id: "abcde4".to_string(),
+            value: MonitorValue::External {
+                name: "Example external monitor".to_string(),
+                memo: Some("Monitor memo".to_string()),
+                method: Some(ExternalMethod::Get),
+                url: "https://example.com".to_string(),
+                request_body: Some("Request Body".to_string()),
+                headers: Some(vec![ExternalHeader {
+                    name: "Cache-Control".to_string(),
+                    value: "no-cache".to_string(),
+                }]),
+                service: Some("service1".to_string()),
+                response_time_duration: Some(5),
+                response_time_warning: Some(3000.0),
+                response_time_critical: Some(5000.0),
+                contains_string: Some("Example Domain".to_string()),
+                max_check_attempts: Some(5),
+                certification_expiration_warning: Some(1200),
+                certification_expiration_critical: Some(60),
+                skip_certificate_verification: Some(true),
+                is_mute: Some(true),
+                notification_interval: Some(60),
+            },
         }
     }
 
@@ -361,16 +355,18 @@ mod tests {
     }
 
     fn expression_monitor_example() -> Monitor {
-        Monitor::Expression {
-            id: Some("abcde5".to_string()),
-            name: "Example expression monitor".to_string(),
-            memo: Some("Monitor memo".to_string()),
-            expression: "min(role(\"foo:bar\", \"custom.foo.bar\"))".to_string(),
-            operator: Operator::LessThan,
-            warning: Some(10.0),
-            critical: None,
-            is_mute: Some(false),
-            notification_interval: None,
+        Monitor {
+            id: "abcde5".to_string(),
+            value: MonitorValue::Expression {
+                name: "Example expression monitor".to_string(),
+                memo: Some("Monitor memo".to_string()),
+                expression: "min(role(\"foo:bar\", \"custom.foo.bar\"))".to_string(),
+                operator: Operator::LessThan,
+                warning: Some(10.0),
+                critical: None,
+                is_mute: Some(false),
+                notification_interval: None,
+            },
         }
     }
 
@@ -388,17 +384,19 @@ mod tests {
     }
 
     fn anomaly_detection_monitor_example() -> Monitor {
-        Monitor::AnomalyDetection {
-            id: Some("abcde6".to_string()),
-            name: "Example Anomaly Detection monitor".to_string(),
-            memo: Some("Monitor memo".to_string()),
-            scopes: vec!["service0:role0".to_string()],
-            warning_sensitivity: Some(Sensitivity::Normal),
-            critical_sensitivity: Some(Sensitivity::Insensitive),
-            max_check_attempts: Some(3),
-            training_period_from: Some(1580000000),
-            is_mute: Some(false),
-            notification_interval: None,
+        Monitor {
+            id: "abcde6".to_string(),
+            value: MonitorValue::AnomalyDetection {
+                name: "Example Anomaly Detection monitor".to_string(),
+                memo: Some("Monitor memo".to_string()),
+                scopes: vec!["service0:role0".to_string()],
+                warning_sensitivity: Some(Sensitivity::Normal),
+                critical_sensitivity: Some(Sensitivity::Insensitive),
+                max_check_attempts: Some(3),
+                training_period_from: Some(1580000000),
+                is_mute: Some(false),
+                notification_interval: None,
+            },
         }
     }
 
@@ -438,54 +436,29 @@ mod tests {
     }
 
     #[test]
-    fn monitor_id() {
-        assert_eq!(host_monitor_example().get_id(), Some("abcde1".to_string()));
-        assert_eq!(
-            connectivity_monitor_example().get_id(),
-            Some("abcde2".to_string())
-        );
-        assert_eq!(
-            service_monitor_example().get_id(),
-            Some("abcde3".to_string())
-        );
-        assert_eq!(
-            external_monitor_example().get_id(),
-            Some("abcde4".to_string())
-        );
-        assert_eq!(
-            expression_monitor_example().get_id(),
-            Some("abcde5".to_string())
-        );
-        assert_eq!(
-            anomaly_detection_monitor_example().get_id(),
-            Some("abcde6".to_string())
-        );
-    }
-
-    #[test]
     fn monitor_name() {
         assert_eq!(
-            host_monitor_example().get_name(),
+            host_monitor_example().value.get_name(),
             "Monitor custom.foo.bar".to_string()
         );
         assert_eq!(
-            connectivity_monitor_example().get_name(),
+            connectivity_monitor_example().value.get_name(),
             "connectivity".to_string()
         );
         assert_eq!(
-            service_monitor_example().get_name(),
+            service_monitor_example().value.get_name(),
             "Service count".to_string()
         );
         assert_eq!(
-            external_monitor_example().get_name(),
+            external_monitor_example().value.get_name(),
             "Example external monitor".to_string()
         );
         assert_eq!(
-            expression_monitor_example().get_name(),
+            expression_monitor_example().value.get_name(),
             "Example expression monitor".to_string()
         );
         assert_eq!(
-            anomaly_detection_monitor_example().get_name(),
+            anomaly_detection_monitor_example().value.get_name(),
             "Example Anomaly Detection monitor".to_string()
         );
     }
@@ -595,7 +568,7 @@ impl client::Client {
     /// Registers a new monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#create.
-    pub async fn create_monitor(&self, monitor: Monitor) -> Result<Monitor> {
+    pub async fn create_monitor(&self, monitor: MonitorValue) -> Result<Monitor> {
         self.request(
             Method::POST,
             "/api/v0/monitors",
@@ -609,13 +582,10 @@ impl client::Client {
     /// Updates a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#update.
-    pub async fn update_monitor(&self, monitor: Monitor) -> Result<Monitor> {
-        let monitor_id: String = monitor
-            .get_id()
-            .ok_or("specify the id to update a monitor")?;
+    pub async fn update_monitor(&self, id: String, monitor: MonitorValue) -> Result<Monitor> {
         self.request(
             Method::PUT,
-            format!("/api/v0/monitors/{}", monitor_id),
+            format!("/api/v0/monitors/{}", id),
             vec![],
             Some(monitor),
             |monitor| monitor,
@@ -626,10 +596,10 @@ impl client::Client {
     /// Deletes a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#delete.
-    pub async fn delete_monitor(&self, monitor_id: String) -> Result<Monitor> {
+    pub async fn delete_monitor(&self, id: String) -> Result<Monitor> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/monitors/{}", monitor_id),
+            format!("/api/v0/monitors/{}", id),
             vec![],
             client::empty_body(),
             |monitor| monitor,

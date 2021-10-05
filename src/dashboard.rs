@@ -1,15 +1,18 @@
 use crate::client;
+use crate::entity::Entity;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 /// A dashboard
+pub type Dashboard = Entity<DashboardValue>;
+
+/// A dashboard value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Dashboard {
-    pub id: Option<String>,
+pub struct DashboardValue {
     pub title: String,
     pub memo: String,
     pub url_path: String,
@@ -114,82 +117,84 @@ mod tests {
 
     fn dashboard_example() -> Dashboard {
         Dashboard {
-            id: Some("abcde1".to_string()),
-            title: "This is a dashboard".to_string(),
-            memo: "This is a dashboard memo.".to_string(),
-            url_path: "example".to_string(),
-            widgets: vec![
-                DashboardWidget::Graph {
-                    title: "Graph title".to_string(),
-                    graph: DashboardGraph::Host {
-                        host_id: "abcde1".to_string(),
-                        name: "loadavg5".to_string(),
+            id: "abcde1".to_string(),
+            value: DashboardValue {
+                title: "This is a dashboard".to_string(),
+                memo: "This is a dashboard memo.".to_string(),
+                url_path: "example".to_string(),
+                widgets: vec![
+                    DashboardWidget::Graph {
+                        title: "Graph title".to_string(),
+                        graph: DashboardGraph::Host {
+                            host_id: "abcde1".to_string(),
+                            name: "loadavg5".to_string(),
+                        },
+                        range: Some(DashboardRange::Relative {
+                            period: 86400,
+                            offset: -3600,
+                        }),
+                        layout: DashboardLayout {
+                            x: 0,
+                            y: 0,
+                            width: 8,
+                            height: 6,
+                        },
                     },
-                    range: Some(DashboardRange::Relative {
-                        period: 86400,
-                        offset: -3600,
-                    }),
-                    layout: DashboardLayout {
-                        x: 0,
-                        y: 0,
-                        width: 8,
-                        height: 6,
+                    DashboardWidget::Graph {
+                        title: "Graph title".to_string(),
+                        graph: DashboardGraph::Role {
+                            role_fullname: "service:role".to_string(),
+                            name: "cpu.{user,iowait,system}".to_string(),
+                            is_stacked: Some(true),
+                        },
+                        range: Some(DashboardRange::Absolute {
+                            start: 1630000000,
+                            end: 1630003600,
+                        }),
+                        layout: DashboardLayout {
+                            x: 8,
+                            y: 0,
+                            width: 8,
+                            height: 6,
+                        },
                     },
-                },
-                DashboardWidget::Graph {
-                    title: "Graph title".to_string(),
-                    graph: DashboardGraph::Role {
+                    DashboardWidget::Value {
+                        title: "Metric value title".to_string(),
+                        metric: DashboardMetric::Host {
+                            host_id: "abcde1".to_string(),
+                            name: "cpu.user.percentage".to_string(),
+                        },
+                        fraction_size: Some(4),
+                        suffix: Some("%".to_string()),
+                        layout: DashboardLayout {
+                            x: 16,
+                            y: 0,
+                            width: 8,
+                            height: 6,
+                        },
+                    },
+                    DashboardWidget::Markdown {
+                        title: "Markdown title".to_string(),
+                        markdown: "# This is a markdown widget".to_string(),
+                        layout: DashboardLayout {
+                            x: 0,
+                            y: 6,
+                            width: 8,
+                            height: 6,
+                        },
+                    },
+                    DashboardWidget::AlertStatus {
+                        title: "Alert status title".to_string(),
                         role_fullname: "service:role".to_string(),
-                        name: "cpu.{user,iowait,system}".to_string(),
-                        is_stacked: Some(true),
+                        layout: DashboardLayout {
+                            x: 8,
+                            y: 6,
+                            width: 8,
+                            height: 6,
+                        },
                     },
-                    range: Some(DashboardRange::Absolute {
-                        start: 1630000000,
-                        end: 1630003600,
-                    }),
-                    layout: DashboardLayout {
-                        x: 8,
-                        y: 0,
-                        width: 8,
-                        height: 6,
-                    },
-                },
-                DashboardWidget::Value {
-                    title: "Metric value title".to_string(),
-                    metric: DashboardMetric::Host {
-                        host_id: "abcde1".to_string(),
-                        name: "cpu.user.percentage".to_string(),
-                    },
-                    fraction_size: Some(4),
-                    suffix: Some("%".to_string()),
-                    layout: DashboardLayout {
-                        x: 16,
-                        y: 0,
-                        width: 8,
-                        height: 6,
-                    },
-                },
-                DashboardWidget::Markdown {
-                    title: "Markdown title".to_string(),
-                    markdown: "# This is a markdown widget".to_string(),
-                    layout: DashboardLayout {
-                        x: 0,
-                        y: 6,
-                        width: 8,
-                        height: 6,
-                    },
-                },
-                DashboardWidget::AlertStatus {
-                    title: "Alert status title".to_string(),
-                    role_fullname: "service:role".to_string(),
-                    layout: DashboardLayout {
-                        x: 8,
-                        y: 6,
-                        width: 8,
-                        height: 6,
-                    },
-                },
-            ],
+                ],
+            },
         }
     }
 
@@ -324,7 +329,7 @@ impl client::Client {
     /// Creates a new dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#create.
-    pub async fn create_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
+    pub async fn create_dashboard(&self, dashboard: DashboardValue) -> Result<Dashboard> {
         self.request(
             Method::POST,
             "/api/v0/dashboards",
@@ -338,10 +343,10 @@ impl client::Client {
     /// Gets a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#get.
-    pub async fn get_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
+    pub async fn get_dashboard(&self, id: String) -> Result<Dashboard> {
         self.request(
             Method::GET,
-            format!("/api/v0/dashboards/{}", dashboard_id),
+            format!("/api/v0/dashboards/{}", id),
             vec![],
             client::empty_body(),
             |dashboard| dashboard,
@@ -352,14 +357,14 @@ impl client::Client {
     /// Updates a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#update.
-    pub async fn update_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
-        let dashboard_id: String = dashboard
-            .clone()
-            .id
-            .ok_or("specify the id to update a dashboard")?;
+    pub async fn update_dashboard(
+        &self,
+        id: String,
+        dashboard: DashboardValue,
+    ) -> Result<Dashboard> {
         self.request(
             Method::PUT,
-            format!("/api/v0/dashboards/{}", dashboard_id),
+            format!("/api/v0/dashboards/{}", id),
             vec![],
             Some(dashboard),
             |dashboard| dashboard,
@@ -370,10 +375,10 @@ impl client::Client {
     /// Deletes a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#delete.
-    pub async fn delete_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
+    pub async fn delete_dashboard(&self, id: String) -> Result<Dashboard> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/dashboards/{}", dashboard_id),
+            format!("/api/v0/dashboards/{}", id),
             vec![],
             client::empty_body(),
             |dashboard| dashboard,

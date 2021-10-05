@@ -65,6 +65,7 @@ pub mod errors {
 mod macros;
 
 pub mod client;
+pub mod entity;
 
 pub mod alert;
 pub mod authority;
