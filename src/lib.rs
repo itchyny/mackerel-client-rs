@@ -19,7 +19,7 @@
 //! println!("{:?}", client.list_service_metric_names("<Service-Name>").await);
 //!
 //! println!("{:?}", client.list_monitors().await);
-//! println!("{:?}", client.delete_monitor("<Monitor-ID>").await);
+//! println!("{:?}", client.delete_monitor("<Monitor-ID>".into()).await);
 //! ```
 //!
 
