@@ -19,6 +19,13 @@ pub struct User {
     pub value: UserValue,
 }
 
+impl std::ops::Deref for User {
+    type Target = UserValue;
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
 /// A user id
 pub type UserId = Id<UserValue>;
 

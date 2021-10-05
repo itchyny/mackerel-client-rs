@@ -64,6 +64,13 @@ pub struct HostValue {
     pub checks: Option<Vec<HostCheck>>,
 }
 
+impl std::ops::Deref for Host {
+    type Target = HostValue;
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

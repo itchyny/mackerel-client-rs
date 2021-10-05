@@ -6,6 +6,13 @@ pub struct Entity<T> {
     pub value: T,
 }
 
+impl<T> std::ops::Deref for Entity<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
 use std::marker::PhantomData;
 #[derive(PartialEq, Eq, Clone, Hash)]
 pub struct Id<T> {
