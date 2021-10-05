@@ -7,6 +7,7 @@ use serde_json::Value;
 use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 use std::default::Default;
+use std::fmt;
 use std::iter::FromIterator;
 
 /// A host
@@ -33,6 +34,17 @@ pub enum HostStatus {
     Standby,
     Maintenance,
     Poweroff,
+}
+
+impl fmt::Display for HostStatus {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            HostStatus::Working => write!(f, "working"),
+            HostStatus::Standby => write!(f, "standby"),
+            HostStatus::Maintenance => write!(f, "maintenance"),
+            HostStatus::Poweroff => write!(f, "poweroff"),
+        }
+    }
 }
 
 /// A host id
@@ -106,6 +118,25 @@ mod tests {
             host_value_example(),
             serde_json::from_value(host_value_json_example()).unwrap()
         );
+    }
+
+    #[test]
+    fn test_host_statuses() {
+        let test_cases = [
+            (HostStatus::Working, "working"),
+            (HostStatus::Standby, "standby"),
+            (HostStatus::Maintenance, "maintenance"),
+            (HostStatus::Poweroff, "poweroff"),
+        ];
+        for &(host_status, status_str) in &test_cases {
+            let str_value = serde_json::Value::String(status_str.to_string());
+            assert_eq!(
+                host_status,
+                serde_json::from_value(str_value.clone()).unwrap()
+            );
+            assert_eq!(str_value, serde_json::to_value(host_status).unwrap());
+            assert_eq!(str_value, format!("{}", host_status).as_str());
+        }
     }
 }
 
