@@ -1,7 +1,7 @@
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::errors::*;
-use crate::monitor::{MonitorType, MonitorValue};
+use crate::monitor::{MonitorId, MonitorType};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -11,13 +11,16 @@ use std::fmt;
 /// An alert
 pub type Alert = Entity<AlertValue>;
 
+/// An alert id
+pub type AlertId = Id<AlertValue>;
+
 /// An alert value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AlertValue {
     pub status: AlertStatus,
-    pub monitor_id: Option<Id<MonitorValue>>,
+    pub monitor_id: Option<MonitorId>,
     #[serde(rename = "type")]
     pub monitor_type: MonitorType,
     pub host_id: Option<String>,
@@ -169,7 +172,7 @@ impl client::Client {
     /// Closes the specified alert.
     ///
     /// See https://mackerel.io/api-docs/entry/alerts#close.
-    pub async fn close_alert(&self, id: Id<AlertValue>, reason: &str) -> Result<Alert> {
+    pub async fn close_alert(&self, id: AlertId, reason: &str) -> Result<Alert> {
         let body: HashMap<&str, &str> = [("reason", reason)].iter().cloned().collect();
         self.request(
             Method::POST,

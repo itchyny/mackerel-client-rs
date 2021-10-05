@@ -9,6 +9,9 @@ use std::fmt;
 /// A monitor
 pub type Monitor = Entity<MonitorValue>;
 
+/// A monitor id
+pub type MonitorId = Id<MonitorValue>;
+
 /// A monitor value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -582,11 +585,7 @@ impl client::Client {
     /// Updates a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#update.
-    pub async fn update_monitor(
-        &self,
-        id: Id<MonitorValue>,
-        monitor: MonitorValue,
-    ) -> Result<Monitor> {
+    pub async fn update_monitor(&self, id: MonitorId, monitor: MonitorValue) -> Result<Monitor> {
         self.request(
             Method::PUT,
             format!("/api/v0/monitors/{}", id),
@@ -600,7 +599,7 @@ impl client::Client {
     /// Deletes a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#delete.
-    pub async fn delete_monitor(&self, id: Id<MonitorValue>) -> Result<Monitor> {
+    pub async fn delete_monitor(&self, id: MonitorId) -> Result<Monitor> {
         self.request(
             Method::DELETE,
             format!("/api/v0/monitors/{}", id),

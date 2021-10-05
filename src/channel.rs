@@ -1,11 +1,14 @@
 use crate::client;
-use crate::entity::Entity;
+use crate::entity::{Entity, Id};
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
 /// A channel
 pub type Channel = Entity<ChannelValue>;
+
+/// A channel id
+pub type ChannelId = Id<ChannelValue>;
 
 /// A channel value
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]

@@ -8,6 +8,9 @@ use serde_with::skip_serializing_none;
 /// A dashboard
 pub type Dashboard = Entity<DashboardValue>;
 
+/// A dashboard id
+pub type DashboardId = Id<DashboardValue>;
+
 /// A dashboard value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -343,7 +346,7 @@ impl client::Client {
     /// Gets a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#get.
-    pub async fn get_dashboard(&self, id: Id<DashboardValue>) -> Result<Dashboard> {
+    pub async fn get_dashboard(&self, id: DashboardId) -> Result<Dashboard> {
         self.request(
             Method::GET,
             format!("/api/v0/dashboards/{}", id),
@@ -359,7 +362,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/dashboards#update.
     pub async fn update_dashboard(
         &self,
-        id: Id<DashboardValue>,
+        id: DashboardId,
         dashboard: DashboardValue,
     ) -> Result<Dashboard> {
         self.request(
@@ -375,7 +378,7 @@ impl client::Client {
     /// Deletes a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#delete.
-    pub async fn delete_dashboard(&self, id: Id<DashboardValue>) -> Result<Dashboard> {
+    pub async fn delete_dashboard(&self, id: DashboardId) -> Result<Dashboard> {
         self.request(
             Method::DELETE,
             format!("/api/v0/dashboards/{}", id),

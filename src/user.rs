@@ -1,12 +1,15 @@
 use crate::authority::Authority;
 use crate::client;
-use crate::entity::Entity;
+use crate::entity::{Entity, Id};
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
 /// A user
 pub type User = Entity<UserValue>;
+
+/// A user id
+pub type UserId = Id<UserValue>;
 
 /// A user value
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
