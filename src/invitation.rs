@@ -1,9 +1,8 @@
-use client;
-use errors::*;
+use crate::authority::Authority;
+use crate::client;
+use crate::errors::*;
 use reqwest::Method;
 use std::collections::HashMap;
-
-use authority::Authority;
 
 /// An invitation
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -15,7 +14,7 @@ pub struct Invitation {
 
 #[cfg(test)]
 mod tests {
-    use invitation::*;
+    use crate::invitation::*;
     use serde_json;
 
     fn invitation_example1() -> Invitation {

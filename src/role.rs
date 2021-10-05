@@ -1,5 +1,5 @@
-use client;
-use errors::*;
+use crate::client;
+use crate::errors::*;
 use reqwest::Method;
 
 /// A role
@@ -11,7 +11,7 @@ pub struct Role {
 
 #[cfg(test)]
 mod tests {
-    use role::*;
+    use crate::role::*;
     use serde_json;
 
     fn role_example() -> Role {

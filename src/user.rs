@@ -1,8 +1,7 @@
-use client;
-use errors::*;
+use crate::authority::Authority;
+use crate::client;
+use crate::errors::*;
 use reqwest::Method;
-
-use authority::Authority;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -16,8 +15,8 @@ pub struct User {
 
 #[cfg(test)]
 mod tests {
+    use crate::user::*;
     use serde_json;
-    use user::*;
 
     fn user_example() -> User {
         User {

@@ -1,5 +1,5 @@
-use client;
-use errors::*;
+use crate::client;
+use crate::errors::*;
 use reqwest::Method;
 
 /// A service
@@ -12,8 +12,8 @@ pub struct Service {
 
 #[cfg(test)]
 mod tests {
+    use crate::service::*;
     use serde_json;
-    use service::*;
 
     fn service_example() -> Service {
         Service {

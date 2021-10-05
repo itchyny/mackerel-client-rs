@@ -60,4 +60,4 @@ pub mod organization;
 pub mod role;
 pub mod service;
 pub mod user;
-pub use client::Client;
+pub use crate::client::Client;
