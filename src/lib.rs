@@ -12,14 +12,14 @@
 //! ```rust,no_run,ignore
 //! let client = Client::new("<Mackerel-API-KEY>");
 //!
-//! println!("{:?}", client.get_organization());
-//! println!("{:?}", client.list_users());
+//! println!("{:?}", client.get_organization().await);
+//! println!("{:?}", client.list_users().await);
 //!
-//! println!("{:?}", client.list_services());
-//! println!("{:?}", client.list_service_metric_names("<Service-Name>"));
+//! println!("{:?}", client.list_services().await);
+//! println!("{:?}", client.list_service_metric_names("<Service-Name>").await);
 //!
-//! println!("{:?}", client.list_monitors());
-//! println!("{:?}", client.delete_monitor("<Monitor-ID>"));
+//! println!("{:?}", client.list_monitors().await);
+//! println!("{:?}", client.delete_monitor("<Monitor-ID>").await);
 //! ```
 //!
 
