@@ -85,10 +85,10 @@ impl client::Client {
     /// Delete the user from the organization.
     ///
     /// See https://mackerel.io/api-docs/entry/users#delete.
-    pub async fn delete_user(&self, user_name: &str) -> Result<User> {
+    pub async fn delete_user(&self, id: UserId) -> Result<User> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/users/{}", user_name),
+            format!("/api/v0/users/{}", id),
             vec![],
             client::empty_body(),
             |user| user,
