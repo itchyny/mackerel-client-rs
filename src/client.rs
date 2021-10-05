@@ -3,7 +3,6 @@ use crate::errors::*;
 use reqwest;
 use serde;
 use serde_json;
-use std::convert::Into;
 use std::default;
 use url;
 
@@ -114,16 +113,16 @@ impl Client {
         .await
         .map_err(|e| format!("failed to send request: {}", e))?;
         if !response.status().is_success() {
-            bail!(self.api_error(response).await)
+            return Err(self.api_error(response).await);
         }
         response
             .json::<R>()
             .await
             .map(converter)
-            .chain_err(|| format!("JSON deserialization failed"))
+            .map_err(|e| format!("JSON deserialization failed: {}", e).into())
     }
 
-    async fn api_error(&self, response: reqwest::Response) -> ErrorKind {
+    async fn api_error(&self, response: reqwest::Response) -> Error {
         let status = response.status();
         let message_opt =
             response
@@ -136,6 +135,6 @@ impl Client {
                         .map(|err| err.get("message").unwrap_or(err))
                         .and_then(|val| val.as_str().map(|s| s.to_string()))
                 });
-        ErrorKind::ApiError(status, message_opt.unwrap_or("".to_string()))
+        Error::ApiError(status, message_opt.unwrap_or("".to_string()))
     }
 }
