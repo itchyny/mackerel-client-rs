@@ -1,5 +1,6 @@
 use crate::client;
 use crate::errors::*;
+use crate::host::HostId;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json;
@@ -20,7 +21,11 @@ impl client::Client {
     /// Retrieves a host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#get.
-    pub async fn get_metadata(&self, host_id: &str, namespace: &str) -> Result<serde_json::Value> {
+    pub async fn get_metadata(
+        &self,
+        host_id: HostId,
+        namespace: &str,
+    ) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
@@ -36,7 +41,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#put.
     pub async fn put_metadata(
         &self,
-        host_id: &str,
+        host_id: HostId,
         namespace: &str,
         metadata: serde_json::Value,
     ) -> Result<()> {
@@ -53,7 +58,7 @@ impl client::Client {
     /// Deletes a host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#delete.
-    pub async fn delete_metadata(&self, host_id: &str, namespace: &str) -> Result<()> {
+    pub async fn delete_metadata(&self, host_id: HostId, namespace: &str) -> Result<()> {
         self.request(
             Method::DELETE,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
@@ -67,7 +72,7 @@ impl client::Client {
     /// Lists host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#list.
-    pub async fn list_metadata(&self, host_id: &str) -> Result<Vec<Metadata>> {
+    pub async fn list_metadata(&self, host_id: HostId) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metadata", host_id),

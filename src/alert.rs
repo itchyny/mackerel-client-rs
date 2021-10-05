@@ -1,6 +1,7 @@
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::errors::*;
+use crate::host::HostId;
 use crate::monitor::{MonitorId, MonitorType};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -23,7 +24,7 @@ pub struct AlertValue {
     pub monitor_id: Option<MonitorId>,
     #[serde(rename = "type")]
     pub monitor_type: MonitorType,
-    pub host_id: Option<String>,
+    pub host_id: Option<HostId>,
     pub value: Option<f64>,
     pub message: Option<String>,
     pub reason: Option<String>,
@@ -64,7 +65,7 @@ mod tests {
                 status: AlertStatus::Critical,
                 monitor_id: Some("abcde2".into()),
                 monitor_type: MonitorType::Connectivity,
-                host_id: Some("abcde1".to_string()),
+                host_id: Some("abcde1".into()),
                 value: None,
                 message: None,
                 reason: None,
@@ -89,7 +90,7 @@ mod tests {
                 status: AlertStatus::Warning,
                 monitor_id: Some("abcde2".into()),
                 monitor_type: MonitorType::Host,
-                host_id: Some("abcde1".to_string()),
+                host_id: Some("abcde1".into()),
                 value: Some(25.0),
                 message: None,
                 reason: None,

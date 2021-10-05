@@ -1,10 +1,14 @@
 use crate::client;
+use crate::entity::Id;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::{map::Map, Value};
 use serde_with::skip_serializing_none;
 use std::default;
+
+// TODO: A host id
+pub type HostId = Id<()>;
 
 // TODO: Define its fields.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -108,14 +112,14 @@ mod tests {
 
 #[derive(Deserialize)]
 struct CreateHostResponse {
-    id: String,
+    id: HostId,
 }
 
 impl client::Client {
     /// Creates a new host.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#create.
-    pub async fn create_host(&self, param: CreateHostParam) -> Result<String> {
+    pub async fn create_host(&self, param: CreateHostParam) -> Result<HostId> {
         self.request(
             Method::POST,
             "/api/v0/hosts",

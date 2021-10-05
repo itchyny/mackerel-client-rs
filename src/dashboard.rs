@@ -1,6 +1,7 @@
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::errors::*;
+use crate::host::HostId;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -62,7 +63,7 @@ pub enum DashboardWidget {
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardGraph {
     #[serde(rename_all = "camelCase")]
-    Host { host_id: String, name: String },
+    Host { host_id: HostId, name: String },
     #[serde(rename_all = "camelCase")]
     Role {
         role_fullname: String,
@@ -83,7 +84,7 @@ pub enum DashboardGraph {
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardMetric {
     #[serde(rename_all = "camelCase")]
-    Host { host_id: String, name: String },
+    Host { host_id: HostId, name: String },
     #[serde(rename_all = "camelCase")]
     Service { service_name: String, name: String },
     #[serde(rename_all = "camelCase")]
@@ -129,7 +130,7 @@ mod tests {
                     DashboardWidget::Graph {
                         title: "Graph title".to_string(),
                         graph: DashboardGraph::Host {
-                            host_id: "abcde1".to_string(),
+                            host_id: "abcde1".into(),
                             name: "loadavg5".to_string(),
                         },
                         range: Some(DashboardRange::Relative {
@@ -164,7 +165,7 @@ mod tests {
                     DashboardWidget::Value {
                         title: "Metric value title".to_string(),
                         metric: DashboardMetric::Host {
-                            host_id: "abcde1".to_string(),
+                            host_id: "abcde1".into(),
                             name: "cpu.user.percentage".to_string(),
                         },
                         fraction_size: Some(4),
