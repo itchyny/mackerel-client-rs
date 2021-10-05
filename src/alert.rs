@@ -1,6 +1,7 @@
 use crate::client;
+use crate::entity::{Entity, Id};
 use crate::errors::*;
-use crate::monitor::MonitorType;
+use crate::monitor::{MonitorType, MonitorValue};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -8,13 +9,15 @@ use std::collections::HashMap;
 use std::fmt;
 
 /// An alert
+pub type Alert = Entity<AlertValue>;
+
+/// An alert value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Alert {
-    pub id: String,
+pub struct AlertValue {
     pub status: AlertStatus,
-    pub monitor_id: Option<String>,
+    pub monitor_id: Option<Id<MonitorValue>>,
     #[serde(rename = "type")]
     pub monitor_type: MonitorType,
     pub host_id: Option<String>,
@@ -54,13 +57,15 @@ mod tests {
     fn alert_example1() -> Alert {
         Alert {
             id: "abcde0".into(),
-            status: AlertStatus::Critical,
-            monitor_id: Some("abcde2".to_string()),
-            monitor_type: MonitorType::Connectivity,
-            host_id: Some("abcde1".to_string()),
-            value: None,
-            message: None,
-            reason: None,
+            value: AlertValue {
+                status: AlertStatus::Critical,
+                monitor_id: Some("abcde2".into()),
+                monitor_type: MonitorType::Connectivity,
+                host_id: Some("abcde1".to_string()),
+                value: None,
+                message: None,
+                reason: None,
+            },
         }
     }
 
@@ -77,13 +82,15 @@ mod tests {
     fn alert_example2() -> Alert {
         Alert {
             id: "abcde0".into(),
-            status: AlertStatus::Warning,
-            monitor_id: Some("abcde2".to_string()),
-            monitor_type: MonitorType::Host,
-            host_id: Some("abcde1".to_string()),
-            value: Some(25.0),
-            message: None,
-            reason: None,
+            value: AlertValue {
+                status: AlertStatus::Warning,
+                monitor_id: Some("abcde2".into()),
+                monitor_type: MonitorType::Host,
+                host_id: Some("abcde1".to_string()),
+                value: Some(25.0),
+                message: None,
+                reason: None,
+            },
         }
     }
 
@@ -162,7 +169,7 @@ impl client::Client {
     /// Closes the specified alert.
     ///
     /// See https://mackerel.io/api-docs/entry/alerts#close.
-    pub async fn close_alert(&self, id: String, reason: &str) -> Result<Alert> {
+    pub async fn close_alert(&self, id: Id<AlertValue>, reason: &str) -> Result<Alert> {
         let body: HashMap<&str, &str> = [("reason", reason)].iter().cloned().collect();
         self.request(
             Method::POST,
