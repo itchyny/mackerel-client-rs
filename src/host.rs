@@ -8,8 +8,34 @@ use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 use std::default::Default;
 
-// TODO: A host id
-pub type HostId = Id<()>;
+/// A host
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Host {
+    pub id: HostId,
+    pub created_at: u64,
+    pub size: String,
+    pub status: HostStatus,
+    pub memo: String,
+    pub is_retired: bool,
+    pub retired_at: Option<u64>,
+    pub roles: HashMap<String, Vec<String>>,
+    #[serde(flatten)]
+    pub value: HostValue,
+}
+
+/// Host status
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum HostStatus {
+    Working,
+    Standby,
+    Maintenance,
+    Poweroff,
+}
+
+/// A host id
+pub type HostId = Id<HostValue>;
 
 /// A host value
 #[skip_serializing_none]
@@ -87,6 +113,21 @@ struct CreateHostResponse {
     id: HostId,
 }
 
+#[derive(Deserialize)]
+struct GetHostResponse {
+    host: Host,
+}
+
+#[derive(Deserialize)]
+struct ListHostsResponse {
+    hosts: Vec<Host>,
+}
+
+#[derive(Deserialize)]
+struct ListMetricNamesResponse {
+    names: Vec<String>,
+}
+
 impl client::Client {
     /// Creates a new host.
     ///
@@ -98,6 +139,109 @@ impl client::Client {
             vec![],
             Some(host),
             |res: CreateHostResponse| res.id,
+        )
+        .await
+    }
+
+    /// Gets a host.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#get.
+    pub async fn get_host(&self, id: HostId) -> Result<Host> {
+        self.request(
+            Method::GET,
+            format!("/api/v0/hosts/{}", id),
+            vec![],
+            client::empty_body(),
+            |res: GetHostResponse| res.host,
+        )
+        .await
+    }
+
+    /// Updates a host.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#update-information.
+    pub async fn update_host(&self, id: HostId, host: HostValue) -> Result<HostId> {
+        self.request(
+            Method::PUT,
+            format!("/api/v0/hosts/{}", id),
+            vec![],
+            Some(host),
+            |res: CreateHostResponse| res.id,
+        )
+        .await
+    }
+
+    /// Updates host status.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#update-status.
+    pub async fn update_host_status(&self, id: HostId, status: HostStatus) -> Result<()> {
+        let body: HashMap<&str, HostStatus> = [("status", status)].iter().cloned().collect();
+        self.request(
+            Method::POST,
+            format!("/api/v0/hosts/{}/status", id),
+            vec![],
+            Some(body),
+            |_: HashMap<String, bool>| (),
+        )
+        .await
+    }
+
+    /// Updates host roles.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#update-roles.
+    pub async fn update_host_roles(&self, id: HostId, role_fullnames: Vec<String>) -> Result<()> {
+        let body: HashMap<&str, Vec<String>> = [("roleFullnames", role_fullnames)]
+            .iter()
+            .cloned()
+            .collect();
+        self.request(
+            Method::POST,
+            format!("/api/v0/hosts/{}/role-fullnames", id),
+            vec![],
+            Some(body),
+            |_: HashMap<String, bool>| (),
+        )
+        .await
+    }
+
+    /// Retires a host.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#retire.
+    pub async fn retire_host(&self, id: HostId) -> Result<()> {
+        self.request(
+            Method::POST,
+            format!("/api/v0/hosts/{}/retire", id),
+            vec![],
+            client::empty_body(),
+            |_: HashMap<String, bool>| (),
+        )
+        .await
+    }
+
+    /// Fetches hosts.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#list.
+    pub async fn list_hosts(&self) -> Result<Vec<Host>> {
+        self.request(
+            Method::GET,
+            "/api/v0/hosts",
+            vec![],
+            client::empty_body(),
+            |res: ListHostsResponse| res.hosts,
+        )
+        .await
+    }
+
+    /// Fetches host metric names.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#metric-names.
+    pub async fn list_host_metric_names(&self, id: HostId) -> Result<Vec<String>> {
+        self.request(
+            Method::GET,
+            format!("/api/v0/hosts/{}/metric-names", id),
+            vec![],
+            client::empty_body(),
+            |res: ListMetricNamesResponse| res.names,
         )
         .await
     }
