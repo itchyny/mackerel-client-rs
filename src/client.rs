@@ -63,7 +63,11 @@ impl Client {
         let mut headers = reqwest::header::HeaderMap::new();
         headers.insert(
             "X-Api-Key",
-            reqwest::header::HeaderValue::from_bytes(self.api_key.as_bytes()).unwrap(),
+            reqwest::header::HeaderValue::from_str(&self.api_key).unwrap(),
+        );
+        headers.insert(
+            reqwest::header::USER_AGENT,
+            reqwest::header::HeaderValue::from_str(&self.user_agent).unwrap(),
         );
         headers.insert(
             reqwest::header::CONTENT_TYPE,
