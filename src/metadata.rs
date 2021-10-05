@@ -24,7 +24,7 @@ impl client::Client {
     pub async fn get_host_metadata(
         &self,
         host_id: HostId,
-        namespace: &str,
+        namespace: String,
     ) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
@@ -42,7 +42,7 @@ impl client::Client {
     pub async fn put_host_metadata(
         &self,
         host_id: HostId,
-        namespace: &str,
+        namespace: String,
         metadata: serde_json::Value,
     ) -> Result<()> {
         self.request(
@@ -58,7 +58,7 @@ impl client::Client {
     /// Deletes a host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#hostdelete.
-    pub async fn delete_host_metadata(&self, host_id: HostId, namespace: &str) -> Result<()> {
+    pub async fn delete_host_metadata(&self, host_id: HostId, namespace: String) -> Result<()> {
         self.request(
             Method::DELETE,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
@@ -89,7 +89,7 @@ impl client::Client {
     pub async fn get_service_metadata(
         &self,
         service_name: String,
-        namespace: &str,
+        namespace: String,
     ) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
@@ -107,7 +107,7 @@ impl client::Client {
     pub async fn put_service_metadata(
         &self,
         service_name: String,
-        namespace: &str,
+        namespace: String,
         metadata: serde_json::Value,
     ) -> Result<()> {
         self.request(
@@ -126,7 +126,7 @@ impl client::Client {
     pub async fn delete_service_metadata(
         &self,
         service_name: String,
-        namespace: &str,
+        namespace: String,
     ) -> Result<()> {
         self.request(
             Method::DELETE,
@@ -159,7 +159,7 @@ impl client::Client {
         &self,
         service_name: String,
         role_name: String,
-        namespace: &str,
+        namespace: String,
     ) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
@@ -181,7 +181,7 @@ impl client::Client {
         &self,
         service_name: String,
         role_name: String,
-        namespace: &str,
+        namespace: String,
         metadata: serde_json::Value,
     ) -> Result<()> {
         self.request(
@@ -204,7 +204,7 @@ impl client::Client {
         &self,
         service_name: String,
         role_name: String,
-        namespace: &str,
+        namespace: String,
     ) -> Result<()> {
         self.request(
             Method::DELETE,

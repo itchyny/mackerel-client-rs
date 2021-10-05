@@ -112,7 +112,7 @@ impl client::Client {
     /// Revokes an invitation.
     ///
     /// See https://mackerel.io/api-docs/entry/invitations#revoke.
-    pub async fn revoke_invitation(&self, email: &str) -> Result<()> {
+    pub async fn revoke_invitation(&self, email: String) -> Result<()> {
         self.request(
             Method::POST,
             "/api/v0/invitations/revoke",

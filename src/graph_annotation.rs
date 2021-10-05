@@ -80,7 +80,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#get.
     pub async fn list_graph_annotations(
         &self,
-        service: &str,
+        service: String,
         from: u64,
         to: u64,
     ) -> Result<Vec<GraphAnnotation>> {
@@ -88,7 +88,7 @@ impl client::Client {
             Method::GET,
             "/api/v0/graph-annotations",
             vec![
-                ("service", vec![service]),
+                ("service", vec![&service]),
                 ("from", vec![&from.to_string()]),
                 ("to", vec![&to.to_string()]),
             ],
