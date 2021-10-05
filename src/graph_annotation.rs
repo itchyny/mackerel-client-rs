@@ -1,5 +1,5 @@
 use crate::client;
-use crate::entity::Entity;
+use crate::entity::{Entity, Id};
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -27,7 +27,7 @@ mod tests {
 
     fn graph_annotation_example() -> GraphAnnotation {
         GraphAnnotation {
-            id: "abcde1".to_string(),
+            id: "abcde1".into(),
             value: GraphAnnotationValue {
                 title: "Deploy application".to_string(),
                 description: "Graph Annotation Example\nhttps://example.com".to_string(),
@@ -120,7 +120,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
     pub async fn update_graph_annotation(
         &self,
-        id: String,
+        id: Id<GraphAnnotationValue>,
         graph_annotation: GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
         self.request(
@@ -136,7 +136,10 @@ impl client::Client {
     /// Deletes a graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#delete.
-    pub async fn delete_graph_annotation(&self, id: String) -> Result<GraphAnnotation> {
+    pub async fn delete_graph_annotation(
+        &self,
+        id: Id<GraphAnnotationValue>,
+    ) -> Result<GraphAnnotation> {
         self.request(
             Method::DELETE,
             format!("/api/v0/graph-annotations/{}", id),

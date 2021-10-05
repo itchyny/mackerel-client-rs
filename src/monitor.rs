@@ -1,5 +1,5 @@
 use crate::client;
-use crate::entity::Entity;
+use crate::entity::{Entity, Id};
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -208,7 +208,7 @@ mod tests {
 
     fn host_monitor_example() -> Monitor {
         Monitor {
-            id: "abcde1".to_string(),
+            id: "abcde1".into(),
             value: MonitorValue::Host {
                 name: "Monitor custom.foo.bar".to_string(),
                 memo: Some("Monitor memo".to_string()),
@@ -245,7 +245,7 @@ mod tests {
 
     fn connectivity_monitor_example() -> Monitor {
         Monitor {
-            id: "abcde2".to_string(),
+            id: "abcde2".into(),
             value: MonitorValue::Connectivity {
                 name: "connectivity".to_string(),
                 memo: Some("Monitor memo".to_string()),
@@ -269,7 +269,7 @@ mod tests {
 
     fn service_monitor_example() -> Monitor {
         Monitor {
-            id: "abcde3".to_string(),
+            id: "abcde3".into(),
             value: MonitorValue::Service {
                 name: "Service count".to_string(),
                 memo: Some("Monitor memo".to_string()),
@@ -304,7 +304,7 @@ mod tests {
 
     fn external_monitor_example() -> Monitor {
         Monitor {
-            id: "abcde4".to_string(),
+            id: "abcde4".into(),
             value: MonitorValue::External {
                 name: "Example external monitor".to_string(),
                 memo: Some("Monitor memo".to_string()),
@@ -356,7 +356,7 @@ mod tests {
 
     fn expression_monitor_example() -> Monitor {
         Monitor {
-            id: "abcde5".to_string(),
+            id: "abcde5".into(),
             value: MonitorValue::Expression {
                 name: "Example expression monitor".to_string(),
                 memo: Some("Monitor memo".to_string()),
@@ -385,7 +385,7 @@ mod tests {
 
     fn anomaly_detection_monitor_example() -> Monitor {
         Monitor {
-            id: "abcde6".to_string(),
+            id: "abcde6".into(),
             value: MonitorValue::AnomalyDetection {
                 name: "Example Anomaly Detection monitor".to_string(),
                 memo: Some("Monitor memo".to_string()),
@@ -582,7 +582,11 @@ impl client::Client {
     /// Updates a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#update.
-    pub async fn update_monitor(&self, id: String, monitor: MonitorValue) -> Result<Monitor> {
+    pub async fn update_monitor(
+        &self,
+        id: Id<MonitorValue>,
+        monitor: MonitorValue,
+    ) -> Result<Monitor> {
         self.request(
             Method::PUT,
             format!("/api/v0/monitors/{}", id),
@@ -596,7 +600,7 @@ impl client::Client {
     /// Deletes a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#delete.
-    pub async fn delete_monitor(&self, id: String) -> Result<Monitor> {
+    pub async fn delete_monitor(&self, id: Id<MonitorValue>) -> Result<Monitor> {
         self.request(
             Method::DELETE,
             format!("/api/v0/monitors/{}", id),

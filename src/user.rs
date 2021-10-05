@@ -24,7 +24,7 @@ mod tests {
 
     fn user_example() -> User {
         User {
-            id: "abcde".to_string(),
+            id: "abcde".into(),
             value: UserValue {
                 screen_name: "Example Mackerel".to_string(),
                 email: "mackerel@example.com".to_string(),

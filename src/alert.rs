@@ -53,7 +53,7 @@ mod tests {
 
     fn alert_example1() -> Alert {
         Alert {
-            id: "abcde0".to_string(),
+            id: "abcde0".into(),
             status: AlertStatus::Critical,
             monitor_id: Some("abcde2".to_string()),
             monitor_type: MonitorType::Connectivity,
@@ -76,7 +76,7 @@ mod tests {
 
     fn alert_example2() -> Alert {
         Alert {
-            id: "abcde0".to_string(),
+            id: "abcde0".into(),
             status: AlertStatus::Warning,
             monitor_id: Some("abcde2".to_string()),
             monitor_type: MonitorType::Host,

@@ -22,7 +22,7 @@ mod tests {
 
     fn channel_example1() -> Channel {
         Channel {
-            id: "abcde1".to_string(),
+            id: "abcde1".into(),
             value: ChannelValue {
                 name: "Example Channel 1".to_string(),
                 channel_type: "slack".to_string(),
@@ -40,7 +40,7 @@ mod tests {
 
     fn channel_example2() -> Channel {
         Channel {
-            id: "abcde2".to_string(),
+            id: "abcde2".into(),
             value: ChannelValue {
                 name: "Example Channel 2".to_string(),
                 channel_type: "email".to_string(),

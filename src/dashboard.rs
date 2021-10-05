@@ -1,5 +1,5 @@
 use crate::client;
-use crate::entity::Entity;
+use crate::entity::{Entity, Id};
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -117,7 +117,7 @@ mod tests {
 
     fn dashboard_example() -> Dashboard {
         Dashboard {
-            id: "abcde1".to_string(),
+            id: "abcde1".into(),
             value: DashboardValue {
                 title: "This is a dashboard".to_string(),
                 memo: "This is a dashboard memo.".to_string(),
@@ -343,7 +343,7 @@ impl client::Client {
     /// Gets a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#get.
-    pub async fn get_dashboard(&self, id: String) -> Result<Dashboard> {
+    pub async fn get_dashboard(&self, id: Id<DashboardValue>) -> Result<Dashboard> {
         self.request(
             Method::GET,
             format!("/api/v0/dashboards/{}", id),
@@ -359,7 +359,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/dashboards#update.
     pub async fn update_dashboard(
         &self,
-        id: String,
+        id: Id<DashboardValue>,
         dashboard: DashboardValue,
     ) -> Result<Dashboard> {
         self.request(
@@ -375,7 +375,7 @@ impl client::Client {
     /// Deletes a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#delete.
-    pub async fn delete_dashboard(&self, id: String) -> Result<Dashboard> {
+    pub async fn delete_dashboard(&self, id: Id<DashboardValue>) -> Result<Dashboard> {
         self.request(
             Method::DELETE,
             format!("/api/v0/dashboards/{}", id),
