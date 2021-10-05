@@ -61,9 +61,6 @@ pub mod errors {
     pub type Result<T> = std::result::Result<T, Error>;
 }
 
-#[macro_use]
-mod macros;
-
 pub mod client;
 pub mod entity;
 
