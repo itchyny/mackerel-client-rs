@@ -19,7 +19,7 @@ impl default::Default for Client {
         Client {
             api_key: "".to_string(),
             api_base: "https://api.mackerelio.com".to_string(),
-            user_agent: "mackerel-client-rs".to_string(),
+            user_agent: format!("mackerel-client-rs/{}", env!("CARGO_PKG_VERSION")),
         }
     }
 }
