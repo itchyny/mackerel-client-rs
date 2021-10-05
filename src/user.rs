@@ -1,12 +1,23 @@
 use crate::authority::Authority;
 use crate::client;
-use crate::entity::{Entity, Id};
+use crate::entity::Id;
 use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
 /// A user
-pub type User = Entity<UserValue>;
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct User {
+    pub id: UserId,
+    pub is_in_registration_process: bool,
+    #[serde(rename = "isMFAEnabled")]
+    pub is_mfa_enabled: bool,
+    pub authentication_methods: Vec<String>,
+    pub joined_at: u64,
+    #[serde(flatten)]
+    pub value: UserValue,
+}
 
 /// A user id
 pub type UserId = Id<UserValue>;
@@ -28,6 +39,10 @@ mod tests {
     fn user_example() -> User {
         User {
             id: "abcde".into(),
+            is_in_registration_process: false,
+            is_mfa_enabled: false,
+            authentication_methods: vec!["password".to_string()],
+            joined_at: 1630000000,
             value: UserValue {
                 screen_name: "Example Mackerel".to_string(),
                 email: "mackerel@example.com".to_string(),
@@ -41,7 +56,11 @@ mod tests {
             "id": "abcde",
             "screenName": "Example Mackerel",
             "email": "mackerel@example.com",
-            "authority": "collaborator"
+            "authority": "collaborator",
+            "isInRegistrationProcess": false,
+            "isMFAEnabled": false,
+            "authenticationMethods": ["password"],
+            "joinedAt": 1630000000,
         })
     }
 
