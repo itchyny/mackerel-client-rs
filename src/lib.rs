@@ -22,14 +22,6 @@
 //! println!("{:?}", client.delete_monitor("<Monitor-ID>"));
 //! ```
 //!
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-#[cfg_attr(test, macro_use)]
-extern crate serde_json;
-
-extern crate reqwest;
-extern crate url;
 
 pub mod errors {
     use reqwest;

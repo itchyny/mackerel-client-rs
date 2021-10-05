@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 
 /// A dashboard
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -15,7 +16,7 @@ pub struct Dashboard {
 #[cfg(test)]
 mod tests {
     use crate::dashboard::*;
-    use serde_json;
+    use serde_json::json;
 
     fn dashboard_example() -> Dashboard {
         Dashboard {

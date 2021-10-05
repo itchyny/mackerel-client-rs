@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 use std::fmt;
 
 /// A monitor
@@ -265,7 +266,7 @@ impl fmt::Display for Sensitivity {
 #[cfg(test)]
 mod tests {
     use crate::monitor::*;
-    use serde_json;
+    use serde_json::json;
 
     fn host_monitor_example() -> Monitor {
         Monitor::Host {

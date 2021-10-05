@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 use serde_json::{map::Map, Value};
 use std::default;
 
@@ -54,6 +55,7 @@ impl default::Default for CreateHostParam {
 mod tests {
 
     use crate::host::*;
+    use serde_json::json;
 
     fn json_example() -> serde_json::Value {
         json!({

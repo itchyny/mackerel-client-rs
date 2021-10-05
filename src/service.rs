@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 
 /// A service
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -13,7 +14,7 @@ pub struct Service {
 #[cfg(test)]
 mod tests {
     use crate::service::*;
-    use serde_json;
+    use serde_json::json;
 
     fn service_example() -> Service {
         Service {

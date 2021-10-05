@@ -2,6 +2,7 @@ use crate::client;
 use crate::errors::*;
 use crate::monitor::MonitorType;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
 
@@ -51,7 +52,7 @@ impl fmt::Display for AlertStatus {
 #[cfg(test)]
 mod tests {
     use crate::alert::*;
-    use serde_json;
+    use serde_json::json;
 
     fn alert_example1() -> Alert {
         Alert {

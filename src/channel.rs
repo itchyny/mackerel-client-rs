@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 
 /// A channel
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -14,7 +15,7 @@ pub struct Channel {
 #[cfg(test)]
 mod tests {
     use crate::channel::*;
-    use serde_json;
+    use serde_json::json;
 
     fn channel_example1() -> Channel {
         Channel {

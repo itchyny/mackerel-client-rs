@@ -2,6 +2,7 @@ use crate::authority::Authority;
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// An invitation
@@ -15,7 +16,7 @@ pub struct Invitation {
 #[cfg(test)]
 mod tests {
     use crate::invitation::*;
-    use serde_json;
+    use serde_json::json;
 
     fn invitation_example1() -> Invitation {
         Invitation {

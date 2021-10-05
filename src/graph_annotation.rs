@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 
 /// A graph annotation
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -17,7 +18,7 @@ pub struct GraphAnnotation {
 #[cfg(test)]
 mod tests {
     use crate::graph_annotation::*;
-    use serde_json;
+    use serde_json::json;
 
     fn graph_annotation_example() -> GraphAnnotation {
         GraphAnnotation {

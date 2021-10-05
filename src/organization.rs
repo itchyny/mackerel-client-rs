@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 
 /// An organization
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -11,7 +12,7 @@ pub struct Organization {
 #[cfg(test)]
 mod tests {
     use crate::organization::*;
-    use serde_json;
+    use serde_json::json;
 
     fn organization_example() -> Organization {
         Organization {

@@ -13,7 +13,6 @@ The official Go client library: [mackerel-client-go](https://github.com/mackerel
 
 ## Example
 ```rust
-extern crate mackerel_client;
 use mackerel_client::*;
 
 fn main() {

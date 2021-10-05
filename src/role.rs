@@ -1,6 +1,7 @@
 use crate::client;
 use crate::errors::*;
 use reqwest::Method;
+use serde_derive::{Deserialize, Serialize};
 
 /// A role
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -12,7 +13,7 @@ pub struct Role {
 #[cfg(test)]
 mod tests {
     use crate::role::*;
-    use serde_json;
+    use serde_json::json;
 
     fn role_example() -> Role {
         Role {
