@@ -110,7 +110,7 @@ impl client::Client {
         .await
     }
 
-    /// Fetches the names of the service metrics.
+    /// Fetches service metric names.
     ///
     /// See https://mackerel.io/api-docs/entry/services#metric-names.
     pub async fn list_service_metric_names(&self, service_name: String) -> Result<Vec<String>> {

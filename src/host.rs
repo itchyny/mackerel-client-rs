@@ -7,6 +7,7 @@ use serde_json::Value;
 use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 use std::default::Default;
+use std::iter::FromIterator;
 
 /// A host
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -175,12 +176,11 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-status.
     pub async fn update_host_status(&self, id: HostId, status: HostStatus) -> Result<()> {
-        let body: HashMap<&str, HostStatus> = [("status", status)].iter().cloned().collect();
         self.request(
             Method::POST,
             format!("/api/v0/hosts/{}/status", id),
             vec![],
-            Some(body),
+            Some(HashMap::<_, _>::from_iter([("status", status)])),
             |_: HashMap<String, bool>| (),
         )
         .await
@@ -190,15 +190,14 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-roles.
     pub async fn update_host_roles(&self, id: HostId, role_fullnames: Vec<String>) -> Result<()> {
-        let body: HashMap<&str, Vec<String>> = [("roleFullnames", role_fullnames)]
-            .iter()
-            .cloned()
-            .collect();
         self.request(
             Method::POST,
             format!("/api/v0/hosts/{}/role-fullnames", id),
             vec![],
-            Some(body),
+            Some(HashMap::<_, _>::from_iter([(
+                "roleFullnames",
+                role_fullnames,
+            )])),
             |_: HashMap<String, bool>| (),
         )
         .await

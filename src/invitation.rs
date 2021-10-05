@@ -4,6 +4,7 @@ use crate::errors::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::iter::FromIterator;
 
 /// An invitation
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -112,12 +113,11 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/invitations#revoke.
     pub async fn revoke_invitation(&self, email: &str) -> Result<()> {
-        let body: HashMap<&str, &str> = [("email", email)].iter().cloned().collect();
         self.request(
             Method::POST,
             "/api/v0/invitations/revoke",
             vec![],
-            Some(body),
+            Some(HashMap::<_, _>::from_iter([("email", email)])),
             |_: HashMap<String, bool>| (),
         )
         .await

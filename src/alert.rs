@@ -8,6 +8,7 @@ use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 use std::fmt;
+use std::iter::FromIterator;
 
 /// An alert
 pub type Alert = Entity<AlertValue>;
@@ -174,12 +175,11 @@ impl client::Client {
     ///
     /// See https://mackerel.io/api-docs/entry/alerts#close.
     pub async fn close_alert(&self, id: AlertId, reason: &str) -> Result<Alert> {
-        let body: HashMap<&str, &str> = [("reason", reason)].iter().cloned().collect();
         self.request(
             Method::POST,
             format!("/api/v0/alerts/{}/close", id),
             vec![],
-            Some(body),
+            Some(HashMap::<_, _>::from_iter([("reason", reason)])),
             |alert| alert,
         )
         .await
