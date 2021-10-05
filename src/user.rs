@@ -68,7 +68,7 @@ struct ListUsersResponse {
 }
 
 impl client::Client {
-    /// Fetches all the services.
+    /// Fetches all the users.
     ///
     /// See https://mackerel.io/api-docs/entry/users#list.
     pub async fn list_users(&self) -> Result<Vec<User>> {
