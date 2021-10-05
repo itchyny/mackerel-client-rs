@@ -6,11 +6,6 @@ use serde_json::{map::Map, Value};
 use serde_with::skip_serializing_none;
 use std::default;
 
-#[derive(Debug, Deserialize)]
-pub struct HostId {
-    id: String,
-}
-
 // TODO: Define its fields.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -111,6 +106,11 @@ mod tests {
     }
 }
 
+#[derive(Deserialize)]
+struct CreateHostResponse {
+    id: String,
+}
+
 impl client::Client {
     /// Creates a new host.
     ///
@@ -121,7 +121,7 @@ impl client::Client {
             "/api/v0/hosts",
             vec![],
             Some(param),
-            |host_id: HostId| host_id.id,
+            |res: CreateHostResponse| res.id,
         )
         .await
     }
