@@ -441,27 +441,27 @@ mod tests {
     #[test]
     fn monitor_name() {
         assert_eq!(
-            host_monitor_example().value.get_name(),
+            host_monitor_example().get_name(),
             "Monitor custom.foo.bar".to_string()
         );
         assert_eq!(
-            connectivity_monitor_example().value.get_name(),
+            connectivity_monitor_example().get_name(),
             "connectivity".to_string()
         );
         assert_eq!(
-            service_monitor_example().value.get_name(),
+            service_monitor_example().get_name(),
             "Service count".to_string()
         );
         assert_eq!(
-            external_monitor_example().value.get_name(),
+            external_monitor_example().get_name(),
             "Example external monitor".to_string()
         );
         assert_eq!(
-            expression_monitor_example().value.get_name(),
+            expression_monitor_example().get_name(),
             "Example expression monitor".to_string()
         );
         assert_eq!(
-            anomaly_detection_monitor_example().value.get_name(),
+            anomaly_detection_monitor_example().get_name(),
             "Example Anomaly Detection monitor".to_string()
         );
     }
