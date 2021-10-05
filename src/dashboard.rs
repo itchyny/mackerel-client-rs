@@ -61,7 +61,7 @@ impl client::Client {
     /// Fetches all the dashboards.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#list.
-    pub fn list_dashboards(&self) -> Result<Vec<Dashboard>> {
+    pub async fn list_dashboards(&self) -> Result<Vec<Dashboard>> {
         self.request(
             Method::GET,
             "/api/v0/dashboards",
@@ -69,12 +69,13 @@ impl client::Client {
             client::empty_body(),
             |res: ListDashboardsResponse| res.dashboards,
         )
+        .await
     }
 
     /// Creates a new dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#create.
-    pub fn create_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
+    pub async fn create_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
         self.request(
             Method::POST,
             "/api/v0/dashboards",
@@ -82,12 +83,13 @@ impl client::Client {
             Some(dashboard),
             |dashboard| dashboard,
         )
+        .await
     }
 
     /// Gets a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#get.
-    pub fn get_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
+    pub async fn get_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
         self.request(
             Method::GET,
             format!("/api/v0/dashboards/{}", dashboard_id),
@@ -95,12 +97,13 @@ impl client::Client {
             client::empty_body(),
             |dashboard| dashboard,
         )
+        .await
     }
 
     /// Updates a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#update.
-    pub fn update_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
+    pub async fn update_dashboard(&self, dashboard: Dashboard) -> Result<Dashboard> {
         let dashboard_id: String = dashboard
             .clone()
             .id
@@ -112,12 +115,13 @@ impl client::Client {
             Some(dashboard),
             |dashboard| dashboard,
         )
+        .await
     }
 
     /// Deletes a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#delete.
-    pub fn delete_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
+    pub async fn delete_dashboard(&self, dashboard_id: String) -> Result<Dashboard> {
         self.request(
             Method::DELETE,
             format!("/api/v0/dashboards/{}", dashboard_id),
@@ -125,5 +129,6 @@ impl client::Client {
             client::empty_body(),
             |dashboard| dashboard,
         )
+        .await
     }
 }

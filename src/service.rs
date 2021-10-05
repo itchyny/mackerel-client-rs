@@ -70,7 +70,7 @@ impl client::Client {
     /// Fetches all the services.
     ///
     /// See https://mackerel.io/api-docs/entry/services#list.
-    pub fn list_services(&self) -> Result<Vec<Service>> {
+    pub async fn list_services(&self) -> Result<Vec<Service>> {
         self.request(
             Method::GET,
             "/api/v0/services",
@@ -78,12 +78,13 @@ impl client::Client {
             client::empty_body(),
             |res: ListServiceResponse| res.services,
         )
+        .await
     }
 
     /// Creates a new service.
     ///
     /// See https://mackerel.io/api-docs/entry/services#create.
-    pub fn create_service(&self, service: Service) -> Result<Service> {
+    pub async fn create_service(&self, service: Service) -> Result<Service> {
         self.request(
             Method::POST,
             "/api/v0/services",
@@ -91,12 +92,13 @@ impl client::Client {
             Some(service),
             |service| service,
         )
+        .await
     }
 
     /// Deletes a service.
     ///
     /// See https://mackerel.io/api-docs/entry/services#delete.
-    pub fn delete_service(&self, service_name: String) -> Result<Service> {
+    pub async fn delete_service(&self, service_name: String) -> Result<Service> {
         self.request(
             Method::DELETE,
             format!("/api/v0/services/{}", service_name),
@@ -104,12 +106,13 @@ impl client::Client {
             client::empty_body(),
             |service| service,
         )
+        .await
     }
 
     /// Fetches the names of the service metrics.
     ///
     /// See https://mackerel.io/api-docs/entry/services#metric-names.
-    pub fn list_service_metric_names(&self, service_name: String) -> Result<Vec<String>> {
+    pub async fn list_service_metric_names(&self, service_name: String) -> Result<Vec<String>> {
         self.request(
             Method::GET,
             format!("/api/v0/services/{}/metric-names", service_name),
@@ -117,5 +120,6 @@ impl client::Client {
             client::empty_body(),
             |res: ListMetricNamesResponse| res.names,
         )
+        .await
     }
 }

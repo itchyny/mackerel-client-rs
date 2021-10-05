@@ -19,7 +19,7 @@ impl client::Client {
     /// Retrieves a host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#get.
-    pub fn get_metadata(&self, host_id: &str, namespace: &str) -> Result<serde_json::Value> {
+    pub async fn get_metadata(&self, host_id: &str, namespace: &str) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
@@ -27,12 +27,13 @@ impl client::Client {
             client::empty_body(),
             |res| res,
         )
+        .await
     }
 
     /// Creates/Updatates a host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#put.
-    pub fn put_metadata(
+    pub async fn put_metadata(
         &self,
         host_id: &str,
         namespace: &str,
@@ -45,12 +46,13 @@ impl client::Client {
             Some(metadata),
             |_: serde_json::Value| (),
         )
+        .await
     }
 
     /// Deletes a host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#delete.
-    pub fn delete_metadata(&self, host_id: &str, namespace: &str) -> Result<()> {
+    pub async fn delete_metadata(&self, host_id: &str, namespace: &str) -> Result<()> {
         self.request(
             Method::DELETE,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
@@ -58,12 +60,13 @@ impl client::Client {
             client::empty_body(),
             |_: serde_json::Value| (),
         )
+        .await
     }
 
     /// Lists host metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#list.
-    pub fn list_metadata(&self, host_id: &str) -> Result<Vec<Metadata>> {
+    pub async fn list_metadata(&self, host_id: &str) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metadata", host_id),
@@ -71,5 +74,6 @@ impl client::Client {
             client::empty_body(),
             |res: ListMetadataResponse| res.metadata,
         )
+        .await
     }
 }

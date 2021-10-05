@@ -46,7 +46,7 @@ impl client::Client {
     /// Retrieve the information on the organization.
     ///
     /// See https://mackerel.io/api-docs/entry/organizations#get.
-    pub fn get_organization(&self) -> Result<Organization> {
+    pub async fn get_organization(&self) -> Result<Organization> {
         self.request(
             Method::GET,
             "/api/v0/org",
@@ -54,5 +54,6 @@ impl client::Client {
             client::empty_body(),
             |org| org,
         )
+        .await
     }
 }

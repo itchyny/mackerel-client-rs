@@ -62,7 +62,7 @@ impl client::Client {
     /// Fetches all the services.
     ///
     /// See https://mackerel.io/api-docs/entry/users#list.
-    pub fn list_users(&self) -> Result<Vec<User>> {
+    pub async fn list_users(&self) -> Result<Vec<User>> {
         self.request(
             Method::GET,
             "/api/v0/users",
@@ -70,12 +70,13 @@ impl client::Client {
             client::empty_body(),
             |res: ListUsersResponse| res.users,
         )
+        .await
     }
 
     /// Delete the user from the organization.
     ///
     /// See https://mackerel.io/api-docs/entry/users#delete.
-    pub fn delete_user(&self, user_name: &str) -> Result<User> {
+    pub async fn delete_user(&self, user_name: &str) -> Result<User> {
         self.request(
             Method::DELETE,
             format!("/api/v0/users/{}", user_name),
@@ -83,5 +84,6 @@ impl client::Client {
             client::empty_body(),
             |user| user,
         )
+        .await
     }
 }

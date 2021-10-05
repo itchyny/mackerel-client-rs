@@ -82,7 +82,7 @@ impl client::Client {
     /// Fetches all the channels.
     ///
     /// See https://mackerel.io/api-docs/entry/channels#get.
-    pub fn list_channels(&self) -> Result<Vec<Channel>> {
+    pub async fn list_channels(&self) -> Result<Vec<Channel>> {
         self.request(
             Method::GET,
             "/api/v0/channels",
@@ -90,5 +90,6 @@ impl client::Client {
             client::empty_body(),
             |res: ListChannelResponse| res.channels,
         )
+        .await
     }
 }

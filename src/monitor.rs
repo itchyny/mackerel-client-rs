@@ -628,7 +628,7 @@ impl client::Client {
     /// Fetches all the monitors.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#get.
-    pub fn list_monitors(&self) -> Result<Vec<Monitor>> {
+    pub async fn list_monitors(&self) -> Result<Vec<Monitor>> {
         self.request(
             Method::GET,
             "/api/v0/monitors",
@@ -636,12 +636,13 @@ impl client::Client {
             client::empty_body(),
             |res: ListMonitorsResponse| res.monitors,
         )
+        .await
     }
 
     /// Registers a new monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#create.
-    pub fn create_monitor(&self, monitor: Monitor) -> Result<Monitor> {
+    pub async fn create_monitor(&self, monitor: Monitor) -> Result<Monitor> {
         self.request(
             Method::POST,
             "/api/v0/monitors",
@@ -649,12 +650,13 @@ impl client::Client {
             Some(monitor),
             |monitor| monitor,
         )
+        .await
     }
 
     /// Updates a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#update.
-    pub fn update_monitor(&self, monitor: Monitor) -> Result<Monitor> {
+    pub async fn update_monitor(&self, monitor: Monitor) -> Result<Monitor> {
         let monitor_id: String = monitor
             .get_id()
             .ok_or("specify the id to update a monitor")?;
@@ -665,12 +667,13 @@ impl client::Client {
             Some(monitor),
             |monitor| monitor,
         )
+        .await
     }
 
     /// Deletes a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#delete.
-    pub fn delete_monitor(&self, monitor_id: String) -> Result<Monitor> {
+    pub async fn delete_monitor(&self, monitor_id: String) -> Result<Monitor> {
         self.request(
             Method::DELETE,
             format!("/api/v0/monitors/{}", monitor_id),
@@ -678,5 +681,6 @@ impl client::Client {
             client::empty_body(),
             |monitor| monitor,
         )
+        .await
     }
 }

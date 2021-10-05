@@ -116,7 +116,7 @@ impl client::Client {
     /// Creates a new host.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#create.
-    pub fn create_host(&self, param: CreateHostParam) -> Result<String> {
+    pub async fn create_host(&self, param: CreateHostParam) -> Result<String> {
         self.request(
             Method::POST,
             "/api/v0/hosts",
@@ -124,5 +124,6 @@ impl client::Client {
             Some(param),
             |host_id: HostId| host_id.id,
         )
+        .await
     }
 }

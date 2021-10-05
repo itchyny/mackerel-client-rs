@@ -70,7 +70,7 @@ impl client::Client {
     /// Fetches graph annotations.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#get.
-    pub fn list_graph_annotations(
+    pub async fn list_graph_annotations(
         &self,
         service: &str,
         from: u64,
@@ -87,12 +87,13 @@ impl client::Client {
             client::empty_body(),
             |res: ListGraphAnnotationsResponse| res.graph_annotations,
         )
+        .await
     }
 
     /// Creates a new graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#create.
-    pub fn create_graph_annotation(
+    pub async fn create_graph_annotation(
         &self,
         graph_annotation: GraphAnnotation,
     ) -> Result<GraphAnnotation> {
@@ -103,12 +104,13 @@ impl client::Client {
             Some(graph_annotation),
             |graph_annotation| graph_annotation,
         )
+        .await
     }
 
     /// Updates a graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
-    pub fn update_graph_annotation(
+    pub async fn update_graph_annotation(
         &self,
         graph_annotation: GraphAnnotation,
     ) -> Result<GraphAnnotation> {
@@ -123,12 +125,16 @@ impl client::Client {
             Some(graph_annotation),
             |graph_annotation| graph_annotation,
         )
+        .await
     }
 
     /// Deletes a graph annotation.
     ///
     /// See https://mackerel.io/api-docs/entry/graph-annotations#delete.
-    pub fn delete_graph_annotation(&self, graph_annotation_id: String) -> Result<GraphAnnotation> {
+    pub async fn delete_graph_annotation(
+        &self,
+        graph_annotation_id: String,
+    ) -> Result<GraphAnnotation> {
         self.request(
             Method::DELETE,
             format!("/api/v0/graph-annotations/{}", graph_annotation_id),
@@ -136,5 +142,6 @@ impl client::Client {
             client::empty_body(),
             |graph_annotation| graph_annotation,
         )
+        .await
     }
 }

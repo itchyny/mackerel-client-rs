@@ -76,7 +76,7 @@ impl Client {
     ///
     /// The entire response body is deserialized as `R`, converted by `converter`
     /// and returns `S`.
-    pub fn request<P, B, R, F, S>(
+    pub async fn request<P, B, R, F, S>(
         &self,
         method: reqwest::Method,
         path: P,
@@ -90,7 +90,7 @@ impl Client {
         for<'de> R: serde::de::Deserialize<'de>,
         F: FnOnce(R) -> S,
     {
-        let client = reqwest::blocking::Client::new();
+        let client = reqwest::Client::new();
         let url = self.build_url(path.as_ref(), queries);
         let body_bytes = body_opt
             .map(|b| serde_json::to_vec(&b).unwrap())
@@ -107,19 +107,24 @@ impl Client {
             }
         }
         .send()
+        .await
         .map_err(|e| format!("failed to send request: {}", e))?;
         if !response.status().is_success() {
-            bail!(self.api_error(response))
+            bail!(self.api_error(response).await)
         }
-        serde_json::from_reader(response)
+        response
+            .json::<R>()
+            .await
             .map(converter)
             .chain_err(|| format!("JSON deserialization failed"))
     }
 
-    fn api_error(&self, response: reqwest::blocking::Response) -> ErrorKind {
+    async fn api_error(&self, response: reqwest::Response) -> ErrorKind {
         let status = response.status();
         let message_opt =
-            serde_json::from_reader(response)
+            response
+                .json::<serde_json::Value>()
+                .await
                 .ok()
                 .and_then(|value: serde_json::Value| {
                     value

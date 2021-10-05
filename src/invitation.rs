@@ -96,7 +96,7 @@ impl client::Client {
     /// Creates a new invitation.
     ///
     /// See https://mackerel.io/api-docs/entry/invitations#create.
-    pub fn create_invitation(&self, invitation: Invitation) -> Result<Invitation> {
+    pub async fn create_invitation(&self, invitation: Invitation) -> Result<Invitation> {
         self.request(
             Method::POST,
             "/api/v0/invitations",
@@ -104,12 +104,13 @@ impl client::Client {
             Some(invitation),
             |res: Invitation| res,
         )
+        .await
     }
 
     /// Revokes an invitation.
     ///
     /// See https://mackerel.io/api-docs/entry/invitations#revoke.
-    pub fn revoke_invitation(&self, email: &str) -> Result<()> {
+    pub async fn revoke_invitation(&self, email: &str) -> Result<()> {
         let body: HashMap<&str, &str> = [("email", email)].iter().cloned().collect();
         self.request(
             Method::POST,
@@ -118,5 +119,6 @@ impl client::Client {
             Some(body),
             |_: HashMap<String, bool>| (),
         )
+        .await
     }
 }
