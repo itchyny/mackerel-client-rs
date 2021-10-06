@@ -59,9 +59,12 @@ pub struct HostValue {
     pub display_name: Option<String>,
     pub custom_identifier: Option<String>,
     pub meta: HashMap<String, Value>,
-    pub interfaces: Option<Vec<HostInterface>>,
-    pub role_fullnames: Option<Vec<String>>,
-    pub checks: Option<Vec<HostCheck>>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub interfaces: Vec<HostInterface>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub role_fullnames: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub checks: Vec<HostCheck>,
 }
 
 impl std::ops::Deref for Host {
@@ -77,8 +80,10 @@ impl std::ops::Deref for Host {
 pub struct HostInterface {
     pub name: String,
     pub mac_address: Option<String>,
-    pub ipv4_addresses: Option<Vec<String>>,
-    pub ipv6_addresses: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub ipv4_addresses: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub ipv6_addresses: Vec<String>,
     pub ip_address: Option<String>,
     pub ipv6_address: Option<String>,
 }
