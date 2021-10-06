@@ -1,5 +1,5 @@
 use crate::client;
-use crate::errors::*;
+use crate::error::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 

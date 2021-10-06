@@ -1,7 +1,7 @@
 use crate::authority::Authority;
 use crate::client;
 use crate::entity::Id;
-use crate::errors::*;
+use crate::error::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 

@@ -1,5 +1,5 @@
 //! Mackerel API client
-use crate::errors::*;
+use crate::error::*;
 use reqwest;
 use serde;
 use serde_json;

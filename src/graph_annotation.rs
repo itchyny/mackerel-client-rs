@@ -1,6 +1,6 @@
 use crate::client;
 use crate::entity::{Entity, Id};
-use crate::errors::*;
+use crate::error::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;

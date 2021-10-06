@@ -1,6 +1,6 @@
 use crate::client;
 use crate::entity::{Entity, Id};
-use crate::errors::*;
+use crate::error::*;
 use crate::host::HostId;
 use crate::monitor::{MonitorId, MonitorType};
 use reqwest::Method;
