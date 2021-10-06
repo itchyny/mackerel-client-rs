@@ -20,6 +20,7 @@ pub struct DashboardValue {
     pub title: String,
     pub memo: String,
     pub url_path: String,
+    #[serde(default)]
     pub widgets: Vec<DashboardWidget>,
 }
 
