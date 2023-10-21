@@ -20,7 +20,8 @@ pub enum MonitorValue {
     #[serde(rename_all = "camelCase")]
     Host {
         name: String,
-        memo: Option<String>,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        memo: String,
         duration: u64,
         metric: String,
         operator: Operator,
@@ -28,22 +29,28 @@ pub enum MonitorValue {
         critical: Option<f64>,
         is_mute: Option<bool>,
         notification_interval: Option<u64>,
-        scopes: Option<Vec<String>>,
-        exclude_scopes: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        scopes: Vec<String>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        exclude_scopes: Vec<String>,
     },
     #[serde(rename_all = "camelCase")]
     Connectivity {
         name: String,
-        memo: Option<String>,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        memo: String,
         is_mute: Option<bool>,
         notification_interval: Option<u64>,
-        scopes: Option<Vec<String>>,
-        exclude_scopes: Option<Vec<String>>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        scopes: Vec<String>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        exclude_scopes: Vec<String>,
     },
     #[serde(rename_all = "camelCase")]
     Service {
         name: String,
-        memo: Option<String>,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        memo: String,
         service: String,
         duration: u64,
         metric: String,
@@ -56,7 +63,8 @@ pub enum MonitorValue {
     #[serde(rename_all = "camelCase")]
     External {
         name: String,
-        memo: Option<String>,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        memo: String,
         method: Option<ExternalMethod>,
         url: String,
         request_body: Option<String>,
@@ -76,7 +84,8 @@ pub enum MonitorValue {
     #[serde(rename_all = "camelCase")]
     Expression {
         name: String,
-        memo: Option<String>,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        memo: String,
         expression: String,
         operator: Operator,
         warning: Option<f64>,
@@ -87,7 +96,9 @@ pub enum MonitorValue {
     #[serde(rename_all = "camelCase")]
     AnomalyDetection {
         name: String,
-        memo: Option<String>,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        memo: String,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
         scopes: Vec<String>,
         warning_sensitivity: Option<Sensitivity>,
         critical_sensitivity: Option<Sensitivity>,
@@ -214,7 +225,7 @@ mod tests {
             id: "abcde1".into(),
             value: MonitorValue::Host {
                 name: "Monitor custom.foo.bar".to_string(),
-                memo: Some("Monitor memo".to_string()),
+                memo: "Monitor memo".to_string(),
                 duration: 5,
                 metric: "custom.foo.bar".to_string(),
                 operator: Operator::GreaterThan,
@@ -222,8 +233,8 @@ mod tests {
                 critical: Some(20.0),
                 is_mute: Some(false),
                 notification_interval: Some(30),
-                scopes: Some(vec!["service0".to_string()]),
-                exclude_scopes: Some(vec!["service0:role3".to_string()]),
+                scopes: vec!["service0".to_string()],
+                exclude_scopes: vec!["service0:role3".to_string()],
             },
         }
     }
@@ -251,11 +262,11 @@ mod tests {
             id: "abcde2".into(),
             value: MonitorValue::Connectivity {
                 name: "connectivity".to_string(),
-                memo: Some("Monitor memo".to_string()),
+                memo: "Monitor memo".to_string(),
                 is_mute: Some(false),
                 notification_interval: None,
-                scopes: None,
-                exclude_scopes: None,
+                scopes: vec![],
+                exclude_scopes: vec![],
             },
         }
     }
@@ -275,7 +286,7 @@ mod tests {
             id: "abcde3".into(),
             value: MonitorValue::Service {
                 name: "Service count".to_string(),
-                memo: Some("Monitor memo".to_string()),
+                memo: "Monitor memo".to_string(),
                 service: "service1".to_string(),
                 duration: 5,
                 metric: "custom.service.count".to_string(),
@@ -310,7 +321,7 @@ mod tests {
             id: "abcde4".into(),
             value: MonitorValue::External {
                 name: "Example external monitor".to_string(),
-                memo: Some("Monitor memo".to_string()),
+                memo: "Monitor memo".to_string(),
                 method: Some(ExternalMethod::Get),
                 url: "https://example.com".to_string(),
                 request_body: Some("Request Body".to_string()),
@@ -362,7 +373,7 @@ mod tests {
             id: "abcde5".into(),
             value: MonitorValue::Expression {
                 name: "Example expression monitor".to_string(),
-                memo: Some("Monitor memo".to_string()),
+                memo: "Monitor memo".to_string(),
                 expression: "min(role(\"foo:bar\", \"custom.foo.bar\"))".to_string(),
                 operator: Operator::LessThan,
                 warning: Some(10.0),
@@ -391,7 +402,7 @@ mod tests {
             id: "abcde6".into(),
             value: MonitorValue::AnomalyDetection {
                 name: "Example Anomaly Detection monitor".to_string(),
-                memo: Some("Monitor memo".to_string()),
+                memo: "".to_string(),
                 scopes: vec!["service0:role0".to_string()],
                 warning_sensitivity: Some(Sensitivity::Normal),
                 critical_sensitivity: Some(Sensitivity::Insensitive),
@@ -408,7 +419,6 @@ mod tests {
             "type": "anomalyDetection",
             "id": "abcde6",
             "name": "Example Anomaly Detection monitor",
-            "memo": "Monitor memo",
             "scopes": ["service0:role0"],
             "warningSensitivity": "normal",
             "criticalSensitivity": "insensitive",
