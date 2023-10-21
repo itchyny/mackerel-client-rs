@@ -41,19 +41,13 @@ impl<T> Clone for Id<T> {
 
 impl<T> From<&str> for Id<T> {
     fn from(id: &str) -> Self {
-        Self {
-            id: id.into(),
-            phantom: PhantomData,
-        }
+        Self::new(id.into())
     }
 }
 
 impl<T> From<String> for Id<T> {
     fn from(id: String) -> Self {
-        Self {
-            id: id.into(),
-            phantom: PhantomData,
-        }
+        Self::new(id.into())
     }
 }
 
@@ -94,9 +88,6 @@ impl<'de, T> Deserialize<'de> for Id<T> {
     where
         D: Deserializer<'de>,
     {
-        Ok(Self {
-            id: str16::deserialize(deserializer)?,
-            phantom: PhantomData,
-        })
+        Ok(Self::new(str16::deserialize(deserializer)?))
     }
 }
