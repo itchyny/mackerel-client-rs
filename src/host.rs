@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::default::Default;
 use std::fmt;
 use std::iter::FromIterator;
+use url::form_urlencoded;
 
 /// A host
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -163,8 +164,19 @@ struct GetHostResponse {
 }
 
 #[derive(Deserialize)]
+struct GetHostByCustomIdentifierResponse {
+    host: Option<Host>,
+}
+
+#[derive(Deserialize)]
 struct ListHostsResponse {
     hosts: Vec<Host>,
+}
+
+#[derive(Serialize)]
+struct UpdateHostStatusesRequest {
+    ids: Vec<HostId>,
+    status: HostStatus,
 }
 
 #[derive(Deserialize)]
@@ -201,6 +213,26 @@ impl client::Client {
         .await
     }
 
+    /// Gets a host by the custom identifier.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#get-by-custom-identifier.
+    pub async fn get_host_by_custom_identifier(
+        &self,
+        custom_identifier: String,
+    ) -> Result<Option<Host>> {
+        self.request(
+            Method::GET,
+            format!(
+                "/api/v0/hosts-by-custom-identifier/{}",
+                form_urlencoded::byte_serialize(custom_identifier.as_bytes()).collect::<String>(),
+            ),
+            vec![],
+            client::empty_body(),
+            |res: GetHostByCustomIdentifierResponse| res.host,
+        )
+        .await
+    }
+
     /// Updates a host.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-information.
@@ -218,12 +250,33 @@ impl client::Client {
     /// Updates host status.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-status.
-    pub async fn update_host_status(&self, host_id: HostId, status: HostStatus) -> Result<()> {
+    pub async fn update_host_status(&self, host_id: HostId, host_status: HostStatus) -> Result<()> {
         self.request(
             Method::POST,
             format!("/api/v0/hosts/{}/status", host_id),
             vec![],
-            Some(HashMap::<_, _>::from_iter([("status", status)])),
+            Some(HashMap::<_, _>::from_iter([("status", host_status)])),
+            |_: serde_json::Value| (),
+        )
+        .await
+    }
+
+    /// Updates host statuses.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#update-status.
+    pub async fn update_host_statuses(
+        &self,
+        host_ids: Vec<HostId>,
+        host_status: HostStatus,
+    ) -> Result<()> {
+        self.request(
+            Method::POST,
+            format!("/api/v0/hosts/bulk-update-statuses"),
+            vec![],
+            Some(UpdateHostStatusesRequest {
+                ids: host_ids,
+                status: host_status,
+            }),
             |_: serde_json::Value| (),
         )
         .await
@@ -259,6 +312,20 @@ impl client::Client {
             format!("/api/v0/hosts/{}/retire", host_id),
             vec![],
             client::empty_body(),
+            |_: serde_json::Value| (),
+        )
+        .await
+    }
+
+    /// Retires hosts.
+    ///
+    /// See https://mackerel.io/api-docs/entry/hosts#bulk-retire.
+    pub async fn retire_hosts(&self, host_ids: Vec<HostId>) -> Result<()> {
+        self.request(
+            Method::POST,
+            format!("/api/v0/hosts/bulk-retire"),
+            vec![],
+            Some(HashMap::<_, _>::from_iter([("ids", host_ids)])),
             |_: serde_json::Value| (),
         )
         .await
