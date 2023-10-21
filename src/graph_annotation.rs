@@ -16,11 +16,13 @@ pub type GraphAnnotationId = Id<GraphAnnotationValue>;
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct GraphAnnotationValue {
     pub title: String,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub description: String,
     pub from: u64,
     pub to: u64,
     pub service: String,
-    pub roles: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub roles: Vec<String>,
 }
 
 #[cfg(test)]
@@ -28,7 +30,7 @@ mod tests {
     use crate::graph_annotation::*;
     use serde_json::json;
 
-    fn graph_annotation_example() -> GraphAnnotation {
+    fn graph_annotation_example1() -> GraphAnnotation {
         GraphAnnotation {
             id: "abcde1".into(),
             value: GraphAnnotationValue {
@@ -37,12 +39,12 @@ mod tests {
                 from: 1484000000,
                 to: 1484000030,
                 service: "ExampleService".to_string(),
-                roles: Some(vec!["ExampleRole1".to_string(), "ExampleRole2".to_string()]),
+                roles: vec!["ExampleRole1".to_string(), "ExampleRole2".to_string()],
             },
         }
     }
 
-    fn json_example() -> serde_json::Value {
+    fn json_example1() -> serde_json::Value {
         json!({
             "id": "abcde1",
             "title": "Deploy application",
@@ -54,19 +56,51 @@ mod tests {
         })
     }
 
+    fn graph_annotation_example2() -> GraphAnnotation {
+        GraphAnnotation {
+            id: "abcde2".into(),
+            value: GraphAnnotationValue {
+                title: "Deploy application".to_string(),
+                description: "".to_string(),
+                from: 1484000000,
+                to: 1484000030,
+                service: "ExampleService".to_string(),
+                roles: vec![],
+            },
+        }
+    }
+
+    fn json_example2() -> serde_json::Value {
+        json!({
+            "id": "abcde2",
+            "title": "Deploy application",
+            "from": 1484000000,
+            "to": 1484000030,
+            "service": "ExampleService",
+        })
+    }
+
     #[test]
     fn serialize_graph_annotation() {
         assert_eq!(
-            json_example(),
-            serde_json::to_value(&graph_annotation_example()).unwrap()
+            json_example1(),
+            serde_json::to_value(&graph_annotation_example1()).unwrap()
+        );
+        assert_eq!(
+            json_example2(),
+            serde_json::to_value(&graph_annotation_example2()).unwrap()
         );
     }
 
     #[test]
     fn deserialize_graph_annotation() {
         assert_eq!(
-            graph_annotation_example(),
-            serde_json::from_value(json_example()).unwrap()
+            graph_annotation_example1(),
+            serde_json::from_value(json_example1()).unwrap()
+        );
+        assert_eq!(
+            graph_annotation_example2(),
+            serde_json::from_value(json_example2()).unwrap()
         );
     }
 }
@@ -106,7 +140,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#create.
     pub async fn create_graph_annotation(
         &self,
-        graph_annotation: GraphAnnotation,
+        graph_annotation: GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::POST,
