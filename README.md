@@ -34,7 +34,7 @@ async fn main() {
 Refer to the [documentation](https://docs.rs/mackerel_client/).
 
 ## Author
-itchyny <itchyny@hatena.ne.jp>
+itchyny <itchyny@cybozu.co.jp>
 
 ## License
 This software is released under the MIT License, see LICENSE.
