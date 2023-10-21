@@ -5,6 +5,7 @@ use crate::error::*;
 use crate::monitor::MonitorId;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::fmt;
 
 /// A notification group
 pub type NotificationGroup = Entity<NotificationGroupValue>;
@@ -32,6 +33,15 @@ pub struct NotificationGroupValue {
 pub enum NotificationGroupLevel {
     All,
     Critical,
+}
+
+impl fmt::Display for NotificationGroupLevel {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            NotificationGroupLevel::All => write!(f, "all"),
+            NotificationGroupLevel::Critical => write!(f, "critical"),
+        }
+    }
 }
 
 /// A notification group monitor
