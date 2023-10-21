@@ -72,7 +72,9 @@ impl<T> fmt::Display for Id<T> {
 
 impl<T> fmt::Debug for Id<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.id.fmt(f)
+        f.write_str("\"")?;
+        self.id.fmt(f)?;
+        f.write_str("\"")
     }
 }
 
