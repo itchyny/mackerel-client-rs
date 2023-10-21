@@ -578,7 +578,7 @@ impl client::Client {
         .await
     }
 
-    /// Registers a new monitor.
+    /// Creates a new monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#create.
     pub async fn create_monitor(&self, monitor: MonitorValue) -> Result<Monitor> {
