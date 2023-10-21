@@ -29,8 +29,8 @@ pub struct AlertValue {
     pub value: Option<f64>,
     pub message: Option<String>,
     pub reason: Option<String>,
-    // pub openedAt: DateTime, // TODO
-    // pub closedAt: Option<DateTime>, // TODO
+    pub opened_at: u64,
+    pub closed_at: Option<u64>,
 }
 
 /// Alert statuses
@@ -70,6 +70,8 @@ mod tests {
                 value: None,
                 message: None,
                 reason: None,
+                opened_at: 1690000000,
+                closed_at: Some(1700000000),
             },
         }
     }
@@ -80,7 +82,9 @@ mod tests {
             "status": "CRITICAL",
             "monitorId": "abcde2",
             "type": "connectivity",
-            "hostId": "abcde1"
+            "hostId": "abcde1",
+            "openedAt": 1690000000,
+            "closedAt": 1700000000,
         })
     }
 
@@ -95,6 +99,8 @@ mod tests {
                 value: Some(25.0),
                 message: None,
                 reason: None,
+                opened_at: 1690000000,
+                closed_at: None,
             },
         }
     }
@@ -106,7 +112,8 @@ mod tests {
             "monitorId": "abcde2",
             "type": "host",
             "hostId": "abcde1",
-            "value": 25.0
+            "value": 25.0,
+            "openedAt": 1690000000,
         })
     }
 
