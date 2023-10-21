@@ -21,9 +21,10 @@ async fn main() {
 
     println!("{:?}", client.get_organization().await);
     println!("{:?}", client.list_users().await);
+    println!("{:?}", client.list_invitations().await);
 
     println!("{:?}", client.list_services().await);
-    println!("{:?}", client.list_service_metric_names("<Service-Name>").await);
+    println!("{:?}", client.list_service_metric_names("<Service-Name>".to_string()).await);
 
     println!("{:?}", client.list_monitors().await);
     println!("{:?}", client.delete_monitor("<Monitor-ID>".into()).await);
