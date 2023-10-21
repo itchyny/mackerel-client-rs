@@ -8,6 +8,9 @@ use serde_with::skip_serializing_none;
 /// A graph annotation
 pub type GraphAnnotation = Entity<GraphAnnotationValue>;
 
+/// A graph annotation id
+pub type GraphAnnotationId = Id<GraphAnnotationValue>;
+
 /// A graph annotation value
 #[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -120,12 +123,12 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
     pub async fn update_graph_annotation(
         &self,
-        id: Id<GraphAnnotationValue>,
+        graph_annontation_id: GraphAnnotationId,
         graph_annotation: GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::PUT,
-            format!("/api/v0/graph-annotations/{}", id),
+            format!("/api/v0/graph-annotations/{}", graph_annontation_id),
             vec![],
             Some(graph_annotation),
             |graph_annotation| graph_annotation,
@@ -138,11 +141,11 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#delete.
     pub async fn delete_graph_annotation(
         &self,
-        id: Id<GraphAnnotationValue>,
+        graph_annotation_id: GraphAnnotationId,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/graph-annotations/{}", id),
+            format!("/api/v0/graph-annotations/{}", graph_annotation_id),
             vec![],
             client::empty_body(),
             |graph_annotation| graph_annotation,

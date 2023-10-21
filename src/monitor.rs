@@ -585,10 +585,14 @@ impl client::Client {
     /// Updates a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#update.
-    pub async fn update_monitor(&self, id: MonitorId, monitor: MonitorValue) -> Result<Monitor> {
+    pub async fn update_monitor(
+        &self,
+        monitor_id: MonitorId,
+        monitor: MonitorValue,
+    ) -> Result<Monitor> {
         self.request(
             Method::PUT,
-            format!("/api/v0/monitors/{}", id),
+            format!("/api/v0/monitors/{}", monitor_id),
             vec![],
             Some(monitor),
             |monitor| monitor,
@@ -599,10 +603,10 @@ impl client::Client {
     /// Deletes a monitor.
     ///
     /// See https://mackerel.io/api-docs/entry/monitors#delete.
-    pub async fn delete_monitor(&self, id: MonitorId) -> Result<Monitor> {
+    pub async fn delete_monitor(&self, monitor_id: MonitorId) -> Result<Monitor> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/monitors/{}", id),
+            format!("/api/v0/monitors/{}", monitor_id),
             vec![],
             client::empty_body(),
             |monitor| monitor,

@@ -348,10 +348,10 @@ impl client::Client {
     /// Gets a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#get.
-    pub async fn get_dashboard(&self, id: DashboardId) -> Result<Dashboard> {
+    pub async fn get_dashboard(&self, dashboard_id: DashboardId) -> Result<Dashboard> {
         self.request(
             Method::GET,
-            format!("/api/v0/dashboards/{}", id),
+            format!("/api/v0/dashboards/{}", dashboard_id),
             vec![],
             client::empty_body(),
             |dashboard| dashboard,
@@ -364,12 +364,12 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/dashboards#update.
     pub async fn update_dashboard(
         &self,
-        id: DashboardId,
+        dashboard_id: DashboardId,
         dashboard: DashboardValue,
     ) -> Result<Dashboard> {
         self.request(
             Method::PUT,
-            format!("/api/v0/dashboards/{}", id),
+            format!("/api/v0/dashboards/{}", dashboard_id),
             vec![],
             Some(dashboard),
             |dashboard| dashboard,
@@ -380,10 +380,10 @@ impl client::Client {
     /// Deletes a dashboard.
     ///
     /// See https://mackerel.io/api-docs/entry/dashboards#delete.
-    pub async fn delete_dashboard(&self, id: DashboardId) -> Result<Dashboard> {
+    pub async fn delete_dashboard(&self, dashboard_id: DashboardId) -> Result<Dashboard> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/dashboards/{}", id),
+            format!("/api/v0/dashboards/{}", dashboard_id),
             vec![],
             client::empty_body(),
             |dashboard| dashboard,

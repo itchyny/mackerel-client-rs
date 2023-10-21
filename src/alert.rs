@@ -174,10 +174,10 @@ impl client::Client {
     /// Closes the specified alert.
     ///
     /// See https://mackerel.io/api-docs/entry/alerts#close.
-    pub async fn close_alert(&self, id: AlertId, reason: String) -> Result<Alert> {
+    pub async fn close_alert(&self, alert_id: AlertId, reason: String) -> Result<Alert> {
         self.request(
             Method::POST,
-            format!("/api/v0/alerts/{}/close", id),
+            format!("/api/v0/alerts/{}/close", alert_id),
             vec![],
             Some(HashMap::<_, _>::from_iter([("reason", reason)])),
             |alert| alert,

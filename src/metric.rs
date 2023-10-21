@@ -22,14 +22,14 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/host-metrics#get.
     pub async fn list_host_metric_values(
         &self,
-        id: HostId,
+        host_id: HostId,
         name: String,
         from: u64,
         to: u64,
     ) -> Result<Vec<MetricValue>> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}/metrics", id),
+            format!("/api/v0/hosts/{}/metrics", host_id),
             vec![
                 ("name", vec![&name]),
                 ("from", vec![&from.to_string()]),

@@ -190,10 +190,10 @@ impl client::Client {
     /// Gets a host.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#get.
-    pub async fn get_host(&self, id: HostId) -> Result<Host> {
+    pub async fn get_host(&self, host_id: HostId) -> Result<Host> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}", id),
+            format!("/api/v0/hosts/{}", host_id),
             vec![],
             client::empty_body(),
             |res: GetHostResponse| res.host,
@@ -204,10 +204,10 @@ impl client::Client {
     /// Updates a host.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-information.
-    pub async fn update_host(&self, id: HostId, host: HostValue) -> Result<()> {
+    pub async fn update_host(&self, host_id: HostId, host: HostValue) -> Result<()> {
         self.request(
             Method::PUT,
-            format!("/api/v0/hosts/{}", id),
+            format!("/api/v0/hosts/{}", host_id),
             vec![],
             Some(host),
             |_: serde_json::Value| (),
@@ -218,10 +218,10 @@ impl client::Client {
     /// Updates host status.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-status.
-    pub async fn update_host_status(&self, id: HostId, status: HostStatus) -> Result<()> {
+    pub async fn update_host_status(&self, host_id: HostId, status: HostStatus) -> Result<()> {
         self.request(
             Method::POST,
-            format!("/api/v0/hosts/{}/status", id),
+            format!("/api/v0/hosts/{}/status", host_id),
             vec![],
             Some(HashMap::<_, _>::from_iter([("status", status)])),
             |_: serde_json::Value| (),
@@ -232,10 +232,14 @@ impl client::Client {
     /// Updates host roles.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#update-roles.
-    pub async fn update_host_roles(&self, id: HostId, role_fullnames: Vec<String>) -> Result<()> {
+    pub async fn update_host_roles(
+        &self,
+        host_id: HostId,
+        role_fullnames: Vec<String>,
+    ) -> Result<()> {
         self.request(
-            Method::POST,
-            format!("/api/v0/hosts/{}/role-fullnames", id),
+            Method::PUT,
+            format!("/api/v0/hosts/{}/role-fullnames", host_id),
             vec![],
             Some(HashMap::<_, _>::from_iter([(
                 "roleFullnames",
@@ -249,10 +253,10 @@ impl client::Client {
     /// Retires a host.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#retire.
-    pub async fn retire_host(&self, id: HostId) -> Result<()> {
+    pub async fn retire_host(&self, host_id: HostId) -> Result<()> {
         self.request(
             Method::POST,
-            format!("/api/v0/hosts/{}/retire", id),
+            format!("/api/v0/hosts/{}/retire", host_id),
             vec![],
             client::empty_body(),
             |_: serde_json::Value| (),
@@ -277,10 +281,10 @@ impl client::Client {
     /// Fetches host metric names.
     ///
     /// See https://mackerel.io/api-docs/entry/hosts#metric-names.
-    pub async fn list_host_metric_names(&self, id: HostId) -> Result<Vec<String>> {
+    pub async fn list_host_metric_names(&self, host_id: HostId) -> Result<Vec<String>> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}/metric-names", id),
+            format!("/api/v0/hosts/{}/metric-names", host_id),
             vec![],
             client::empty_body(),
             |res: ListMetricNamesResponse| res.names,
