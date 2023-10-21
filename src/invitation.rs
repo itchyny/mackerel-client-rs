@@ -22,7 +22,7 @@ impl std::ops::Deref for Invitation {
     }
 }
 
-/// A invitation value
+/// An invitation value
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct InvitationValue {
