@@ -10,6 +10,22 @@ use std::iter::FromIterator;
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Invitation {
+    pub expires_at: u64,
+    #[serde(flatten)]
+    pub value: InvitationValue,
+}
+
+impl std::ops::Deref for Invitation {
+    type Target = InvitationValue;
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
+/// A invitation value
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InvitationValue {
     pub email: String,
     pub authority: Authority,
 }
@@ -21,13 +37,17 @@ mod tests {
 
     fn invitation_example1() -> Invitation {
         Invitation {
-            email: "example1@example.com".to_string(),
-            authority: Authority::Manager,
+            expires_at: 1700000000,
+            value: InvitationValue {
+                email: "example1@example.com".to_string(),
+                authority: Authority::Manager,
+            },
         }
     }
 
     fn json_example1() -> serde_json::Value {
         json!({
+            "expiresAt": 1700000000,
             "email": "example1@example.com",
             "authority": "manager"
         })
@@ -35,20 +55,24 @@ mod tests {
 
     fn invitation_example2() -> Invitation {
         Invitation {
-            email: "example2@example.com".to_string(),
-            authority: Authority::Collaborator,
+            expires_at: 1700000000,
+            value: InvitationValue {
+                email: "example2@example.com".to_string(),
+                authority: Authority::Collaborator,
+            },
         }
     }
 
     fn json_example2() -> serde_json::Value {
         json!({
+            "expiresAt": 1700000000,
             "email": "example2@example.com",
             "authority": "collaborator"
         })
     }
 
-    fn invitation_example3() -> Invitation {
-        Invitation {
+    fn invitation_example3() -> InvitationValue {
+        InvitationValue {
             email: "example3@example.com".to_string(),
             authority: Authority::Viewer,
         }
@@ -94,11 +118,30 @@ mod tests {
     }
 }
 
+#[derive(Deserialize)]
+struct ListInvitationsResponse {
+    invitations: Vec<Invitation>,
+}
+
 impl client::Client {
+    /// Fetches all the invitations.
+    ///
+    /// See https://mackerel.io/api-docs/entry/invitations#list.
+    pub async fn list_invitations(&self) -> Result<Vec<Invitation>> {
+        self.request(
+            Method::GET,
+            "/api/v0/invitations",
+            vec![],
+            client::empty_body(),
+            |res: ListInvitationsResponse| res.invitations,
+        )
+        .await
+    }
+
     /// Creates a new invitation.
     ///
     /// See https://mackerel.io/api-docs/entry/invitations#create.
-    pub async fn create_invitation(&self, invitation: Invitation) -> Result<Invitation> {
+    pub async fn create_invitation(&self, invitation: InvitationValue) -> Result<Invitation> {
         self.request(
             Method::POST,
             "/api/v0/invitations",
