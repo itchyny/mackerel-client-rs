@@ -11,6 +11,7 @@ categories = ["api-bindings"]
 edition = "2021"
 
 [dependencies]
+fixedstr = { version = "0.5.1", features = ["serde"] }
 reqwest = { version = "0.11.22", features = ["json"] }
 serde = "1.0.189"
 serde_derive = "1.0.189"

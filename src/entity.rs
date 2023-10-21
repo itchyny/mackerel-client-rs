@@ -1,4 +1,6 @@
+use fixedstr::str16;
 use serde_derive::{Deserialize, Serialize};
+
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct Entity<T> {
     pub id: Id<T>,
@@ -14,18 +16,26 @@ impl<T> std::ops::Deref for Entity<T> {
 }
 
 use std::marker::PhantomData;
-#[derive(PartialEq, Eq, Clone, Hash)]
+#[derive(PartialEq, Eq, Hash)]
 pub struct Id<T> {
-    id: String,
+    id: str16,
     phantom: PhantomData<T>,
 }
 
 impl<T> Id<T> {
-    pub fn new(id: String) -> Self {
+    pub fn new(id: str16) -> Self {
         Self {
             id,
             phantom: PhantomData,
         }
+    }
+}
+
+impl<T> Copy for Id<T> {}
+
+impl<T> Clone for Id<T> {
+    fn clone(&self) -> Self {
+        *self
     }
 }
 
@@ -41,7 +51,7 @@ impl<T> From<&str> for Id<T> {
 impl<T> From<String> for Id<T> {
     fn from(id: String) -> Self {
         Self {
-            id,
+            id: id.into(),
             phantom: PhantomData,
         }
     }
@@ -49,7 +59,7 @@ impl<T> From<String> for Id<T> {
 
 impl<T> Into<String> for Id<T> {
     fn into(self: Self) -> String {
-        self.id
+        self.id.to_string()
     }
 }
 
@@ -83,7 +93,7 @@ impl<'de, T> Deserialize<'de> for Id<T> {
         D: Deserializer<'de>,
     {
         Ok(Self {
-            id: String::deserialize(deserializer)?,
+            id: str16::deserialize(deserializer)?,
             phantom: PhantomData,
         })
     }
