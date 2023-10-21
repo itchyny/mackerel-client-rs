@@ -39,6 +39,7 @@ pub mod invitation;
 pub mod metadata;
 pub mod metric;
 pub mod monitor;
+pub mod notification_group;
 pub mod organization;
 pub mod role;
 pub mod service;
