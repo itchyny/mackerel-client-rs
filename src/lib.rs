@@ -23,6 +23,7 @@
 //! println!("{:?}", client.delete_monitor("<Monitor-ID>".into()).await);
 //! ```
 //!
+#![feature(type_changing_struct_update)]
 
 pub mod client;
 pub mod entity;

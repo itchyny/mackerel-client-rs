@@ -3,7 +3,6 @@ use crate::error::*;
 use reqwest;
 use serde;
 use serde_json;
-use std::default;
 use url;
 
 /// Represents an API client for Mackerel.
@@ -14,16 +13,6 @@ pub struct Client {
     user_agent: String,
 }
 
-impl default::Default for Client {
-    fn default() -> Client {
-        Client {
-            api_key: "".to_string(),
-            api_base: "https://api.mackerelio.com".to_string(),
-            user_agent: format!("mackerel-client-rs/{}", env!("CARGO_PKG_VERSION")),
-        }
-    }
-}
-
 /// Empty body to avoid type ambiguity.
 pub fn empty_body() -> Option<()> {
     None
@@ -31,20 +20,13 @@ pub fn empty_body() -> Option<()> {
 
 impl Client {
     /// Creates a new API client from API key.
-    pub fn new(api_key: &str) -> Client {
-        Client {
-            api_key: api_key.to_string(),
-            ..Default::default()
-        }
+    pub fn new<S: Into<String>>(api_key: S) -> Client {
+        ClientBuilder::new().api_key(api_key).build()
     }
 
-    /// Creates a new API client from API key and API base.
-    pub fn new_with_api_base(api_key: &str, api_base: &str) -> Client {
-        Client {
-            api_key: api_key.to_string(),
-            api_base: api_base.to_string(),
-            ..Default::default()
-        }
+    /// Creates a new [`ClientBuilder`].
+    pub fn builder() -> ClientBuilder<()> {
+        ClientBuilder::new()
     }
 
     fn build_url(&self, path: &str, queries: Vec<(&str, Vec<&str>)>) -> url::Url {
@@ -136,5 +118,57 @@ impl Client {
                         .and_then(|val| val.as_str().map(|s| s.to_string()))
                 });
         Error::ApiError(status, message_opt.unwrap_or("".to_string()))
+    }
+}
+
+/// A builder for [`Client`].
+#[derive(Default)]
+pub struct ClientBuilder<ApiKey> {
+    api_key: ApiKey,
+    api_base: Option<String>,
+    user_agent: Option<String>,
+}
+
+impl ClientBuilder<()> {
+    fn new() -> Self {
+        ClientBuilder::default()
+    }
+
+    pub fn api_key<S: Into<String>>(self, api_key: S) -> ClientBuilder<String> {
+        ClientBuilder {
+            api_key: api_key.into(),
+            ..self
+        }
+    }
+}
+
+impl<ApiKey> ClientBuilder<ApiKey> {
+    pub fn api_base<S: Into<String>>(self, api_base: S) -> Self {
+        Self {
+            api_base: Some(api_base.into()),
+            ..self
+        }
+    }
+
+    pub fn user_agent<S: Into<String>>(self, user_agent: S) -> Self {
+        Self {
+            user_agent: Some(user_agent.into()),
+            ..self
+        }
+    }
+}
+
+impl ClientBuilder<String> {
+    /// Builds a [`Client`].
+    pub fn build(self) -> Client {
+        Client {
+            api_key: self.api_key,
+            api_base: self
+                .api_base
+                .unwrap_or("https://api.mackerelio.com".to_string()),
+            user_agent: self
+                .user_agent
+                .unwrap_or(format!("mackerel-client-rs/{}", env!("CARGO_PKG_VERSION"))),
+        }
     }
 }
