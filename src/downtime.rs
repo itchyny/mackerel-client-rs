@@ -214,7 +214,7 @@ struct ListDowntimesResponse {
 impl client::Client {
     /// Fetches all the downtimes.
     ///
-    /// See https://mackerel.io/api-docs/entry/downtimes#list.
+    /// See <https://mackerel.io/api-docs/entry/downtimes#list>.
     pub async fn list_downtimes(&self) -> Result<Vec<Downtime>> {
         self.request(
             Method::GET,
@@ -228,7 +228,7 @@ impl client::Client {
 
     /// Creates a new downtime.
     ///
-    /// See https://mackerel.io/api-docs/entry/downtimes#create.
+    /// See <https://mackerel.io/api-docs/entry/downtimes#create>.
     pub async fn create_downtime(&self, downtime: DowntimeValue) -> Result<Downtime> {
         self.request(
             Method::POST,
@@ -242,7 +242,7 @@ impl client::Client {
 
     /// Updates a downtime.
     ///
-    /// See https://mackerel.io/api-docs/entry/downtimes#update.
+    /// See <https://mackerel.io/api-docs/entry/downtimes#update>.
     pub async fn update_downtime(
         &self,
         downtime_id: DowntimeId,
@@ -260,7 +260,7 @@ impl client::Client {
 
     /// Deletes a downtime.
     ///
-    /// See https://mackerel.io/api-docs/entry/downtimes#delete.
+    /// See <https://mackerel.io/api-docs/entry/downtimes#delete>.
     pub async fn delete_downtime(&self, downtime_id: DowntimeId) -> Result<Downtime> {
         self.request(
             Method::DELETE,

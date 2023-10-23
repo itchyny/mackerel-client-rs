@@ -154,7 +154,7 @@ struct ListNotificationGroupsResponse {
 impl client::Client {
     /// Fetches all the notification groups.
     ///
-    /// See https://mackerel.io/api-docs/entry/notification-groups#get.
+    /// See <https://mackerel.io/api-docs/entry/notification-groups#get>.
     pub async fn list_notification_groups(&self) -> Result<Vec<NotificationGroup>> {
         self.request(
             Method::GET,
@@ -168,7 +168,7 @@ impl client::Client {
 
     /// Creates a new notification group.
     ///
-    /// See https://mackerel.io/api-docs/entry/notification-groups#create.
+    /// See <https://mackerel.io/api-docs/entry/notification-groups#create>.
     pub async fn create_notification_group(
         &self,
         notification_group: NotificationGroupValue,
@@ -185,7 +185,7 @@ impl client::Client {
 
     /// Updates a notification group.
     ///
-    /// See https://mackerel.io/api-docs/entry/notification-groups#update.
+    /// See <https://mackerel.io/api-docs/entry/notification-groups#update>.
     pub async fn update_notification_group(
         &self,
         notification_group_id: NotificationGroupId,
@@ -203,7 +203,7 @@ impl client::Client {
 
     /// Deletes a notification group.
     ///
-    /// See https://mackerel.io/api-docs/entry/notification-groups#delete.
+    /// See <https://mackerel.io/api-docs/entry/notification-groups#delete>.
     pub async fn delete_notification_group(
         &self,
         notification_group_id: NotificationGroupId,

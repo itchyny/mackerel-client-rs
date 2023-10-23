@@ -46,7 +46,7 @@ mod tests {
 impl client::Client {
     /// Retrieve the information on the organization.
     ///
-    /// See https://mackerel.io/api-docs/entry/organizations#get.
+    /// See <https://mackerel.io/api-docs/entry/organizations#get>.
     pub async fn get_organization(&self) -> Result<Organization> {
         self.request(
             Method::GET,

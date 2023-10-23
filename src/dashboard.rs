@@ -326,7 +326,7 @@ struct ListDashboardsResponse {
 impl client::Client {
     /// Fetches all the dashboards.
     ///
-    /// See https://mackerel.io/api-docs/entry/dashboards#list.
+    /// See <https://mackerel.io/api-docs/entry/dashboards#list>.
     pub async fn list_dashboards(&self) -> Result<Vec<Dashboard>> {
         self.request(
             Method::GET,
@@ -340,7 +340,7 @@ impl client::Client {
 
     /// Creates a new dashboard.
     ///
-    /// See https://mackerel.io/api-docs/entry/dashboards#create.
+    /// See <https://mackerel.io/api-docs/entry/dashboards#create>.
     pub async fn create_dashboard(&self, dashboard: DashboardValue) -> Result<Dashboard> {
         self.request(
             Method::POST,
@@ -354,7 +354,7 @@ impl client::Client {
 
     /// Gets a dashboard.
     ///
-    /// See https://mackerel.io/api-docs/entry/dashboards#get.
+    /// See <https://mackerel.io/api-docs/entry/dashboards#get>.
     pub async fn get_dashboard(&self, dashboard_id: DashboardId) -> Result<Dashboard> {
         self.request(
             Method::GET,
@@ -368,7 +368,7 @@ impl client::Client {
 
     /// Updates a dashboard.
     ///
-    /// See https://mackerel.io/api-docs/entry/dashboards#update.
+    /// See <https://mackerel.io/api-docs/entry/dashboards#update>.
     pub async fn update_dashboard(
         &self,
         dashboard_id: DashboardId,
@@ -386,7 +386,7 @@ impl client::Client {
 
     /// Deletes a dashboard.
     ///
-    /// See https://mackerel.io/api-docs/entry/dashboards#delete.
+    /// See <https://mackerel.io/api-docs/entry/dashboards#delete>.
     pub async fn delete_dashboard(&self, dashboard_id: DashboardId) -> Result<Dashboard> {
         self.request(
             Method::DELETE,

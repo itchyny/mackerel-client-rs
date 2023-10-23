@@ -114,7 +114,7 @@ struct ListAlertGroupSettingsResponse {
 impl client::Client {
     /// Fetches all the alert group settings.
     ///
-    /// See https://mackerel.io/api-docs/entry/alert-group-settings#list.
+    /// See <https://mackerel.io/api-docs/entry/alert-group-settings#list>.
     pub async fn list_alert_group_settings(&self) -> Result<Vec<AlertGroupSetting>> {
         self.request(
             Method::GET,
@@ -128,7 +128,7 @@ impl client::Client {
 
     /// Creates a new alert group setting.
     ///
-    /// See https://mackerel.io/api-docs/entry/alert-group-settings#create.
+    /// See <https://mackerel.io/api-docs/entry/alert-group-settings#create>.
     pub async fn create_alert_group_setting(
         &self,
         alert_group_setting: AlertGroupSettingValue,
@@ -145,7 +145,7 @@ impl client::Client {
 
     /// Gets an alert group setting.
     ///
-    /// See https://mackerel.io/api-docs/entry/alert-group-settings#get.
+    /// See <https://mackerel.io/api-docs/entry/alert-group-settings#get>.
     pub async fn get_alert_group_setting(
         &self,
         alert_group_setting_id: AlertGroupSettingId,
@@ -162,7 +162,7 @@ impl client::Client {
 
     /// Updates an alert group setting.
     ///
-    /// See https://mackerel.io/api-docs/entry/alert-group-settings#update.
+    /// See <https://mackerel.io/api-docs/entry/alert-group-settings#update>.
     pub async fn update_alert_group_setting(
         &self,
         alert_group_setting_id: AlertGroupSettingId,
@@ -180,7 +180,7 @@ impl client::Client {
 
     /// Deletes an alert group setting.
     ///
-    /// See https://mackerel.io/api-docs/entry/alert-group-settings#delete.
+    /// See <https://mackerel.io/api-docs/entry/alert-group-settings#delete>.
     pub async fn delete_alert_group_setting(
         &self,
         alert_group_setting_id: AlertGroupSettingId,

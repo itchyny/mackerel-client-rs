@@ -189,7 +189,7 @@ struct ListMetricNamesResponse {
 impl client::Client {
     /// Creates a new host.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#create.
+    /// See <https://mackerel.io/api-docs/entry/hosts#create>.
     pub async fn create_host(&self, host: HostValue) -> Result<HostId> {
         self.request(
             Method::POST,
@@ -203,7 +203,7 @@ impl client::Client {
 
     /// Gets a host.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#get.
+    /// See <https://mackerel.io/api-docs/entry/hosts#get>.
     pub async fn get_host(&self, host_id: HostId) -> Result<Host> {
         self.request(
             Method::GET,
@@ -217,7 +217,7 @@ impl client::Client {
 
     /// Gets a host by the custom identifier.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#get-by-custom-identifier.
+    /// See <https://mackerel.io/api-docs/entry/hosts#get-by-custom-identifier>.
     pub async fn get_host_by_custom_identifier(
         &self,
         custom_identifier: String,
@@ -237,7 +237,7 @@ impl client::Client {
 
     /// Updates a host.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#update-information.
+    /// See <https://mackerel.io/api-docs/entry/hosts#update-information>.
     pub async fn update_host(&self, host_id: HostId, host: HostValue) -> Result<()> {
         self.request(
             Method::PUT,
@@ -251,7 +251,7 @@ impl client::Client {
 
     /// Updates host status.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#update-status.
+    /// See <https://mackerel.io/api-docs/entry/hosts#update-status>.
     pub async fn update_host_status(&self, host_id: HostId, host_status: HostStatus) -> Result<()> {
         self.request(
             Method::POST,
@@ -265,7 +265,7 @@ impl client::Client {
 
     /// Updates host statuses.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#update-status.
+    /// See <https://mackerel.io/api-docs/entry/hosts#update-status>.
     pub async fn update_host_statuses(
         &self,
         host_ids: Vec<HostId>,
@@ -286,7 +286,7 @@ impl client::Client {
 
     /// Updates host roles.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#update-roles.
+    /// See <https://mackerel.io/api-docs/entry/hosts#update-roles>.
     pub async fn update_host_roles(
         &self,
         host_id: HostId,
@@ -307,7 +307,7 @@ impl client::Client {
 
     /// Retires a host.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#retire.
+    /// See <https://mackerel.io/api-docs/entry/hosts#retire>.
     pub async fn retire_host(&self, host_id: HostId) -> Result<()> {
         self.request(
             Method::POST,
@@ -321,7 +321,7 @@ impl client::Client {
 
     /// Retires hosts.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#bulk-retire.
+    /// See <https://mackerel.io/api-docs/entry/hosts#bulk-retire>.
     pub async fn retire_hosts(&self, host_ids: Vec<HostId>) -> Result<()> {
         self.request(
             Method::POST,
@@ -335,7 +335,7 @@ impl client::Client {
 
     /// Fetches hosts.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#list.
+    /// See <https://mackerel.io/api-docs/entry/hosts#list>.
     pub async fn list_hosts(&self) -> Result<Vec<Host>> {
         self.request(
             Method::GET,
@@ -349,7 +349,7 @@ impl client::Client {
 
     /// Fetches host metric names.
     ///
-    /// See https://mackerel.io/api-docs/entry/hosts#metric-names.
+    /// See <https://mackerel.io/api-docs/entry/hosts#metric-names>.
     pub async fn list_host_metric_names(&self, host_id: HostId) -> Result<Vec<String>> {
         self.request(
             Method::GET,

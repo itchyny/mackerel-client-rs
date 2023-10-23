@@ -168,7 +168,7 @@ struct ListAlertsResponse {
 impl client::Client {
     /// Fetches open alerts.
     ///
-    /// See https://mackerel.io/api-docs/entry/alerts#get.
+    /// See <https://mackerel.io/api-docs/entry/alerts#get>.
     pub async fn list_open_alerts(
         &self,
         cursor_opt: Option<String>,
@@ -179,7 +179,7 @@ impl client::Client {
 
     /// Fetches closed alerts.
     ///
-    /// See https://mackerel.io/api-docs/entry/alerts#get.
+    /// See <https://mackerel.io/api-docs/entry/alerts#get>.
     pub async fn list_closed_alerts(
         &self,
         cursor_opt: Option<String>,
@@ -210,7 +210,7 @@ impl client::Client {
 
     /// Gets an alert.
     ///
-    /// See https://mackerel.io/api-docs/entry/alerts#get.
+    /// See <https://mackerel.io/api-docs/entry/alerts#get>.
     pub async fn get_alert(&self, alert_id: AlertId) -> Result<Alert> {
         self.request(
             Method::GET,
@@ -224,7 +224,7 @@ impl client::Client {
 
     /// Updates an alert.
     ///
-    /// See https://mackerel.io/api-docs/entry/alerts#update.
+    /// See <https://mackerel.io/api-docs/entry/alerts#update>.
     pub async fn update_alert(&self, alert_id: AlertId, memo: String) -> Result<()> {
         self.request(
             Method::PUT,
@@ -238,7 +238,7 @@ impl client::Client {
 
     /// Closes the specified alert.
     ///
-    /// See https://mackerel.io/api-docs/entry/alerts#close.
+    /// See <https://mackerel.io/api-docs/entry/alerts#close>.
     pub async fn close_alert(&self, alert_id: AlertId, reason: String) -> Result<Alert> {
         self.request(
             Method::POST,

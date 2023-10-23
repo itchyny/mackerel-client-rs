@@ -107,7 +107,7 @@ struct ListMetricValuesResponse {
 impl client::Client {
     /// Posts host metric values.
     ///
-    /// See https://mackerel.io/api-docs/entry/host-metrics#post.
+    /// See <https://mackerel.io/api-docs/entry/host-metrics#post>.
     pub async fn post_host_metric_values(
         &self,
         host_metric_values: Vec<HostMetricValue>,
@@ -124,7 +124,7 @@ impl client::Client {
 
     /// Fetches host metric value.
     ///
-    /// See https://mackerel.io/api-docs/entry/host-metrics#get.
+    /// See <https://mackerel.io/api-docs/entry/host-metrics#get>.
     pub async fn list_host_metric_values(
         &self,
         host_id: HostId,
@@ -148,7 +148,7 @@ impl client::Client {
 
     /// Posts service metric values.
     ///
-    /// See https://mackerel.io/api-docs/entry/service-metrics#post.
+    /// See <https://mackerel.io/api-docs/entry/service-metrics#post>.
     pub async fn post_service_metric_values(
         &self,
         service_name: ServiceName,
@@ -166,7 +166,7 @@ impl client::Client {
 
     /// Fetches service metric values.
     ///
-    /// See https://mackerel.io/api-docs/entry/service-metrics#get.
+    /// See <https://mackerel.io/api-docs/entry/service-metrics#get>.
     pub async fn list_service_metric_values(
         &self,
         service_name: ServiceName,

@@ -116,7 +116,7 @@ struct ListGraphAnnotationsResponse {
 impl client::Client {
     /// Fetches graph annotations.
     ///
-    /// See https://mackerel.io/api-docs/entry/graph-annotations#get.
+    /// See <https://mackerel.io/api-docs/entry/graph-annotations#get>.
     pub async fn list_graph_annotations(
         &self,
         service: ServiceName,
@@ -139,7 +139,7 @@ impl client::Client {
 
     /// Creates a new graph annotation.
     ///
-    /// See https://mackerel.io/api-docs/entry/graph-annotations#create.
+    /// See <https://mackerel.io/api-docs/entry/graph-annotations#create>.
     pub async fn create_graph_annotation(
         &self,
         graph_annotation: GraphAnnotationValue,
@@ -156,7 +156,7 @@ impl client::Client {
 
     /// Updates a graph annotation.
     ///
-    /// See https://mackerel.io/api-docs/entry/graph-annotations#update.
+    /// See <https://mackerel.io/api-docs/entry/graph-annotations#update>.
     pub async fn update_graph_annotation(
         &self,
         graph_annontation_id: GraphAnnotationId,
@@ -174,7 +174,7 @@ impl client::Client {
 
     /// Deletes a graph annotation.
     ///
-    /// See https://mackerel.io/api-docs/entry/graph-annotations#delete.
+    /// See <https://mackerel.io/api-docs/entry/graph-annotations#delete>.
     pub async fn delete_graph_annotation(
         &self,
         graph_annotation_id: GraphAnnotationId,

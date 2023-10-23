@@ -567,7 +567,7 @@ struct ListMonitorsResponse {
 impl client::Client {
     /// Fetches all the monitors.
     ///
-    /// See https://mackerel.io/api-docs/entry/monitors#get.
+    /// See <https://mackerel.io/api-docs/entry/monitors#get>.
     pub async fn list_monitors(&self) -> Result<Vec<Monitor>> {
         self.request(
             Method::GET,
@@ -581,7 +581,7 @@ impl client::Client {
 
     /// Creates a new monitor.
     ///
-    /// See https://mackerel.io/api-docs/entry/monitors#create.
+    /// See <https://mackerel.io/api-docs/entry/monitors#create>.
     pub async fn create_monitor(&self, monitor: MonitorValue) -> Result<Monitor> {
         self.request(
             Method::POST,
@@ -595,7 +595,7 @@ impl client::Client {
 
     /// Updates a monitor.
     ///
-    /// See https://mackerel.io/api-docs/entry/monitors#update.
+    /// See <https://mackerel.io/api-docs/entry/monitors#update>.
     pub async fn update_monitor(
         &self,
         monitor_id: MonitorId,
@@ -613,7 +613,7 @@ impl client::Client {
 
     /// Deletes a monitor.
     ///
-    /// See https://mackerel.io/api-docs/entry/monitors#delete.
+    /// See <https://mackerel.io/api-docs/entry/monitors#delete>.
     pub async fn delete_monitor(&self, monitor_id: MonitorId) -> Result<Monitor> {
         self.request(
             Method::DELETE,

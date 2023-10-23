@@ -523,7 +523,7 @@ struct ListChannelResponse {
 impl client::Client {
     /// Fetches all the channels.
     ///
-    /// See https://mackerel.io/api-docs/entry/channels#get.
+    /// See <https://mackerel.io/api-docs/entry/channels#get>.
     pub async fn list_channels(&self) -> Result<Vec<Channel>> {
         self.request(
             Method::GET,
@@ -537,7 +537,7 @@ impl client::Client {
 
     /// Creates a new channel.
     ///
-    /// See https://mackerel.io/api-docs/entry/channels#create.
+    /// See <https://mackerel.io/api-docs/entry/channels#create>.
     pub async fn create_channel(&self, channel: ChannelValue) -> Result<Channel> {
         self.request(
             Method::POST,
@@ -551,7 +551,7 @@ impl client::Client {
 
     /// Deletes a channel.
     ///
-    /// See https://mackerel.io/api-docs/entry/channels#delete.
+    /// See <https://mackerel.io/api-docs/entry/channels#delete>.
     pub async fn delete_channel(&self, channel_id: ChannelId) -> Result<Channel> {
         self.request(
             Method::DELETE,

@@ -144,7 +144,7 @@ struct ListMetricNamesResponse {
 impl client::Client {
     /// Fetches all the services.
     ///
-    /// See https://mackerel.io/api-docs/entry/services#list.
+    /// See <https://mackerel.io/api-docs/entry/services#list>.
     pub async fn list_services(&self) -> Result<Vec<Service>> {
         self.request(
             Method::GET,
@@ -158,7 +158,7 @@ impl client::Client {
 
     /// Creates a new service.
     ///
-    /// See https://mackerel.io/api-docs/entry/services#create.
+    /// See <https://mackerel.io/api-docs/entry/services#create>.
     pub async fn create_service(&self, service: Service) -> Result<Service> {
         self.request(
             Method::POST,
@@ -172,7 +172,7 @@ impl client::Client {
 
     /// Deletes a service.
     ///
-    /// See https://mackerel.io/api-docs/entry/services#delete.
+    /// See <https://mackerel.io/api-docs/entry/services#delete>.
     pub async fn delete_service(&self, service_name: ServiceName) -> Result<Service> {
         self.request(
             Method::DELETE,
@@ -186,7 +186,7 @@ impl client::Client {
 
     /// Fetches service metric names.
     ///
-    /// See https://mackerel.io/api-docs/entry/services#metric-names.
+    /// See <https://mackerel.io/api-docs/entry/services#metric-names>.
     pub async fn list_service_metric_names(
         &self,
         service_name: ServiceName,

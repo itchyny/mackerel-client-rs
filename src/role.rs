@@ -132,7 +132,7 @@ struct ListRolesResponse {
 impl client::Client {
     /// Fetches the roles in the specified service.
     ///
-    /// See https://mackerel.io/api-docs/entry/services#rolelist.
+    /// See <https://mackerel.io/api-docs/entry/services#rolelist>.
     pub async fn list_roles(&self, service_name: ServiceName) -> Result<Vec<Role>> {
         self.request(
             Method::GET,
@@ -146,7 +146,7 @@ impl client::Client {
 
     /// Creates a new role.
     ///
-    /// See https://mackerel.io/api-docs/entry/services#rolecreate.
+    /// See <https://mackerel.io/api-docs/entry/services#rolecreate>.
     pub async fn create_role(&self, service_name: ServiceName, role: Role) -> Result<Role> {
         self.request(
             Method::POST,
@@ -160,7 +160,7 @@ impl client::Client {
 
     /// Deletes a role.
     ///
-    /// See https://mackerel.io/api-docs/entry/services#roledelete.
+    /// See <https://mackerel.io/api-docs/entry/services#roledelete>.
     pub async fn delete_role(
         &self,
         service_name: ServiceName,

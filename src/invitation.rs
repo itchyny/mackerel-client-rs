@@ -126,7 +126,7 @@ struct ListInvitationsResponse {
 impl client::Client {
     /// Fetches all the invitations.
     ///
-    /// See https://mackerel.io/api-docs/entry/invitations#list.
+    /// See <https://mackerel.io/api-docs/entry/invitations#list>.
     pub async fn list_invitations(&self) -> Result<Vec<Invitation>> {
         self.request(
             Method::GET,
@@ -140,7 +140,7 @@ impl client::Client {
 
     /// Creates a new invitation.
     ///
-    /// See https://mackerel.io/api-docs/entry/invitations#create.
+    /// See <https://mackerel.io/api-docs/entry/invitations#create>.
     pub async fn create_invitation(&self, invitation: InvitationValue) -> Result<Invitation> {
         self.request(
             Method::POST,
@@ -154,7 +154,7 @@ impl client::Client {
 
     /// Revokes an invitation.
     ///
-    /// See https://mackerel.io/api-docs/entry/invitations#revoke.
+    /// See <https://mackerel.io/api-docs/entry/invitations#revoke>.
     pub async fn revoke_invitation(&self, email: String) -> Result<()> {
         self.request(
             Method::POST,

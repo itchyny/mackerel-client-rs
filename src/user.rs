@@ -150,7 +150,7 @@ struct ListUsersResponse {
 impl client::Client {
     /// Fetches all the users.
     ///
-    /// See https://mackerel.io/api-docs/entry/users#list.
+    /// See <https://mackerel.io/api-docs/entry/users#list>.
     pub async fn list_users(&self) -> Result<Vec<User>> {
         self.request(
             Method::GET,
@@ -164,7 +164,7 @@ impl client::Client {
 
     /// Delete the user from the organization.
     ///
-    /// See https://mackerel.io/api-docs/entry/users#delete.
+    /// See <https://mackerel.io/api-docs/entry/users#delete>.
     pub async fn delete_user(&self, user_id: UserId) -> Result<User> {
         self.request(
             Method::DELETE,

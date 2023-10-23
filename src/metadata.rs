@@ -22,7 +22,7 @@ struct ListMetadataResponse {
 impl client::Client {
     /// Retrieves a host metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#hostget.
+    /// See <https://mackerel.io/api-docs/entry/metadata#hostget>.
     pub async fn get_host_metadata(
         &self,
         host_id: HostId,
@@ -40,7 +40,7 @@ impl client::Client {
 
     /// Creates/Updates a host metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#hostput.
+    /// See <https://mackerel.io/api-docs/entry/metadata#hostput>.
     pub async fn put_host_metadata(
         &self,
         host_id: HostId,
@@ -59,7 +59,7 @@ impl client::Client {
 
     /// Deletes a host metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#hostdelete.
+    /// See <https://mackerel.io/api-docs/entry/metadata#hostdelete>.
     pub async fn delete_host_metadata(&self, host_id: HostId, namespace: String) -> Result<()> {
         self.request(
             Method::DELETE,
@@ -73,7 +73,7 @@ impl client::Client {
 
     /// Lists host metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#hostlist.
+    /// See <https://mackerel.io/api-docs/entry/metadata#hostlist>.
     pub async fn list_host_metadata(&self, host_id: HostId) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
@@ -87,7 +87,7 @@ impl client::Client {
 
     /// Retrieves a service metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#serviceget.
+    /// See <https://mackerel.io/api-docs/entry/metadata#serviceget>.
     pub async fn get_service_metadata(
         &self,
         service_name: ServiceName,
@@ -105,7 +105,7 @@ impl client::Client {
 
     /// Creates/Updates a service metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#serviceput.
+    /// See <https://mackerel.io/api-docs/entry/metadata#serviceput>.
     pub async fn put_service_metadata(
         &self,
         service_name: ServiceName,
@@ -124,7 +124,7 @@ impl client::Client {
 
     /// Deletes a service metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#servicedelete.
+    /// See <https://mackerel.io/api-docs/entry/metadata#servicedelete>.
     pub async fn delete_service_metadata(
         &self,
         service_name: ServiceName,
@@ -142,7 +142,7 @@ impl client::Client {
 
     /// Lists service metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#servicelist.
+    /// See <https://mackerel.io/api-docs/entry/metadata#servicelist>.
     pub async fn list_service_metadata(&self, service_name: ServiceName) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
@@ -156,7 +156,7 @@ impl client::Client {
 
     /// Retrieves a role metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#roleget.
+    /// See <https://mackerel.io/api-docs/entry/metadata#roleget>.
     pub async fn get_role_metadata(
         &self,
         service_name: ServiceName,
@@ -178,7 +178,7 @@ impl client::Client {
 
     /// Creates/Updates a role metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#roleput.
+    /// See <https://mackerel.io/api-docs/entry/metadata#roleput>.
     pub async fn put_role_metadata(
         &self,
         service_name: ServiceName,
@@ -201,7 +201,7 @@ impl client::Client {
 
     /// Deletes a role metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#roledelete.
+    /// See <https://mackerel.io/api-docs/entry/metadata#roledelete>.
     pub async fn delete_role_metadata(
         &self,
         service_name: ServiceName,
@@ -223,7 +223,7 @@ impl client::Client {
 
     /// Lists role metadata.
     ///
-    /// See https://mackerel.io/api-docs/entry/metadata#rolelist.
+    /// See <https://mackerel.io/api-docs/entry/metadata#rolelist>.
     pub async fn list_role_metadata(
         &self,
         service_name: ServiceName,
