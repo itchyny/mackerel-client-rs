@@ -5,7 +5,6 @@ use crate::monitor::MonitorId;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
 use std::fmt;
 
 /// A downtime
@@ -15,7 +14,6 @@ pub type Downtime = Entity<DowntimeValue>;
 pub type DowntimeId = Id<DowntimeValue>;
 
 /// A downtime value
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DowntimeValue {
@@ -25,6 +23,7 @@ pub struct DowntimeValue {
     #[serde(with = "chrono::serde::ts_seconds")]
     pub start: DateTime<Utc>,
     pub duration: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recurrence: Option<DowntimeRecurrence>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub service_scopes: Vec<String>,

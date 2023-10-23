@@ -7,14 +7,12 @@ use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
-use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 use std::fmt;
 use std::iter::FromIterator;
 use url::form_urlencoded;
 
 /// A host
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Host {
@@ -24,7 +22,11 @@ pub struct Host {
     pub size: HostSize,
     pub status: HostStatus,
     pub is_retired: bool,
-    #[serde(default, with = "chrono::serde::ts_seconds_option")]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub retired_at: Option<DateTime<Utc>>,
     pub roles: HashMap<ServiceName, Vec<RoleName>>,
     #[serde(flatten)]
@@ -73,12 +75,13 @@ impl fmt::Display for HostStatus {
 pub type HostId = Id<HostValue>;
 
 /// A host value
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HostValue {
     pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub display_name: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub custom_identifier: Option<String>,
     pub meta: HashMap<String, Value>,
     #[serde(default, skip_serializing_if = "String::is_empty")]
@@ -98,17 +101,19 @@ impl std::ops::Deref for Host {
     }
 }
 
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HostInterface {
     pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mac_address: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv4_addresses: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv6_addresses: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ip_address: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ipv6_address: Option<String>,
 }
 

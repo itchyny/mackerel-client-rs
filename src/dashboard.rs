@@ -15,7 +15,6 @@ pub type Dashboard = Entity<DashboardValue>;
 pub type DashboardId = Id<DashboardValue>;
 
 /// A dashboard value
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DashboardValue {
@@ -61,7 +60,6 @@ pub enum DashboardWidget {
 }
 
 /// A dashboard graph
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardGraph {
@@ -71,7 +69,7 @@ pub enum DashboardGraph {
     Role {
         role_fullname: String,
         name: String,
-        is_stacked: Option<bool>,
+        is_stacked: bool,
     },
     #[serde(rename_all = "camelCase")]
     Service {
@@ -85,7 +83,6 @@ pub enum DashboardGraph {
 }
 
 /// A dashboard metric
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardMetric {
@@ -103,7 +100,6 @@ pub enum DashboardMetric {
 }
 
 /// A dashboard range
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardRange {
@@ -122,7 +118,6 @@ pub enum DashboardRange {
 }
 
 /// A dashboard layout
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct DashboardLayout {
     pub x: u64,
@@ -166,7 +161,7 @@ mod tests {
                         graph: DashboardGraph::Role {
                             role_fullname: "service:role".to_string(),
                             name: "cpu.{user,iowait,system}".to_string(),
-                            is_stacked: Some(true),
+                            is_stacked: true,
                         },
                         range: Some(DashboardRange::Absolute {
                             start: DateTime::from_timestamp(1630000000, 0).unwrap(),

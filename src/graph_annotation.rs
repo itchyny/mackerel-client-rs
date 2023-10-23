@@ -6,7 +6,6 @@ use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
 
 /// A graph annotation
 pub type GraphAnnotation = Entity<GraphAnnotationValue>;
@@ -15,7 +14,6 @@ pub type GraphAnnotation = Entity<GraphAnnotationValue>;
 pub type GraphAnnotationId = Id<GraphAnnotationValue>;
 
 /// A graph annotation value
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct GraphAnnotationValue {
     pub title: String,
