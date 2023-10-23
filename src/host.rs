@@ -3,27 +3,29 @@ use crate::entity::Id;
 use crate::error::*;
 use crate::role::RoleName;
 use crate::service::ServiceName;
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_with::skip_serializing_none;
 use std::collections::HashMap;
-use std::default::Default;
 use std::fmt;
 use std::iter::FromIterator;
 use url::form_urlencoded;
 
 /// A host
+#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Host {
     pub id: HostId,
-    pub created_at: u64,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub created_at: DateTime<Utc>,
     pub size: String,
     pub status: HostStatus,
-    pub memo: String,
     pub is_retired: bool,
-    pub retired_at: Option<u64>,
+    #[serde(default, with = "chrono::serde::ts_seconds_option")]
+    pub retired_at: Option<DateTime<Utc>>,
     pub roles: HashMap<ServiceName, Vec<RoleName>>,
     #[serde(flatten)]
     pub value: HostValue,
@@ -55,13 +57,15 @@ pub type HostId = Id<HostValue>;
 
 /// A host value
 #[skip_serializing_none]
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize, Default)]
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HostValue {
     pub name: String,
     pub display_name: Option<String>,
     pub custom_identifier: Option<String>,
     pub meta: HashMap<String, Value>,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub interfaces: Vec<HostInterface>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -105,33 +109,105 @@ mod tests {
     use crate::host::*;
     use serde_json::json;
 
-    fn host_value_example() -> HostValue {
-        HostValue {
-            name: "test-host".to_string(),
-            ..HostValue::default()
+    fn host_example1() -> Host {
+        Host {
+            id: "abcde1".into(),
+            created_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
+            size: "standard".to_string(),
+            status: HostStatus::Working,
+            is_retired: false,
+            retired_at: None,
+            roles: HashMap::new(),
+            value: HostValue {
+                name: "example-host".to_string(),
+                display_name: None,
+                custom_identifier: None,
+                meta: HashMap::new(),
+                memo: "".to_string(),
+                interfaces: vec![],
+                role_fullnames: vec![],
+                checks: vec![],
+            },
         }
     }
 
-    fn host_value_json_example() -> serde_json::Value {
+    fn host_json_example1() -> serde_json::Value {
         json!({
-            "name": "test-host",
-            "meta": {}
+            "id": "abcde1",
+            "createdAt": 1700000000,
+            "size": "standard",
+            "status": "working",
+            "isRetired": false,
+            "roles": {},
+            "name": "example-host",
+            "meta": {},
+        })
+    }
+
+    fn host_example2() -> Host {
+        Host {
+            id: "abcde2".into(),
+            created_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
+            size: "standard".to_string(),
+            status: HostStatus::Working,
+            is_retired: true,
+            retired_at: Some(DateTime::from_timestamp(1710000000, 0).unwrap()),
+            roles: HashMap::<_, _>::from_iter([(
+                "ExampleService".into(),
+                vec!["ExampleRole".into()],
+            )]),
+            value: HostValue {
+                name: "example-host".to_string(),
+                display_name: Some("Example host".to_string()),
+                custom_identifier: Some("custom-identifier".to_string()),
+                meta: HashMap::new(),
+                memo: "host memo".to_string(),
+                interfaces: vec![],
+                role_fullnames: vec!["ExampleService:ExampleRole".to_string()],
+                checks: vec![],
+            },
+        }
+    }
+
+    fn host_json_example2() -> serde_json::Value {
+        json!({
+            "id": "abcde2",
+            "createdAt": 1700000000,
+            "size": "standard",
+            "status": "working",
+            "isRetired": true,
+            "retiredAt": 1710000000,
+            "roles": {"ExampleService": ["ExampleRole"]},
+            "name": "example-host",
+            "displayName": "Example host",
+            "customIdentifier": "custom-identifier",
+            "meta": {},
+            "memo": "host memo",
+            "roleFullnames": ["ExampleService:ExampleRole"],
         })
     }
 
     #[test]
-    fn serialize_create_host_param() {
+    fn serialize_host() {
         assert_eq!(
-            serde_json::to_value(&host_value_example()).unwrap(),
-            host_value_json_example()
+            serde_json::to_value(&host_example1()).unwrap(),
+            host_json_example1()
+        );
+        assert_eq!(
+            serde_json::to_value(&host_example2()).unwrap(),
+            host_json_example2()
         );
     }
 
     #[test]
-    fn deserialize_create_host_param() {
+    fn deserialize_host() {
         assert_eq!(
-            host_value_example(),
-            serde_json::from_value(host_value_json_example()).unwrap()
+            host_example1(),
+            serde_json::from_value(host_json_example1()).unwrap()
+        );
+        assert_eq!(
+            host_example2(),
+            serde_json::from_value(host_json_example2()).unwrap()
         );
     }
 

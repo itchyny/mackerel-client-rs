@@ -3,6 +3,7 @@ use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::host::HostId;
 use crate::monitor::{MonitorId, MonitorType};
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -29,8 +30,10 @@ pub struct AlertValue {
     pub value: Option<f64>,
     pub message: Option<String>,
     pub reason: Option<String>,
-    pub opened_at: u64,
-    pub closed_at: Option<u64>,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub opened_at: DateTime<Utc>,
+    #[serde(default, with = "chrono::serde::ts_seconds_option")]
+    pub closed_at: Option<DateTime<Utc>>,
 }
 
 /// Alert statuses
@@ -70,8 +73,8 @@ mod tests {
                 value: None,
                 message: None,
                 reason: None,
-                opened_at: 1690000000,
-                closed_at: Some(1700000000),
+                opened_at: DateTime::from_timestamp(1690000000, 0).unwrap(),
+                closed_at: Some(DateTime::from_timestamp(1700000000, 0).unwrap()),
             },
         }
     }
@@ -99,7 +102,7 @@ mod tests {
                 value: Some(25.0),
                 message: None,
                 reason: None,
-                opened_at: 1690000000,
+                opened_at: DateTime::from_timestamp(1690000000, 0).unwrap(),
                 closed_at: None,
             },
         }

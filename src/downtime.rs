@@ -2,6 +2,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::monitor::MonitorId;
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -21,7 +22,8 @@ pub struct DowntimeValue {
     pub name: String,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
-    pub start: u64,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub start: DateTime<Utc>,
     pub duration: u64,
     pub recurrence: Option<DowntimeRecurrence>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -46,7 +48,8 @@ pub struct DowntimeRecurrence {
     pub interval: u64,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub weekdays: Vec<DowntimeRecurrenceWeekday>,
-    pub until: Option<u64>,
+    #[serde(default, with = "chrono::serde::ts_seconds_option")]
+    pub until: Option<DateTime<Utc>>,
 }
 
 /// A downtime recurrence types
@@ -109,7 +112,7 @@ mod tests {
             value: DowntimeValue {
                 name: "Example downtime".to_string(),
                 memo: "This is a downtime memo.".to_string(),
-                start: 1700000000,
+                start: DateTime::from_timestamp(1700000000, 0).unwrap(),
                 duration: 60,
                 recurrence: None,
                 service_scopes: vec![],
@@ -138,7 +141,7 @@ mod tests {
             value: DowntimeValue {
                 name: "Example downtime".to_string(),
                 memo: "".to_string(),
-                start: 1700000000,
+                start: DateTime::from_timestamp(1700000000, 0).unwrap(),
                 duration: 60,
                 recurrence: Some(DowntimeRecurrence {
                     recurrence_type: DowntimeRecurrenceType::Weekly,
@@ -148,7 +151,7 @@ mod tests {
                         DowntimeRecurrenceWeekday::Tuesday,
                         DowntimeRecurrenceWeekday::Wednesday,
                     ],
-                    until: Some(1710000000),
+                    until: Some(DateTime::from_timestamp(1710000000, 0).unwrap()),
                 }),
                 service_scopes: vec!["service0".to_string()],
                 service_exclude_scopes: vec!["service1".to_string()],

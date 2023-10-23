@@ -1,6 +1,7 @@
 use crate::authority::Authority;
 use crate::client;
 use crate::error::*;
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -10,7 +11,8 @@ use std::iter::FromIterator;
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Invitation {
-    pub expires_at: u64,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub expires_at: DateTime<Utc>,
     #[serde(flatten)]
     pub value: InvitationValue,
 }
@@ -37,7 +39,7 @@ mod tests {
 
     fn invitation_example1() -> Invitation {
         Invitation {
-            expires_at: 1700000000,
+            expires_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
             value: InvitationValue {
                 email: "example1@example.com".to_string(),
                 authority: Authority::Manager,
@@ -55,7 +57,7 @@ mod tests {
 
     fn invitation_example2() -> Invitation {
         Invitation {
-            expires_at: 1700000000,
+            expires_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
             value: InvitationValue {
                 email: "example2@example.com".to_string(),
                 authority: Authority::Collaborator,

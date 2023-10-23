@@ -3,6 +3,7 @@ use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::role::RoleName;
 use crate::service::ServiceName;
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -20,8 +21,10 @@ pub struct GraphAnnotationValue {
     pub title: String,
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub description: String,
-    pub from: u64,
-    pub to: u64,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub from: DateTime<Utc>,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub to: DateTime<Utc>,
     pub service: ServiceName,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub roles: Vec<RoleName>,
@@ -38,8 +41,8 @@ mod tests {
             value: GraphAnnotationValue {
                 title: "Deploy application".to_string(),
                 description: "Graph Annotation Example\nhttps://example.com".to_string(),
-                from: 1484000000,
-                to: 1484000030,
+                from: DateTime::from_timestamp(1484000000, 0).unwrap(),
+                to: DateTime::from_timestamp(1484000030, 0).unwrap(),
                 service: "ExampleService".into(),
                 roles: vec!["ExampleRole1".into(), "ExampleRole2".into()],
             },
@@ -64,8 +67,8 @@ mod tests {
             value: GraphAnnotationValue {
                 title: "Deploy application".to_string(),
                 description: "".to_string(),
-                from: 1484000000,
-                to: 1484000030,
+                from: DateTime::from_timestamp(1484000000, 0).unwrap(),
+                to: DateTime::from_timestamp(1484000030, 0).unwrap(),
                 service: "ExampleService".into(),
                 roles: vec![],
             },
@@ -120,16 +123,16 @@ impl client::Client {
     pub async fn list_graph_annotations(
         &self,
         service: ServiceName,
-        from: u64,
-        to: u64,
+        from: DateTime<Utc>,
+        to: DateTime<Utc>,
     ) -> Result<Vec<GraphAnnotation>> {
         self.request(
             Method::GET,
             "/api/v0/graph-annotations",
             vec![
                 ("service", vec![&service]),
-                ("from", vec![&from.to_string()]),
-                ("to", vec![&to.to_string()]),
+                ("from", vec![&from.timestamp().to_string()]),
+                ("to", vec![&to.timestamp().to_string()]),
             ],
             client::empty_body(),
             |res: ListGraphAnnotationsResponse| res.graph_annotations,

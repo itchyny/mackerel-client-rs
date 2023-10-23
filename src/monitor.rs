@@ -2,6 +2,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::service::ServiceName;
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -104,7 +105,8 @@ pub enum MonitorValue {
         warning_sensitivity: Option<Sensitivity>,
         critical_sensitivity: Option<Sensitivity>,
         max_check_attempts: Option<u64>,
-        training_period_from: Option<u64>,
+        #[serde(default, with = "chrono::serde::ts_seconds_option")]
+        training_period_from: Option<DateTime<Utc>>,
         is_mute: Option<bool>,
         notification_interval: Option<u64>,
     },
@@ -408,7 +410,7 @@ mod tests {
                 warning_sensitivity: Some(Sensitivity::Normal),
                 critical_sensitivity: Some(Sensitivity::Insensitive),
                 max_check_attempts: Some(3),
-                training_period_from: Some(1580000000),
+                training_period_from: Some(DateTime::from_timestamp(1580000000, 0).unwrap()),
                 is_mute: Some(false),
                 notification_interval: None,
             },

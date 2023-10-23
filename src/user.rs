@@ -2,6 +2,7 @@ use crate::authority::Authority;
 use crate::client;
 use crate::entity::Id;
 use crate::error::*;
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use std::fmt;
@@ -16,7 +17,8 @@ pub struct User {
     pub is_mfa_enabled: bool,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub authentication_methods: Vec<AuthenticationMethod>,
-    pub joined_at: u64,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub joined_at: DateTime<Utc>,
     #[serde(flatten)]
     pub value: UserValue,
 }
@@ -78,7 +80,7 @@ mod tests {
             is_in_registration_process: false,
             is_mfa_enabled: false,
             authentication_methods: vec![AuthenticationMethod::Password],
-            joined_at: 1630000000,
+            joined_at: DateTime::from_timestamp(1630000000, 0).unwrap(),
             value: UserValue {
                 screen_name: "Example Mackerel".to_string(),
                 email: "mackerel@example.com".to_string(),

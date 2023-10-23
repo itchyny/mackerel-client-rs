@@ -2,6 +2,7 @@ use crate::client;
 use crate::error::*;
 use crate::host::HostId;
 use crate::service::ServiceName;
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
@@ -27,7 +28,8 @@ pub struct ServiceMetricValue {
 /// A metric value
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct MetricValue {
-    pub time: u64,
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub time: DateTime<Utc>,
     pub value: f64,
 }
 
@@ -41,7 +43,7 @@ mod tests {
             host_id: "abcde1".into(),
             name: "loadavg.loadavg1".to_string(),
             value: MetricValue {
-                time: 1700000000,
+                time: DateTime::from_timestamp(1700000000, 0).unwrap(),
                 value: 1.2,
             },
         }
@@ -60,7 +62,7 @@ mod tests {
         ServiceMetricValue {
             name: "custom.metric.name".to_string(),
             value: MetricValue {
-                time: 1700000000,
+                time: DateTime::from_timestamp(1700000000, 0).unwrap(),
                 value: 1.3,
             },
         }
@@ -129,16 +131,16 @@ impl client::Client {
         &self,
         host_id: HostId,
         name: String,
-        from: u64,
-        to: u64,
+        from: DateTime<Utc>,
+        to: DateTime<Utc>,
     ) -> Result<Vec<MetricValue>> {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metrics", host_id),
             vec![
                 ("name", vec![&name]),
-                ("from", vec![&from.to_string()]),
-                ("to", vec![&to.to_string()]),
+                ("from", vec![&from.timestamp().to_string()]),
+                ("to", vec![&to.timestamp().to_string()]),
             ],
             client::empty_body(),
             |res: ListMetricValuesResponse| res.metrics,
@@ -171,16 +173,16 @@ impl client::Client {
         &self,
         service_name: ServiceName,
         name: String,
-        from: u64,
-        to: u64,
+        from: DateTime<Utc>,
+        to: DateTime<Utc>,
     ) -> Result<Vec<MetricValue>> {
         self.request(
             Method::GET,
             format!("/api/v0/services/{}/metrics", service_name),
             vec![
                 ("name", vec![&name]),
-                ("from", vec![&from.to_string()]),
-                ("to", vec![&to.to_string()]),
+                ("from", vec![&from.timestamp().to_string()]),
+                ("to", vec![&to.timestamp().to_string()]),
             ],
             client::empty_body(),
             |res: ListMetricValuesResponse| res.metrics,

@@ -3,9 +3,10 @@ use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::host::HostId;
 use crate::service::ServiceName;
+use chrono::{DateTime, Duration, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
+use serde_with::{skip_serializing_none, DurationSeconds};
 
 /// A dashboard
 pub type Dashboard = Entity<DashboardValue>;
@@ -106,10 +107,18 @@ pub enum DashboardMetric {
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardRange {
-    #[serde(rename_all = "camelCase")]
-    Relative { period: u64, offset: i64 },
-    #[serde(rename_all = "camelCase")]
-    Absolute { start: u64, end: u64 },
+    Relative {
+        #[serde(with = "serde_with::As::<DurationSeconds<i64>>")]
+        period: Duration,
+        #[serde(with = "serde_with::As::<DurationSeconds<i64>>")]
+        offset: Duration,
+    },
+    Absolute {
+        #[serde(with = "chrono::serde::ts_seconds")]
+        start: DateTime<Utc>,
+        #[serde(with = "chrono::serde::ts_seconds")]
+        end: DateTime<Utc>,
+    },
 }
 
 /// A dashboard layout
@@ -142,8 +151,8 @@ mod tests {
                             name: "loadavg5".to_string(),
                         },
                         range: Some(DashboardRange::Relative {
-                            period: 86400,
-                            offset: -3600,
+                            period: Duration::seconds(86400),
+                            offset: Duration::seconds(-3600),
                         }),
                         layout: DashboardLayout {
                             x: 0,
@@ -160,8 +169,8 @@ mod tests {
                             is_stacked: Some(true),
                         },
                         range: Some(DashboardRange::Absolute {
-                            start: 1630000000,
-                            end: 1630003600,
+                            start: DateTime::from_timestamp(1630000000, 0).unwrap(),
+                            end: DateTime::from_timestamp(1630003600, 0).unwrap(),
                         }),
                         layout: DashboardLayout {
                             x: 8,
