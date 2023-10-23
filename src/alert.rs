@@ -159,21 +159,79 @@ mod tests {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct ListAlertsResponse {
     alerts: Vec<Alert>,
+    next_id: Option<String>,
 }
 
 impl client::Client {
-    /// Fetches all the open alerts.
+    /// Fetches open alerts.
     ///
     /// See https://mackerel.io/api-docs/entry/alerts#get.
-    pub async fn list_alerts(&self) -> Result<Vec<Alert>> {
+    pub async fn list_open_alerts(
+        &self,
+        cursor_opt: Option<String>,
+        limit: usize,
+    ) -> Result<(Vec<Alert>, Option<String>)> {
+        self.list_alerts("false", cursor_opt, limit).await
+    }
+
+    /// Fetches closed alerts.
+    ///
+    /// See https://mackerel.io/api-docs/entry/alerts#get.
+    pub async fn list_closed_alerts(
+        &self,
+        cursor_opt: Option<String>,
+        limit: usize,
+    ) -> Result<(Vec<Alert>, Option<String>)> {
+        self.list_alerts("true", cursor_opt, limit).await
+    }
+
+    async fn list_alerts(
+        &self,
+        with_closed: &str,
+        cursor_opt: Option<String>,
+        limit: usize,
+    ) -> Result<(Vec<Alert>, Option<String>)> {
         self.request(
             Method::GET,
             "/api/v0/alerts",
+            vec![
+                ("withClosed", vec![with_closed]),
+                ("nextId", cursor_opt.as_deref().into_iter().collect()),
+                ("limit", vec![limit.to_string().as_str()]),
+            ],
+            client::empty_body(),
+            |res: ListAlertsResponse| (res.alerts, res.next_id),
+        )
+        .await
+    }
+
+    /// Gets an alert.
+    ///
+    /// See https://mackerel.io/api-docs/entry/alerts#get.
+    pub async fn get_alert(&self, alert_id: AlertId) -> Result<Alert> {
+        self.request(
+            Method::GET,
+            format!("/api/v0/alerts/{}", alert_id),
             vec![],
             client::empty_body(),
-            |res: ListAlertsResponse| res.alerts,
+            |alert| alert,
+        )
+        .await
+    }
+
+    /// Updates an alert.
+    ///
+    /// See https://mackerel.io/api-docs/entry/alerts#update.
+    pub async fn update_alert(&self, alert_id: AlertId, memo: String) -> Result<()> {
+        self.request(
+            Method::PUT,
+            format!("/api/v0/alerts/{}", alert_id),
+            vec![],
+            Some(HashMap::<_, _>::from_iter([("memo", memo)])),
+            |_: serde_json::Value| (),
         )
         .await
     }
