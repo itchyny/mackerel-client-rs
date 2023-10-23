@@ -1,6 +1,8 @@
 use crate::client;
 use crate::entity::Id;
 use crate::error::*;
+use crate::role::RoleName;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
@@ -22,7 +24,7 @@ pub struct Host {
     pub memo: String,
     pub is_retired: bool,
     pub retired_at: Option<u64>,
-    pub roles: HashMap<String, Vec<String>>,
+    pub roles: HashMap<ServiceName, Vec<RoleName>>,
     #[serde(flatten)]
     pub value: HostValue,
 }

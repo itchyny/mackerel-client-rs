@@ -1,6 +1,8 @@
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
+use crate::role::RoleName;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -20,9 +22,9 @@ pub struct GraphAnnotationValue {
     pub description: String,
     pub from: u64,
     pub to: u64,
-    pub service: String,
+    pub service: ServiceName,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub roles: Vec<String>,
+    pub roles: Vec<RoleName>,
 }
 
 #[cfg(test)]
@@ -38,8 +40,8 @@ mod tests {
                 description: "Graph Annotation Example\nhttps://example.com".to_string(),
                 from: 1484000000,
                 to: 1484000030,
-                service: "ExampleService".to_string(),
-                roles: vec!["ExampleRole1".to_string(), "ExampleRole2".to_string()],
+                service: "ExampleService".into(),
+                roles: vec!["ExampleRole1".into(), "ExampleRole2".into()],
             },
         }
     }
@@ -64,7 +66,7 @@ mod tests {
                 description: "".to_string(),
                 from: 1484000000,
                 to: 1484000030,
-                service: "ExampleService".to_string(),
+                service: "ExampleService".into(),
                 roles: vec![],
             },
         }
@@ -117,7 +119,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/graph-annotations#get.
     pub async fn list_graph_annotations(
         &self,
-        service: String,
+        service: ServiceName,
         from: u64,
         to: u64,
     ) -> Result<Vec<GraphAnnotation>> {

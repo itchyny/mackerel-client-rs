@@ -1,6 +1,7 @@
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -51,7 +52,7 @@ pub enum MonitorValue {
         name: String,
         #[serde(default, skip_serializing_if = "String::is_empty")]
         memo: String,
-        service: String,
+        service: ServiceName,
         duration: u64,
         metric: String,
         operator: Operator,
@@ -69,7 +70,7 @@ pub enum MonitorValue {
         url: String,
         request_body: Option<String>,
         headers: Option<Vec<ExternalHeader>>,
-        service: Option<String>,
+        service: Option<ServiceName>,
         response_time_duration: Option<u64>,
         response_time_warning: Option<f64>,
         response_time_critical: Option<f64>,
@@ -287,7 +288,7 @@ mod tests {
             value: MonitorValue::Service {
                 name: "Service count".to_string(),
                 memo: "Monitor memo".to_string(),
-                service: "service1".to_string(),
+                service: "service1".into(),
                 duration: 5,
                 metric: "custom.service.count".to_string(),
                 operator: Operator::GreaterThan,
@@ -329,7 +330,7 @@ mod tests {
                     name: "Cache-Control".to_string(),
                     value: "no-cache".to_string(),
                 }]),
-                service: Some("service1".to_string()),
+                service: Some("service1".into()),
                 response_time_duration: Some(5),
                 response_time_warning: Some(3000.0),
                 response_time_critical: Some(5000.0),

@@ -3,6 +3,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::monitor::MonitorId;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use std::fmt;
@@ -56,7 +57,7 @@ pub struct NotificationGroupMonitor {
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationGroupService {
-    pub name: String,
+    pub name: ServiceName,
 }
 
 #[cfg(test)]
@@ -101,7 +102,7 @@ mod tests {
                     skip_default: false,
                 }],
                 services: vec![NotificationGroupService {
-                    name: "ExampleService".to_string(),
+                    name: "ExampleService".into(),
                 }],
             },
         }

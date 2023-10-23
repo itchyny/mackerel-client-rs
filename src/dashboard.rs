@@ -2,6 +2,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::host::HostId;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -72,7 +73,10 @@ pub enum DashboardGraph {
         is_stacked: Option<bool>,
     },
     #[serde(rename_all = "camelCase")]
-    Service { service_name: String, name: String },
+    Service {
+        service_name: ServiceName,
+        name: String,
+    },
     #[serde(rename_all = "camelCase")]
     Expression { expression: String },
     #[serde(rename_all = "camelCase")]
@@ -87,7 +91,10 @@ pub enum DashboardMetric {
     #[serde(rename_all = "camelCase")]
     Host { host_id: HostId, name: String },
     #[serde(rename_all = "camelCase")]
-    Service { service_name: String, name: String },
+    Service {
+        service_name: ServiceName,
+        name: String,
+    },
     #[serde(rename_all = "camelCase")]
     Expression { expression: String },
     #[serde(rename_all = "camelCase")]

@@ -1,6 +1,7 @@
 use crate::client;
 use crate::error::*;
 use crate::host::HostId;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
@@ -150,7 +151,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/service-metrics#post.
     pub async fn post_service_metric_values(
         &self,
-        service_name: String,
+        service_name: ServiceName,
         service_metric_values: Vec<ServiceMetricValue>,
     ) -> Result<()> {
         self.request(
@@ -168,7 +169,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/service-metrics#get.
     pub async fn list_service_metric_values(
         &self,
-        service_name: String,
+        service_name: ServiceName,
         name: String,
         from: u64,
         to: u64,

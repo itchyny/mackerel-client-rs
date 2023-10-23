@@ -1,6 +1,8 @@
 use crate::client;
 use crate::error::*;
 use crate::host::HostId;
+use crate::role::RoleName;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json;
@@ -88,7 +90,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#serviceget.
     pub async fn get_service_metadata(
         &self,
-        service_name: String,
+        service_name: ServiceName,
         namespace: String,
     ) -> Result<serde_json::Value> {
         self.request(
@@ -106,7 +108,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#serviceput.
     pub async fn put_service_metadata(
         &self,
-        service_name: String,
+        service_name: ServiceName,
         namespace: String,
         metadata: serde_json::Value,
     ) -> Result<()> {
@@ -125,7 +127,7 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#servicedelete.
     pub async fn delete_service_metadata(
         &self,
-        service_name: String,
+        service_name: ServiceName,
         namespace: String,
     ) -> Result<()> {
         self.request(
@@ -141,7 +143,7 @@ impl client::Client {
     /// Lists service metadata.
     ///
     /// See https://mackerel.io/api-docs/entry/metadata#servicelist.
-    pub async fn list_service_metadata(&self, service_name: String) -> Result<Vec<Metadata>> {
+    pub async fn list_service_metadata(&self, service_name: ServiceName) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
             format!("/api/v0/services/{}/metadata", service_name),
@@ -157,8 +159,8 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#roleget.
     pub async fn get_role_metadata(
         &self,
-        service_name: String,
-        role_name: String,
+        service_name: ServiceName,
+        role_name: RoleName,
         namespace: String,
     ) -> Result<serde_json::Value> {
         self.request(
@@ -179,8 +181,8 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#roleput.
     pub async fn put_role_metadata(
         &self,
-        service_name: String,
-        role_name: String,
+        service_name: ServiceName,
+        role_name: RoleName,
         namespace: String,
         metadata: serde_json::Value,
     ) -> Result<()> {
@@ -202,8 +204,8 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#roledelete.
     pub async fn delete_role_metadata(
         &self,
-        service_name: String,
-        role_name: String,
+        service_name: ServiceName,
+        role_name: RoleName,
         namespace: String,
     ) -> Result<()> {
         self.request(
@@ -224,8 +226,8 @@ impl client::Client {
     /// See https://mackerel.io/api-docs/entry/metadata#rolelist.
     pub async fn list_role_metadata(
         &self,
-        service_name: String,
-        role_name: String,
+        service_name: ServiceName,
+        role_name: RoleName,
     ) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
