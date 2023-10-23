@@ -9,7 +9,6 @@ use serde_derive::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::collections::HashMap;
 use std::fmt;
-use std::iter::FromIterator;
 
 /// An alert
 pub type Alert = Entity<AlertValue>;
@@ -233,7 +232,7 @@ impl client::Client {
             Method::PUT,
             format!("/api/v0/alerts/{}", alert_id),
             vec![],
-            Some(HashMap::<_, _>::from_iter([("memo", memo)])),
+            Some(HashMap::from([("memo", memo)])),
             |_: serde_json::Value| (),
         )
         .await
@@ -247,7 +246,7 @@ impl client::Client {
             Method::POST,
             format!("/api/v0/alerts/{}/close", alert_id),
             vec![],
-            Some(HashMap::<_, _>::from_iter([("reason", reason)])),
+            Some(HashMap::from([("reason", reason)])),
             |alert| alert,
         )
         .await

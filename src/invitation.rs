@@ -5,7 +5,6 @@ use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::iter::FromIterator;
 
 /// An invitation
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -162,7 +161,7 @@ impl client::Client {
             Method::POST,
             "/api/v0/invitations/revoke",
             vec![],
-            Some(HashMap::<_, _>::from_iter([("email", email)])),
+            Some(HashMap::from([("email", email)])),
             |_: serde_json::Value| (),
         )
         .await

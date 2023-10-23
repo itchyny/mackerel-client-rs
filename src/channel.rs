@@ -153,10 +153,7 @@ mod tests {
                 name: "Example Slack Channel".to_string(),
                 url: "slack@example.com".to_string(),
                 enabled_graph_image: true,
-                mentions: HashMap::<_, _>::from_iter([(
-                    "critical".to_string(),
-                    "@channel".to_string(),
-                )]),
+                mentions: HashMap::from([("critical".to_string(), "@channel".to_string())]),
                 events: vec![
                     NotificationEvent::HostStatus,
                     NotificationEvent::HostRegister,

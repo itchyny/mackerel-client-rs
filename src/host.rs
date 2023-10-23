@@ -9,7 +9,6 @@ use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fmt;
-use std::iter::FromIterator;
 use url::form_urlencoded;
 
 /// A host
@@ -378,7 +377,7 @@ impl client::Client {
             Method::POST,
             format!("/api/v0/hosts/{}/status", host_id),
             vec![],
-            Some(HashMap::<_, _>::from_iter([("status", host_status)])),
+            Some(HashMap::from([("status", host_status)])),
             |_: serde_json::Value| (),
         )
         .await
@@ -417,10 +416,7 @@ impl client::Client {
             Method::PUT,
             format!("/api/v0/hosts/{}/role-fullnames", host_id),
             vec![],
-            Some(HashMap::<_, _>::from_iter([(
-                "roleFullnames",
-                role_fullnames,
-            )])),
+            Some(HashMap::from([("roleFullnames", role_fullnames)])),
             |_: serde_json::Value| (),
         )
         .await
@@ -448,7 +444,7 @@ impl client::Client {
             Method::POST,
             format!("/api/v0/hosts/bulk-retire"),
             vec![],
-            Some(HashMap::<_, _>::from_iter([("ids", host_ids)])),
+            Some(HashMap::from([("ids", host_ids)])),
             |_: serde_json::Value| (),
         )
         .await
