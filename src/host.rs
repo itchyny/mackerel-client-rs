@@ -112,12 +112,12 @@ pub struct HostInterface {
     pub ipv6_address: Option<String>,
 }
 
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HostCheck {
     pub name: String,
-    pub memo: Option<String>,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
 }
 
 #[cfg(test)]
@@ -180,7 +180,16 @@ mod tests {
                 memo: "host memo".to_string(),
                 interfaces: vec![],
                 role_fullnames: vec!["ExampleService:ExampleRole".to_string()],
-                checks: vec![],
+                checks: vec![
+                    HostCheck {
+                        name: "check0".to_string(),
+                        memo: "check0 memo".to_string(),
+                    },
+                    HostCheck {
+                        name: "check1".to_string(),
+                        memo: "".to_string(),
+                    },
+                ],
             },
         }
     }
@@ -200,6 +209,7 @@ mod tests {
             "meta": {},
             "memo": "host memo",
             "roleFullnames": ["ExampleService:ExampleRole"],
+            "checks": [{"name": "check0", "memo": "check0 memo"}, {"name": "check1"}],
         })
     }
 
