@@ -4,6 +4,7 @@ use crate::entity::Id;
 use crate::error::*;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::fmt;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -13,7 +14,8 @@ pub struct User {
     pub is_in_registration_process: bool,
     #[serde(rename = "isMFAEnabled")]
     pub is_mfa_enabled: bool,
-    pub authentication_methods: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub authentication_methods: Vec<AuthenticationMethod>,
     pub joined_at: u64,
     #[serde(flatten)]
     pub value: UserValue,
@@ -38,6 +40,33 @@ pub struct UserValue {
     pub authority: Authority,
 }
 
+/// Authentication methods
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum AuthenticationMethod {
+    Password,
+    GitHub,
+    IDCF,
+    Google,
+    Nifty,
+    Yammer,
+    KDDI,
+}
+
+impl fmt::Display for AuthenticationMethod {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            AuthenticationMethod::Password => write!(f, "password"),
+            AuthenticationMethod::GitHub => write!(f, "github"),
+            AuthenticationMethod::IDCF => write!(f, "idcf"),
+            AuthenticationMethod::Google => write!(f, "google"),
+            AuthenticationMethod::Nifty => write!(f, "nifty"),
+            AuthenticationMethod::Yammer => write!(f, "yammer"),
+            AuthenticationMethod::KDDI => write!(f, "kddi"),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::user::*;
@@ -48,7 +77,7 @@ mod tests {
             id: "abcde".into(),
             is_in_registration_process: false,
             is_mfa_enabled: false,
-            authentication_methods: vec!["password".to_string()],
+            authentication_methods: vec![AuthenticationMethod::Password],
             joined_at: 1630000000,
             value: UserValue {
                 screen_name: "Example Mackerel".to_string(),
@@ -85,6 +114,31 @@ mod tests {
             user_example(),
             serde_json::from_value(json_example()).unwrap()
         );
+    }
+
+    #[test]
+    fn authentication_methods() {
+        let test_cases = [
+            (AuthenticationMethod::Password, "password"),
+            (AuthenticationMethod::GitHub, "github"),
+            (AuthenticationMethod::IDCF, "idcf"),
+            (AuthenticationMethod::Google, "google"),
+            (AuthenticationMethod::Nifty, "nifty"),
+            (AuthenticationMethod::Yammer, "yammer"),
+            (AuthenticationMethod::KDDI, "kddi"),
+        ];
+        for &(authentication_method, authentication_method_str) in &test_cases {
+            let str_value = serde_json::Value::String(authentication_method_str.to_string());
+            assert_eq!(
+                authentication_method,
+                serde_json::from_value(str_value.clone()).unwrap()
+            );
+            assert_eq!(
+                str_value,
+                serde_json::to_value(authentication_method).unwrap()
+            );
+            assert_eq!(str_value, format!("{}", authentication_method).as_str());
+        }
     }
 }
 
