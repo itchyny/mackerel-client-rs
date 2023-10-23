@@ -21,3 +21,27 @@ impl fmt::Display for Authority {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::authority::*;
+
+    #[test]
+    fn authorities() {
+        let test_cases = [
+            (Authority::Owner, "owner"),
+            (Authority::Manager, "manager"),
+            (Authority::Collaborator, "collaborator"),
+            (Authority::Viewer, "viewer"),
+        ];
+        for &(authority, authority_str) in &test_cases {
+            let str_value = serde_json::Value::String(authority_str.to_string());
+            assert_eq!(
+                authority,
+                serde_json::from_value(str_value.clone()).unwrap()
+            );
+            assert_eq!(str_value, serde_json::to_value(authority).unwrap());
+            assert_eq!(str_value, format!("{}", authority).as_str());
+        }
+    }
+}
