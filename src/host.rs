@@ -21,7 +21,7 @@ pub struct Host {
     pub id: HostId,
     #[serde(with = "chrono::serde::ts_seconds")]
     pub created_at: DateTime<Utc>,
-    pub size: String,
+    pub size: HostSize,
     pub status: HostStatus,
     pub is_retired: bool,
     #[serde(default, with = "chrono::serde::ts_seconds_option")]
@@ -29,6 +29,23 @@ pub struct Host {
     pub roles: HashMap<ServiceName, Vec<RoleName>>,
     #[serde(flatten)]
     pub value: HostValue,
+}
+
+/// Host size
+#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum HostSize {
+    Standard,
+    Micro,
+}
+
+impl fmt::Display for HostSize {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            HostSize::Standard => write!(f, "standard"),
+            HostSize::Micro => write!(f, "micro"),
+        }
+    }
 }
 
 /// Host status
@@ -105,7 +122,6 @@ pub struct HostCheck {
 
 #[cfg(test)]
 mod tests {
-
     use crate::host::*;
     use serde_json::json;
 
@@ -113,7 +129,7 @@ mod tests {
         Host {
             id: "abcde1".into(),
             created_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
-            size: "standard".to_string(),
+            size: HostSize::Standard,
             status: HostStatus::Working,
             is_retired: false,
             retired_at: None,
@@ -148,8 +164,8 @@ mod tests {
         Host {
             id: "abcde2".into(),
             created_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
-            size: "standard".to_string(),
-            status: HostStatus::Working,
+            size: HostSize::Micro,
+            status: HostStatus::Poweroff,
             is_retired: true,
             retired_at: Some(DateTime::from_timestamp(1710000000, 0).unwrap()),
             roles: HashMap::<_, _>::from_iter([(
@@ -173,8 +189,8 @@ mod tests {
         json!({
             "id": "abcde2",
             "createdAt": 1700000000,
-            "size": "standard",
-            "status": "working",
+            "size": "micro",
+            "status": "poweroff",
             "isRetired": true,
             "retiredAt": 1710000000,
             "roles": {"ExampleService": ["ExampleRole"]},
@@ -209,6 +225,20 @@ mod tests {
             host_example2(),
             serde_json::from_value(host_json_example2()).unwrap()
         );
+    }
+
+    #[test]
+    fn test_host_sizes() {
+        let test_cases = [(HostSize::Standard, "standard"), (HostSize::Micro, "micro")];
+        for &(host_size, status_str) in &test_cases {
+            let str_value = serde_json::Value::String(status_str.to_string());
+            assert_eq!(
+                host_size,
+                serde_json::from_value(str_value.clone()).unwrap()
+            );
+            assert_eq!(str_value, serde_json::to_value(host_size).unwrap());
+            assert_eq!(str_value, format!("{}", host_size).as_str());
+        }
     }
 
     #[test]
