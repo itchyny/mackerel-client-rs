@@ -190,12 +190,12 @@ impl client::Client {
     /// Creates a new host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#create>.
-    pub async fn create_host(&self, host: HostValue) -> Result<HostId> {
+    pub async fn create_host(&self, host_value: HostValue) -> Result<HostId> {
         self.request(
             Method::POST,
             "/api/v0/hosts",
             vec![],
-            Some(host),
+            Some(host_value),
             |res: CreateHostResponse| res.id,
         )
         .await
@@ -238,12 +238,12 @@ impl client::Client {
     /// Updates a host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#update-information>.
-    pub async fn update_host(&self, host_id: HostId, host: HostValue) -> Result<()> {
+    pub async fn update_host(&self, host_id: HostId, host_value: HostValue) -> Result<()> {
         self.request(
             Method::PUT,
             format!("/api/v0/hosts/{}", host_id),
             vec![],
-            Some(host),
+            Some(host_value),
             |_: serde_json::Value| (),
         )
         .await

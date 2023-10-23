@@ -171,13 +171,13 @@ impl client::Client {
     /// See <https://mackerel.io/api-docs/entry/notification-groups#create>.
     pub async fn create_notification_group(
         &self,
-        notification_group: NotificationGroupValue,
+        notification_group_value: NotificationGroupValue,
     ) -> Result<NotificationGroup> {
         self.request(
             Method::POST,
             "/api/v0/notification-groups",
             vec![],
-            Some(notification_group),
+            Some(notification_group_value),
             |notification_group| notification_group,
         )
         .await
@@ -189,13 +189,13 @@ impl client::Client {
     pub async fn update_notification_group(
         &self,
         notification_group_id: NotificationGroupId,
-        notification_group: NotificationGroupValue,
+        notification_group_value: NotificationGroupValue,
     ) -> Result<NotificationGroup> {
         self.request(
             Method::PUT,
             format!("/api/v0/notification-groups/{}", notification_group_id),
             vec![],
-            Some(notification_group),
+            Some(notification_group_value),
             |notification_group| notification_group,
         )
         .await

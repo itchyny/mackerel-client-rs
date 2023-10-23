@@ -341,12 +341,12 @@ impl client::Client {
     /// Creates a new dashboard.
     ///
     /// See <https://mackerel.io/api-docs/entry/dashboards#create>.
-    pub async fn create_dashboard(&self, dashboard: DashboardValue) -> Result<Dashboard> {
+    pub async fn create_dashboard(&self, dashboard_value: DashboardValue) -> Result<Dashboard> {
         self.request(
             Method::POST,
             "/api/v0/dashboards",
             vec![],
-            Some(dashboard),
+            Some(dashboard_value),
             |dashboard| dashboard,
         )
         .await
@@ -372,13 +372,13 @@ impl client::Client {
     pub async fn update_dashboard(
         &self,
         dashboard_id: DashboardId,
-        dashboard: DashboardValue,
+        dashboard_value: DashboardValue,
     ) -> Result<Dashboard> {
         self.request(
             Method::PUT,
             format!("/api/v0/dashboards/{}", dashboard_id),
             vec![],
-            Some(dashboard),
+            Some(dashboard_value),
             |dashboard| dashboard,
         )
         .await

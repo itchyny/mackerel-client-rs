@@ -538,12 +538,12 @@ impl client::Client {
     /// Creates a new channel.
     ///
     /// See <https://mackerel.io/api-docs/entry/channels#create>.
-    pub async fn create_channel(&self, channel: ChannelValue) -> Result<Channel> {
+    pub async fn create_channel(&self, channel_value: ChannelValue) -> Result<Channel> {
         self.request(
             Method::POST,
             "/api/v0/channels",
             vec![],
-            Some(channel),
+            Some(channel_value),
             |channel| channel,
         )
         .await

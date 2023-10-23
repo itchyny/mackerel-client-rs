@@ -141,13 +141,13 @@ impl client::Client {
     /// Creates a new invitation.
     ///
     /// See <https://mackerel.io/api-docs/entry/invitations#create>.
-    pub async fn create_invitation(&self, invitation: InvitationValue) -> Result<Invitation> {
+    pub async fn create_invitation(&self, invitation_value: InvitationValue) -> Result<Invitation> {
         self.request(
             Method::POST,
             "/api/v0/invitations",
             vec![],
-            Some(invitation),
-            |res: Invitation| res,
+            Some(invitation_value),
+            |invitation: Invitation| invitation,
         )
         .await
     }

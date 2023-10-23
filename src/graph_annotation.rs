@@ -142,13 +142,13 @@ impl client::Client {
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#create>.
     pub async fn create_graph_annotation(
         &self,
-        graph_annotation: GraphAnnotationValue,
+        graph_annotation_value: GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::POST,
             "/api/v0/graph-annotations",
             vec![],
-            Some(graph_annotation),
+            Some(graph_annotation_value),
             |graph_annotation| graph_annotation,
         )
         .await
@@ -160,13 +160,13 @@ impl client::Client {
     pub async fn update_graph_annotation(
         &self,
         graph_annontation_id: GraphAnnotationId,
-        graph_annotation: GraphAnnotationValue,
+        graph_annotation_value: GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::PUT,
             format!("/api/v0/graph-annotations/{}", graph_annontation_id),
             vec![],
-            Some(graph_annotation),
+            Some(graph_annotation_value),
             |graph_annotation| graph_annotation,
         )
         .await

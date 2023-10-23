@@ -582,12 +582,12 @@ impl client::Client {
     /// Creates a new monitor.
     ///
     /// See <https://mackerel.io/api-docs/entry/monitors#create>.
-    pub async fn create_monitor(&self, monitor: MonitorValue) -> Result<Monitor> {
+    pub async fn create_monitor(&self, monitor_value: MonitorValue) -> Result<Monitor> {
         self.request(
             Method::POST,
             "/api/v0/monitors",
             vec![],
-            Some(monitor),
+            Some(monitor_value),
             |monitor| monitor,
         )
         .await
@@ -599,13 +599,13 @@ impl client::Client {
     pub async fn update_monitor(
         &self,
         monitor_id: MonitorId,
-        monitor: MonitorValue,
+        monitor_value: MonitorValue,
     ) -> Result<Monitor> {
         self.request(
             Method::PUT,
             format!("/api/v0/monitors/{}", monitor_id),
             vec![],
-            Some(monitor),
+            Some(monitor_value),
             |monitor| monitor,
         )
         .await

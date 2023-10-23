@@ -229,12 +229,12 @@ impl client::Client {
     /// Creates a new downtime.
     ///
     /// See <https://mackerel.io/api-docs/entry/downtimes#create>.
-    pub async fn create_downtime(&self, downtime: DowntimeValue) -> Result<Downtime> {
+    pub async fn create_downtime(&self, downtime_value: DowntimeValue) -> Result<Downtime> {
         self.request(
             Method::POST,
             "/api/v0/downtimes",
             vec![],
-            Some(downtime),
+            Some(downtime_value),
             |downtime| downtime,
         )
         .await
@@ -246,13 +246,13 @@ impl client::Client {
     pub async fn update_downtime(
         &self,
         downtime_id: DowntimeId,
-        downtime: DowntimeValue,
+        downtime_value: DowntimeValue,
     ) -> Result<Downtime> {
         self.request(
             Method::PUT,
             format!("/api/v0/downtimes/{}", downtime_id),
             vec![],
-            Some(downtime),
+            Some(downtime_value),
             |downtime| downtime,
         )
         .await

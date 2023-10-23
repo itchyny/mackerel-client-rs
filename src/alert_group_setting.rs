@@ -11,7 +11,7 @@ pub type AlertGroupSetting = Entity<AlertGroupSettingValue>;
 /// An alert group setting id
 pub type AlertGroupSettingId = Id<AlertGroupSettingValue>;
 
-/// An alert group setting id value
+/// An alert group setting value
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AlertGroupSettingValue {
@@ -131,13 +131,13 @@ impl client::Client {
     /// See <https://mackerel.io/api-docs/entry/alert-group-settings#create>.
     pub async fn create_alert_group_setting(
         &self,
-        alert_group_setting: AlertGroupSettingValue,
+        alert_group_setting_value: AlertGroupSettingValue,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::POST,
             "/api/v0/alert-group-settings",
             vec![],
-            Some(alert_group_setting),
+            Some(alert_group_setting_value),
             |alert_group_setting| alert_group_setting,
         )
         .await
@@ -166,13 +166,13 @@ impl client::Client {
     pub async fn update_alert_group_setting(
         &self,
         alert_group_setting_id: AlertGroupSettingId,
-        alert_group_setting: AlertGroupSettingValue,
+        alert_group_setting_value: AlertGroupSettingValue,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::PUT,
             format!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
             vec![],
-            Some(alert_group_setting),
+            Some(alert_group_setting_value),
             |alert_group_setting| alert_group_setting,
         )
         .await
