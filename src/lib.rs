@@ -28,6 +28,7 @@
 pub mod client;
 pub mod entity;
 pub mod error;
+pub(crate) mod name;
 
 pub mod alert;
 pub mod alert_group_setting;

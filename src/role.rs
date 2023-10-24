@@ -1,91 +1,24 @@
 use crate::client;
 use crate::error::*;
+use crate::name::Name;
 use crate::service::ServiceName;
-use fixedstr::str64;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
 /// A role
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
 pub struct Role {
     pub name: RoleName,
     pub memo: String,
 }
 
-use std::marker::PhantomData;
-#[derive(PartialEq, Eq, Copy, Clone, Hash)]
-pub struct RoleName {
-    role_name: str64,
-    phantom: PhantomData<Role>,
-}
-
-impl RoleName {
-    pub fn new(role_name: str64) -> Self {
-        Self {
-            role_name,
-            phantom: PhantomData,
-        }
-    }
-}
-
-impl From<&str> for RoleName {
-    fn from(role_name: &str) -> Self {
-        Self::new(role_name.into())
-    }
-}
-
-impl From<String> for RoleName {
-    fn from(role_name: String) -> Self {
-        Self::new(role_name.into())
-    }
-}
-
-impl Into<String> for RoleName {
-    fn into(self: Self) -> String {
-        self.role_name.to_string()
-    }
-}
-
-impl std::ops::Deref for RoleName {
-    type Target = str;
-    fn deref(&self) -> &Self::Target {
-        &self.role_name
-    }
-}
-
-impl std::fmt::Display for RoleName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.role_name.fmt(f)
-    }
-}
-
-impl std::fmt::Debug for RoleName {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("\"")?;
-        self.role_name.fmt(f)?;
-        f.write_str("\"")
-    }
-}
-
-use serde::ser::{Serialize, Serializer};
-impl Serialize for RoleName {
-    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        self.role_name.serialize(serializer)
-    }
-}
-
-use serde::de::{Deserialize, Deserializer};
-impl<'de> Deserialize<'de> for RoleName {
-    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(Self::new(str64::deserialize(deserializer)?))
-    }
-}
+/// A role name
+/// ```rust
+/// use mackerel_client::role::RoleName;
+///
+/// let role_name = RoleName::from("ExampleRole");
+/// ```
+pub type RoleName = Name<Role>;
 
 #[cfg(test)]
 mod tests {
@@ -94,14 +27,14 @@ mod tests {
 
     fn role_example() -> Role {
         Role {
-            name: "FooRole".into(),
+            name: "ExampleRole".into(),
             memo: "role memo".to_string(),
         }
     }
 
     fn json_example() -> serde_json::Value {
         json!({
-            "name": "FooRole",
+            "name": "ExampleRole",
             "memo": "role memo"
         })
     }
