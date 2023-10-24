@@ -113,6 +113,7 @@ pub struct HostCheck {
 #[cfg(test)]
 mod tests {
     use crate::host::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn host_example1() -> Host {
@@ -239,37 +240,32 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_host_sizes() {
-        let test_cases = [(HostSize::Standard, "standard"), (HostSize::Micro, "micro")];
-        for &(host_size, host_size_str) in &test_cases {
-            assert_eq!(host_size.to_string(), host_size_str);
-            assert_eq!(host_size, host_size_str.parse().unwrap());
-            assert_eq!(
-                host_size,
-                serde_json::from_value(host_size_str.into()).unwrap()
-            );
-            assert_eq!(serde_json::to_value(host_size).unwrap(), host_size_str);
-        }
+    #[rstest]
+    #[case(HostSize::Standard, "standard")]
+    #[case(HostSize::Micro, "micro")]
+    fn test_host_size(#[case] host_size: HostSize, #[case] host_size_str: &str) {
+        assert_eq!(host_size.to_string(), host_size_str);
+        assert_eq!(host_size, host_size_str.parse().unwrap());
+        assert_eq!(
+            host_size,
+            serde_json::from_value(host_size_str.into()).unwrap()
+        );
+        assert_eq!(serde_json::to_value(host_size).unwrap(), host_size_str);
     }
 
-    #[test]
-    fn test_host_statuses() {
-        let test_cases = [
-            (HostStatus::Working, "working"),
-            (HostStatus::Standby, "standby"),
-            (HostStatus::Maintenance, "maintenance"),
-            (HostStatus::Poweroff, "poweroff"),
-        ];
-        for &(host_status, host_status_str) in &test_cases {
-            assert_eq!(host_status.to_string(), host_status_str);
-            assert_eq!(host_status, host_status_str.parse().unwrap());
-            assert_eq!(
-                host_status,
-                serde_json::from_value(host_status_str.into()).unwrap()
-            );
-            assert_eq!(serde_json::to_value(host_status).unwrap(), host_status_str);
-        }
+    #[rstest]
+    #[case(HostStatus::Working, "working")]
+    #[case(HostStatus::Standby, "standby")]
+    #[case(HostStatus::Maintenance, "maintenance")]
+    #[case(HostStatus::Poweroff, "poweroff")]
+    fn test_host_status(#[case] host_status: HostStatus, #[case] host_status_str: &str) {
+        assert_eq!(host_status.to_string(), host_status_str);
+        assert_eq!(host_status, host_status_str.parse().unwrap());
+        assert_eq!(
+            host_status,
+            serde_json::from_value(host_status_str.into()).unwrap()
+        );
+        assert_eq!(serde_json::to_value(host_status).unwrap(), host_status_str);
     }
 }
 

@@ -82,6 +82,7 @@ pub enum DowntimeRecurrenceWeekday {
 #[cfg(test)]
 mod tests {
     use crate::downtime::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn downtime_example1() -> Downtime {
@@ -183,6 +184,64 @@ mod tests {
         assert_eq!(
             downtime_example2(),
             serde_json::from_value(json_example2()).unwrap()
+        );
+    }
+
+    #[rstest]
+    #[case(DowntimeRecurrenceType::Hourly, "hourly")]
+    #[case(DowntimeRecurrenceType::Daily, "daily")]
+    #[case(DowntimeRecurrenceType::Weekly, "weekly")]
+    #[case(DowntimeRecurrenceType::Monthly, "monthly")]
+    #[case(DowntimeRecurrenceType::Yearly, "yearly")]
+    fn test_downtime_recurrence_type(
+        #[case] downtime_recurrence_type: DowntimeRecurrenceType,
+        #[case] downtime_recurrence_type_str: &str,
+    ) {
+        assert_eq!(
+            downtime_recurrence_type.to_string(),
+            downtime_recurrence_type_str
+        );
+        assert_eq!(
+            downtime_recurrence_type,
+            downtime_recurrence_type_str.parse().unwrap()
+        );
+        assert_eq!(
+            downtime_recurrence_type,
+            serde_json::from_value(downtime_recurrence_type_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(downtime_recurrence_type).unwrap(),
+            downtime_recurrence_type_str
+        );
+    }
+
+    #[rstest]
+    #[case(DowntimeRecurrenceWeekday::Sunday, "Sunday")]
+    #[case(DowntimeRecurrenceWeekday::Monday, "Monday")]
+    #[case(DowntimeRecurrenceWeekday::Tuesday, "Tuesday")]
+    #[case(DowntimeRecurrenceWeekday::Wednesday, "Wednesday")]
+    #[case(DowntimeRecurrenceWeekday::Thursday, "Thursday")]
+    #[case(DowntimeRecurrenceWeekday::Friday, "Friday")]
+    #[case(DowntimeRecurrenceWeekday::Saturday, "Saturday")]
+    fn test_downtime_recurrence_weekday(
+        #[case] downtime_recurrence_weekday: DowntimeRecurrenceWeekday,
+        #[case] downtime_recurrence_weekday_str: &str,
+    ) {
+        assert_eq!(
+            downtime_recurrence_weekday.to_string(),
+            downtime_recurrence_weekday_str
+        );
+        assert_eq!(
+            downtime_recurrence_weekday,
+            downtime_recurrence_weekday_str.parse().unwrap()
+        );
+        assert_eq!(
+            downtime_recurrence_weekday,
+            serde_json::from_value(downtime_recurrence_weekday_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(downtime_recurrence_weekday).unwrap(),
+            downtime_recurrence_weekday_str
         );
     }
 }

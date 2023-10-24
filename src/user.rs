@@ -72,6 +72,7 @@ pub enum UserAuthority {
 #[cfg(test)]
 mod tests {
     use crate::user::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn user_example() -> User {
@@ -118,54 +119,52 @@ mod tests {
         );
     }
 
-    #[test]
-    fn authentication_methods() {
-        let test_cases = [
-            (AuthenticationMethod::Password, "password"),
-            (AuthenticationMethod::GitHub, "github"),
-            (AuthenticationMethod::IDCF, "idcf"),
-            (AuthenticationMethod::Google, "google"),
-            (AuthenticationMethod::Nifty, "nifty"),
-            (AuthenticationMethod::Yammer, "yammer"),
-            (AuthenticationMethod::KDDI, "kddi"),
-        ];
-        for &(authentication_method, authentication_method_str) in &test_cases {
-            assert_eq!(authentication_method.to_string(), authentication_method_str);
-            assert_eq!(
-                authentication_method,
-                authentication_method_str.parse().unwrap()
-            );
-            assert_eq!(
-                authentication_method,
-                serde_json::from_value(authentication_method_str.into()).unwrap()
-            );
-            assert_eq!(
-                serde_json::to_value(authentication_method).unwrap(),
-                authentication_method_str
-            );
-        }
+    #[rstest]
+    #[case(AuthenticationMethod::Password, "password")]
+    #[case(AuthenticationMethod::GitHub, "github")]
+    #[case(AuthenticationMethod::IDCF, "idcf")]
+    #[case(AuthenticationMethod::Google, "google")]
+    #[case(AuthenticationMethod::Nifty, "nifty")]
+    #[case(AuthenticationMethod::Yammer, "yammer")]
+    #[case(AuthenticationMethod::KDDI, "kddi")]
+    fn test_authentication_method(
+        #[case] authentication_method: AuthenticationMethod,
+        #[case] authentication_method_str: &str,
+    ) {
+        assert_eq!(authentication_method.to_string(), authentication_method_str);
+        assert_eq!(
+            authentication_method,
+            authentication_method_str.parse().unwrap()
+        );
+        assert_eq!(
+            authentication_method,
+            serde_json::from_value(authentication_method_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(authentication_method).unwrap(),
+            authentication_method_str
+        );
     }
 
-    #[test]
-    fn user_authorities() {
-        let test_cases = [
-            (UserAuthority::Owner, "owner"),
-            (UserAuthority::Manager, "manager"),
-            (UserAuthority::Collaborator, "collaborator"),
-            (UserAuthority::Viewer, "viewer"),
-        ];
-        for &(user_authority, user_authority_str) in &test_cases {
-            assert_eq!(user_authority.to_string(), user_authority_str);
-            assert_eq!(user_authority, user_authority_str.parse().unwrap());
-            assert_eq!(
-                user_authority,
-                serde_json::from_value(user_authority_str.into()).unwrap()
-            );
-            assert_eq!(
-                serde_json::to_value(user_authority).unwrap(),
-                user_authority_str
-            );
-        }
+    #[rstest]
+    #[case(UserAuthority::Owner, "owner")]
+    #[case(UserAuthority::Manager, "manager")]
+    #[case(UserAuthority::Collaborator, "collaborator")]
+    #[case(UserAuthority::Viewer, "viewer")]
+    fn test_user_authority(
+        #[case] user_authority: UserAuthority,
+        #[case] user_authority_str: &str,
+    ) {
+        assert_eq!(user_authority.to_string(), user_authority_str);
+        assert_eq!(user_authority, user_authority_str.parse().unwrap());
+        assert_eq!(
+            user_authority,
+            serde_json::from_value(user_authority_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(user_authority).unwrap(),
+            user_authority_str
+        );
     }
 }
 

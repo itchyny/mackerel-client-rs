@@ -185,6 +185,7 @@ pub enum AnomalyDetectionSensitivity {
 #[cfg(test)]
 mod tests {
     use crate::monitor::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn host_monitor_example() -> Monitor {
@@ -457,83 +458,85 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_monitor_types() {
-        let test_cases = [
-            (MonitorType::Connectivity, "connectivity"),
-            (MonitorType::Host, "host"),
-            (MonitorType::Service, "service"),
-            (MonitorType::External, "external"),
-            (MonitorType::Check, "check"),
-            (MonitorType::Expression, "expression"),
-            (MonitorType::AnomalyDetection, "anomalyDetection"),
-        ];
-        for &(monitor_type, monitor_type_str) in &test_cases {
-            assert_eq!(monitor_type.to_string(), monitor_type_str);
-            assert_eq!(monitor_type, monitor_type_str.parse().unwrap());
-            assert_eq!(
-                monitor_type,
-                serde_json::from_value(monitor_type_str.into()).unwrap()
-            );
-            assert_eq!(
-                serde_json::to_value(monitor_type).unwrap(),
-                monitor_type_str
-            );
-        }
+    #[rstest]
+    #[case(MonitorType::Connectivity, "connectivity")]
+    #[case(MonitorType::Host, "host")]
+    #[case(MonitorType::Service, "service")]
+    #[case(MonitorType::External, "external")]
+    #[case(MonitorType::Check, "check")]
+    #[case(MonitorType::Expression, "expression")]
+    #[case(MonitorType::AnomalyDetection, "anomalyDetection")]
+    fn test_monitor_type(#[case] monitor_type: MonitorType, #[case] monitor_type_str: &str) {
+        assert_eq!(monitor_type.to_string(), monitor_type_str);
+        assert_eq!(monitor_type, monitor_type_str.parse().unwrap());
+        assert_eq!(
+            monitor_type,
+            serde_json::from_value(monitor_type_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(monitor_type).unwrap(),
+            monitor_type_str
+        );
     }
 
-    #[test]
-    fn test_operators() {
-        let test_cases = [(Operator::GreaterThan, ">"), (Operator::LessThan, "<")];
-        for &(operator, operator_str) in &test_cases {
-            assert_eq!(operator.to_string(), operator_str);
-            assert_eq!(operator, operator_str.parse().unwrap());
-            assert_eq!(
-                operator,
-                serde_json::from_value(operator_str.into()).unwrap()
-            );
-            assert_eq!(serde_json::to_value(operator).unwrap(), operator_str);
-        }
+    #[rstest]
+    #[case(Operator::GreaterThan, ">")]
+    #[case(Operator::LessThan, "<")]
+    fn test_operator(#[case] operator: Operator, #[case] operator_str: &str) {
+        assert_eq!(operator.to_string(), operator_str);
+        assert_eq!(operator, operator_str.parse().unwrap());
+        assert_eq!(
+            operator,
+            serde_json::from_value(operator_str.into()).unwrap()
+        );
+        assert_eq!(serde_json::to_value(operator).unwrap(), operator_str);
     }
 
-    #[test]
-    fn external_monitor_methods() {
-        let test_cases = [
-            (ExternalMethod::Get, "GET"),
-            (ExternalMethod::Post, "POST"),
-            (ExternalMethod::Put, "PUT"),
-            (ExternalMethod::Delete, "DELETE"),
-        ];
-        for &(external_method, external_method_str) in &test_cases {
-            assert_eq!(external_method.to_string(), external_method_str);
-            assert_eq!(external_method, external_method_str.parse().unwrap());
-            assert_eq!(
-                external_method,
-                serde_json::from_value(external_method_str.into()).unwrap()
-            );
-            assert_eq!(
-                serde_json::to_value(external_method).unwrap(),
-                external_method_str
-            );
-        }
+    #[rstest]
+    #[case(ExternalMethod::Get, "GET")]
+    #[case(ExternalMethod::Post, "POST")]
+    #[case(ExternalMethod::Put, "PUT")]
+    #[case(ExternalMethod::Delete, "DELETE")]
+    fn test_external_method(
+        #[case] external_method: ExternalMethod,
+        #[case] external_method_str: &str,
+    ) {
+        assert_eq!(external_method.to_string(), external_method_str);
+        assert_eq!(external_method, external_method_str.parse().unwrap());
+        assert_eq!(
+            external_method,
+            serde_json::from_value(external_method_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(external_method).unwrap(),
+            external_method_str
+        );
     }
 
-    #[test]
-    fn anomaly_detection_sensitivities() {
-        let test_cases = [
-            (AnomalyDetectionSensitivity::Insensitive, "insensitive"),
-            (AnomalyDetectionSensitivity::Normal, "normal"),
-            (AnomalyDetectionSensitivity::Sensitive, "sensitive"),
-        ];
-        for &(sensitivity, sensitivity_str) in &test_cases {
-            assert_eq!(sensitivity.to_string(), sensitivity_str);
-            assert_eq!(sensitivity, sensitivity_str.parse().unwrap());
-            assert_eq!(
-                sensitivity,
-                serde_json::from_value(sensitivity_str.into()).unwrap()
-            );
-            assert_eq!(serde_json::to_value(sensitivity).unwrap(), sensitivity_str);
-        }
+    #[rstest]
+    #[case(AnomalyDetectionSensitivity::Insensitive, "insensitive")]
+    #[case(AnomalyDetectionSensitivity::Normal, "normal")]
+    #[case(AnomalyDetectionSensitivity::Sensitive, "sensitive")]
+    fn test_anomaly_detection_sensitivity(
+        #[case] anomaly_detection_sensitivity: AnomalyDetectionSensitivity,
+        #[case] anomaly_detection_sensitivity_str: &str,
+    ) {
+        assert_eq!(
+            anomaly_detection_sensitivity.to_string(),
+            anomaly_detection_sensitivity_str
+        );
+        assert_eq!(
+            anomaly_detection_sensitivity,
+            anomaly_detection_sensitivity_str.parse().unwrap()
+        );
+        assert_eq!(
+            anomaly_detection_sensitivity,
+            serde_json::from_value(anomaly_detection_sensitivity_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(anomaly_detection_sensitivity).unwrap(),
+            anomaly_detection_sensitivity_str
+        );
     }
 }
 

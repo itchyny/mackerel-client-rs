@@ -111,6 +111,7 @@ pub enum NotificationEvent {
 #[cfg(test)]
 mod tests {
     use crate::channel::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn email_channel_example() -> Channel {
@@ -498,6 +499,29 @@ mod tests {
         assert_eq!(
             amazon_event_bridge_channel_example(),
             serde_json::from_value(amazon_event_bridge_json_example()).unwrap()
+        );
+    }
+
+    #[rstest]
+    #[case(NotificationEvent::Alert, "alert")]
+    #[case(NotificationEvent::AlertGroup, "alertGroup")]
+    #[case(NotificationEvent::HostStatus, "hostStatus")]
+    #[case(NotificationEvent::HostRegister, "hostRegister")]
+    #[case(NotificationEvent::HostRetire, "hostRetire")]
+    #[case(NotificationEvent::Monitor, "monitor")]
+    fn test_notification_event(
+        #[case] notification_event: NotificationEvent,
+        #[case] notification_event_str: &str,
+    ) {
+        assert_eq!(notification_event.to_string(), notification_event_str);
+        assert_eq!(notification_event, notification_event_str.parse().unwrap());
+        assert_eq!(
+            notification_event,
+            serde_json::from_value(notification_event_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(notification_event).unwrap(),
+            notification_event_str
         );
     }
 }

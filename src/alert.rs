@@ -50,6 +50,7 @@ pub enum AlertStatus {
 #[cfg(test)]
 mod tests {
     use crate::alert::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn alert_example1() -> Alert {
@@ -134,20 +135,22 @@ mod tests {
         );
     }
 
-    #[test]
-    fn alert_statuses() {
-        let test_cases = [
-            (AlertStatus::Ok, "OK"),
-            (AlertStatus::Critical, "CRITICAL"),
-            (AlertStatus::Warning, "WARNING"),
-            (AlertStatus::Unknown, "UNKNOWN"),
-        ];
-        for &(status, status_str) in &test_cases {
-            assert_eq!(status.to_string(), status_str);
-            assert_eq!(status, status_str.parse().unwrap());
-            assert_eq!(status, serde_json::from_value(status_str.into()).unwrap());
-            assert_eq!(serde_json::to_value(status).unwrap(), status_str);
-        }
+    #[rstest]
+    #[case(AlertStatus::Ok, "OK")]
+    #[case(AlertStatus::Critical, "CRITICAL")]
+    #[case(AlertStatus::Warning, "WARNING")]
+    #[case(AlertStatus::Unknown, "UNKNOWN")]
+    fn test_alert_status(#[case] alert_status: AlertStatus, #[case] alert_status_str: &str) {
+        assert_eq!(alert_status.to_string(), alert_status_str);
+        assert_eq!(alert_status, alert_status_str.parse().unwrap());
+        assert_eq!(
+            alert_status,
+            serde_json::from_value(alert_status_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(alert_status).unwrap(),
+            alert_status_str
+        );
     }
 }
 
