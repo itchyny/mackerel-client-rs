@@ -1,6 +1,6 @@
-use crate::authority::Authority;
 use crate::client;
 use crate::error::*;
+use crate::user::UserAuthority;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -28,7 +28,7 @@ impl std::ops::Deref for Invitation {
 #[serde(rename_all = "camelCase")]
 pub struct InvitationValue {
     pub email: String,
-    pub authority: Authority,
+    pub authority: UserAuthority,
 }
 
 #[cfg(test)]
@@ -41,7 +41,7 @@ mod tests {
             expires_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
             value: InvitationValue {
                 email: "example1@example.com".to_string(),
-                authority: Authority::Manager,
+                authority: UserAuthority::Manager,
             },
         }
     }
@@ -59,7 +59,7 @@ mod tests {
             expires_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
             value: InvitationValue {
                 email: "example2@example.com".to_string(),
-                authority: Authority::Collaborator,
+                authority: UserAuthority::Collaborator,
             },
         }
     }
@@ -75,7 +75,7 @@ mod tests {
     fn invitation_example3() -> InvitationValue {
         InvitationValue {
             email: "example3@example.com".to_string(),
-            authority: Authority::Viewer,
+            authority: UserAuthority::Viewer,
         }
     }
 

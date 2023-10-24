@@ -1,4 +1,3 @@
-use crate::authority::Authority;
 use crate::client;
 use crate::entity::Id;
 use crate::error::*;
@@ -40,7 +39,7 @@ pub type UserId = Id<UserValue>;
 pub struct UserValue {
     pub screen_name: String,
     pub email: String,
-    pub authority: Authority,
+    pub authority: UserAuthority,
 }
 
 /// Authentication methods
@@ -58,6 +57,18 @@ pub enum AuthenticationMethod {
     KDDI,
 }
 
+/// User authority
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
+pub enum UserAuthority {
+    Owner,
+    Manager,
+    Collaborator,
+    Viewer,
+}
+
 #[cfg(test)]
 mod tests {
     use crate::user::*;
@@ -73,7 +84,7 @@ mod tests {
             value: UserValue {
                 screen_name: "Example Mackerel".to_string(),
                 email: "mackerel@example.com".to_string(),
-                authority: Authority::Collaborator,
+                authority: UserAuthority::Collaborator,
             },
         }
     }
@@ -131,6 +142,28 @@ mod tests {
             assert_eq!(
                 serde_json::to_value(authentication_method).unwrap(),
                 authentication_method_str
+            );
+        }
+    }
+
+    #[test]
+    fn user_authorities() {
+        let test_cases = [
+            (UserAuthority::Owner, "owner"),
+            (UserAuthority::Manager, "manager"),
+            (UserAuthority::Collaborator, "collaborator"),
+            (UserAuthority::Viewer, "viewer"),
+        ];
+        for &(user_authority, user_authority_str) in &test_cases {
+            assert_eq!(user_authority.to_string(), user_authority_str);
+            assert_eq!(user_authority, user_authority_str.parse().unwrap());
+            assert_eq!(
+                user_authority,
+                serde_json::from_value(user_authority_str.into()).unwrap()
+            );
+            assert_eq!(
+                serde_json::to_value(user_authority).unwrap(),
+                user_authority_str
             );
         }
     }

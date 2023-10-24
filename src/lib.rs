@@ -31,7 +31,6 @@ pub mod error;
 
 pub mod alert;
 pub mod alert_group_setting;
-pub mod authority;
 pub mod channel;
 pub mod dashboard;
 pub mod downtime;

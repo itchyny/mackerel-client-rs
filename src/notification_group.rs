@@ -20,7 +20,7 @@ pub type NotificationGroupId = Id<NotificationGroupValue>;
 #[serde(rename_all = "camelCase")]
 pub struct NotificationGroupValue {
     pub name: String,
-    pub notification_level: NotificationGroupLevel,
+    pub notification_level: NotificationLevel,
     pub child_notification_group_ids: Vec<NotificationGroupId>,
     pub child_channel_ids: Vec<ChannelId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -29,12 +29,12 @@ pub struct NotificationGroupValue {
     pub services: Vec<NotificationGroupService>,
 }
 
-/// A notification group level
+/// A notification level
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
 #[strum(serialize_all = "lowercase")]
-pub enum NotificationGroupLevel {
+pub enum NotificationLevel {
     All,
     Critical,
 }
@@ -64,7 +64,7 @@ mod tests {
             id: "abcde1".into(),
             value: NotificationGroupValue {
                 name: "Example notification group".to_string(),
-                notification_level: NotificationGroupLevel::All,
+                notification_level: NotificationLevel::All,
                 child_notification_group_ids: vec![],
                 child_channel_ids: vec![],
                 monitors: vec![],
@@ -88,7 +88,7 @@ mod tests {
             id: "abcde2".into(),
             value: NotificationGroupValue {
                 name: "Example notification group".to_string(),
-                notification_level: NotificationGroupLevel::Critical,
+                notification_level: NotificationLevel::Critical,
                 child_notification_group_ids: vec!["abcde3".into()],
                 child_channel_ids: vec!["abcde4".into()],
                 monitors: vec![NotificationGroupMonitor {

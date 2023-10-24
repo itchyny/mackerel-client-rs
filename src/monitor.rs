@@ -102,8 +102,8 @@ pub enum MonitorValue {
         memo: String,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         scopes: Vec<String>,
-        warning_sensitivity: Option<Sensitivity>,
-        critical_sensitivity: Option<Sensitivity>,
+        warning_sensitivity: Option<AnomalyDetectionSensitivity>,
+        critical_sensitivity: Option<AnomalyDetectionSensitivity>,
         max_check_attempts: Option<u64>,
         #[serde(default, with = "chrono::serde::ts_seconds_option")]
         training_period_from: Option<DateTime<Utc>>,
@@ -176,7 +176,7 @@ pub struct ExternalHeader {
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
 #[strum(serialize_all = "lowercase")]
-pub enum Sensitivity {
+pub enum AnomalyDetectionSensitivity {
     Insensitive,
     Normal,
     Sensitive,
@@ -371,8 +371,8 @@ mod tests {
                 name: "Example Anomaly Detection monitor".to_string(),
                 memo: "".to_string(),
                 scopes: vec!["service0:role0".to_string()],
-                warning_sensitivity: Some(Sensitivity::Normal),
-                critical_sensitivity: Some(Sensitivity::Insensitive),
+                warning_sensitivity: Some(AnomalyDetectionSensitivity::Normal),
+                critical_sensitivity: Some(AnomalyDetectionSensitivity::Insensitive),
                 max_check_attempts: Some(3),
                 training_period_from: Some(DateTime::from_timestamp(1580000000, 0).unwrap()),
                 is_mute: Some(false),
@@ -521,9 +521,9 @@ mod tests {
     #[test]
     fn anomaly_detection_sensitivities() {
         let test_cases = [
-            (Sensitivity::Insensitive, "insensitive"),
-            (Sensitivity::Normal, "normal"),
-            (Sensitivity::Sensitive, "sensitive"),
+            (AnomalyDetectionSensitivity::Insensitive, "insensitive"),
+            (AnomalyDetectionSensitivity::Normal, "normal"),
+            (AnomalyDetectionSensitivity::Sensitive, "sensitive"),
         ];
         for &(sensitivity, sensitivity_str) in &test_cases {
             assert_eq!(sensitivity.to_string(), sensitivity_str);
