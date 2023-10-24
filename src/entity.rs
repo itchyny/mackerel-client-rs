@@ -1,5 +1,7 @@
 use fixedstr::str16;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::marker::PhantomData;
 
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 pub struct Entity<T> {
@@ -10,24 +12,18 @@ pub struct Entity<T> {
 
 impl<T> std::ops::Deref for Entity<T> {
     type Target = T;
+
     fn deref(&self) -> &Self::Target {
         &self.value
     }
 }
 
-use std::marker::PhantomData;
-#[derive(PartialEq, Eq, Hash)]
-pub struct Id<T> {
-    id: str16,
-    phantom: PhantomData<T>,
-}
+#[derive(PartialEq, Eq, DeserializeFromStr, SerializeDisplay)]
+pub struct Id<T>(str16, PhantomData<T>);
 
 impl<T> Id<T> {
     pub fn new(id: str16) -> Self {
-        Self {
-            id,
-            phantom: PhantomData,
-        }
+        Self(id, PhantomData)
     }
 }
 
@@ -39,54 +35,58 @@ impl<T> Clone for Id<T> {
     }
 }
 
+#[derive(PartialEq, Eq, Debug)]
+pub struct ParseIdError(String);
+
+impl std::fmt::Display for ParseIdError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "failed to parse id: {}", self.0)
+    }
+}
+
+impl<T> std::str::FromStr for Id<T> {
+    type Err = ParseIdError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !(1..16).contains(&s.len()) {
+            return Err(ParseIdError(s.to_string()));
+        }
+        Ok(Self::new(s.into()))
+    }
+}
+
 impl<T> From<&str> for Id<T> {
-    fn from(id: &str) -> Self {
-        Self::new(id.into())
+    fn from(s: &str) -> Self {
+        s.parse().unwrap()
     }
 }
 
 impl<T> From<String> for Id<T> {
-    fn from(id: String) -> Self {
-        Self::new(id.into())
+    fn from(s: String) -> Self {
+        s.parse().unwrap()
     }
 }
 
 impl<T> Into<String> for Id<T> {
     fn into(self: Self) -> String {
-        self.id.to_string()
+        self.0.to_string()
     }
 }
 
 impl<T> std::fmt::Display for Id<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.id.fmt(f)
+        self.0.fmt(f)
     }
 }
 
 impl<T> std::fmt::Debug for Id<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("\"")?;
-        self.id.fmt(f)?;
-        f.write_str("\"")
+        write!(f, "\"{}\"", self)
     }
 }
 
-use serde::ser::{Serialize, Serializer};
-impl<T> Serialize for Id<T> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        self.id.serialize(serializer)
-    }
-}
-
-use serde::de::{Deserialize, Deserializer};
-impl<'de, T> Deserialize<'de> for Id<T> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(Self::new(str16::deserialize(deserializer)?))
+impl<T> std::hash::Hash for Id<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.hash(state);
     }
 }
