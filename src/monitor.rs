@@ -26,7 +26,7 @@ pub enum MonitorValue {
         memo: String,
         duration: u64,
         metric: String,
-        operator: Operator,
+        operator: MonitorOperator,
         warning: Option<f64>,
         critical: Option<f64>,
         is_mute: Option<bool>,
@@ -56,7 +56,7 @@ pub enum MonitorValue {
         service: ServiceName,
         duration: u64,
         metric: String,
-        operator: Operator,
+        operator: MonitorOperator,
         warning: Option<f64>,
         critical: Option<f64>,
         is_mute: Option<bool>,
@@ -89,7 +89,7 @@ pub enum MonitorValue {
         #[serde(default, skip_serializing_if = "String::is_empty")]
         memo: String,
         expression: String,
-        operator: Operator,
+        operator: MonitorOperator,
         warning: Option<f64>,
         critical: Option<f64>,
         is_mute: Option<bool>,
@@ -145,7 +145,7 @@ pub enum MonitorType {
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
-pub enum Operator {
+pub enum MonitorOperator {
     #[strum(serialize = ">")]
     GreaterThan,
     #[strum(serialize = "<")]
@@ -196,7 +196,7 @@ mod tests {
                 memo: "Monitor memo".to_string(),
                 duration: 5,
                 metric: "custom.foo.bar".to_string(),
-                operator: Operator::GreaterThan,
+                operator: MonitorOperator::GreaterThan,
                 warning: Some(10.0),
                 critical: Some(20.0),
                 is_mute: Some(false),
@@ -258,7 +258,7 @@ mod tests {
                 service: "service1".into(),
                 duration: 5,
                 metric: "custom.service.count".to_string(),
-                operator: Operator::GreaterThan,
+                operator: MonitorOperator::GreaterThan,
                 warning: Some(100.0),
                 critical: Some(200.0),
                 is_mute: Some(false),
@@ -343,7 +343,7 @@ mod tests {
                 name: "Example expression monitor".to_string(),
                 memo: "Monitor memo".to_string(),
                 expression: "min(role(\"foo:bar\", \"custom.foo.bar\"))".to_string(),
-                operator: Operator::LessThan,
+                operator: MonitorOperator::LessThan,
                 warning: Some(10.0),
                 critical: None,
                 is_mute: Some(false),
@@ -480,16 +480,22 @@ mod tests {
     }
 
     #[rstest]
-    #[case(Operator::GreaterThan, ">")]
-    #[case(Operator::LessThan, "<")]
-    fn test_operator(#[case] operator: Operator, #[case] operator_str: &str) {
-        assert_eq!(operator.to_string(), operator_str);
-        assert_eq!(operator, operator_str.parse().unwrap());
+    #[case(MonitorOperator::GreaterThan, ">")]
+    #[case(MonitorOperator::LessThan, "<")]
+    fn test_monitor_operator(
+        #[case] monitor_operator: MonitorOperator,
+        #[case] monitor_operator_str: &str,
+    ) {
+        assert_eq!(monitor_operator.to_string(), monitor_operator_str);
+        assert_eq!(monitor_operator, monitor_operator_str.parse().unwrap());
         assert_eq!(
-            operator,
-            serde_json::from_value(operator_str.into()).unwrap()
+            monitor_operator,
+            serde_json::from_value(monitor_operator_str.into()).unwrap()
         );
-        assert_eq!(serde_json::to_value(operator).unwrap(), operator_str);
+        assert_eq!(
+            serde_json::to_value(monitor_operator).unwrap(),
+            monitor_operator_str
+        );
     }
 
     #[rstest]
