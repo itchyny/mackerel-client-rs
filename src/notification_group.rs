@@ -6,7 +6,8 @@ use crate::monitor::MonitorId;
 use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use std::fmt;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum::{Display, EnumString};
 
 /// A notification group
 pub type NotificationGroup = Entity<NotificationGroupValue>;
@@ -29,20 +30,13 @@ pub struct NotificationGroupValue {
 }
 
 /// A notification group level
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum NotificationGroupLevel {
     All,
     Critical,
-}
-
-impl fmt::Display for NotificationGroupLevel {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            NotificationGroupLevel::All => write!(f, "all"),
-            NotificationGroupLevel::Critical => write!(f, "critical"),
-        }
-    }
 }
 
 /// A notification group monitor

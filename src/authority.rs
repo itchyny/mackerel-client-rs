@@ -1,25 +1,16 @@
-use serde_derive::{Deserialize, Serialize};
-use std::fmt;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum::{Display, EnumString};
 
 /// User authority
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum Authority {
     Owner,
     Manager,
     Collaborator,
     Viewer,
-}
-
-impl fmt::Display for Authority {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Authority::Owner => write!(f, "owner"),
-            Authority::Manager => write!(f, "manager"),
-            Authority::Collaborator => write!(f, "collaborator"),
-            Authority::Viewer => write!(f, "viewer"),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -35,13 +26,13 @@ mod tests {
             (Authority::Viewer, "viewer"),
         ];
         for &(authority, authority_str) in &test_cases {
-            let str_value = serde_json::Value::String(authority_str.to_string());
+            assert_eq!(authority.to_string(), authority_str);
+            assert_eq!(authority, authority_str.parse().unwrap());
             assert_eq!(
                 authority,
-                serde_json::from_value(str_value.clone()).unwrap()
+                serde_json::from_value(authority_str.into()).unwrap()
             );
-            assert_eq!(str_value, serde_json::to_value(authority).unwrap());
-            assert_eq!(str_value, format!("{}", authority).as_str());
+            assert_eq!(serde_json::to_value(authority).unwrap(), authority_str);
         }
     }
 }

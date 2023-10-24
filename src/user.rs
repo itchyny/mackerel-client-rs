@@ -5,7 +5,8 @@ use crate::error::*;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use std::fmt;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum::{Display, EnumString};
 
 /// A user
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -43,8 +44,10 @@ pub struct UserValue {
 }
 
 /// Authentication methods
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum AuthenticationMethod {
     Password,
     GitHub,
@@ -53,20 +56,6 @@ pub enum AuthenticationMethod {
     Nifty,
     Yammer,
     KDDI,
-}
-
-impl fmt::Display for AuthenticationMethod {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            AuthenticationMethod::Password => write!(f, "password"),
-            AuthenticationMethod::GitHub => write!(f, "github"),
-            AuthenticationMethod::IDCF => write!(f, "idcf"),
-            AuthenticationMethod::Google => write!(f, "google"),
-            AuthenticationMethod::Nifty => write!(f, "nifty"),
-            AuthenticationMethod::Yammer => write!(f, "yammer"),
-            AuthenticationMethod::KDDI => write!(f, "kddi"),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -130,16 +119,19 @@ mod tests {
             (AuthenticationMethod::KDDI, "kddi"),
         ];
         for &(authentication_method, authentication_method_str) in &test_cases {
-            let str_value = serde_json::Value::String(authentication_method_str.to_string());
+            assert_eq!(authentication_method.to_string(), authentication_method_str);
             assert_eq!(
                 authentication_method,
-                serde_json::from_value(str_value.clone()).unwrap()
+                authentication_method_str.parse().unwrap()
             );
             assert_eq!(
-                str_value,
-                serde_json::to_value(authentication_method).unwrap()
+                authentication_method,
+                serde_json::from_value(authentication_method_str.into()).unwrap()
             );
-            assert_eq!(str_value, format!("{}", authentication_method).as_str());
+            assert_eq!(
+                serde_json::to_value(authentication_method).unwrap(),
+                authentication_method_str
+            );
         }
     }
 }

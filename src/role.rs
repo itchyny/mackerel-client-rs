@@ -53,15 +53,14 @@ impl std::ops::Deref for RoleName {
     }
 }
 
-use std::fmt;
-impl fmt::Display for RoleName {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for RoleName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.role_name.fmt(f)
     }
 }
 
-impl fmt::Debug for RoleName {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Debug for RoleName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("\"")?;
         self.role_name.fmt(f)?;
         f.write_str("\"")

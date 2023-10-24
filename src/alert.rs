@@ -6,9 +6,9 @@ use crate::monitor::{MonitorId, MonitorType};
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
+use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
-use std::fmt;
+use strum::{Display, EnumString};
 
 /// An alert
 pub type Alert = Entity<AlertValue>;
@@ -36,24 +36,15 @@ pub struct AlertValue {
 }
 
 /// Alert statuses
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "UPPERCASE")]
 pub enum AlertStatus {
     Ok,
     Critical,
     Warning,
     Unknown,
-}
-
-impl fmt::Display for AlertStatus {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            AlertStatus::Ok => write!(f, "OK"),
-            AlertStatus::Critical => write!(f, "CRITICAL"),
-            AlertStatus::Warning => write!(f, "WARNING"),
-            AlertStatus::Unknown => write!(f, "UNKNOWN"),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -152,10 +143,10 @@ mod tests {
             (AlertStatus::Unknown, "UNKNOWN"),
         ];
         for &(status, status_str) in &test_cases {
-            let str_value = serde_json::Value::String(status_str.to_string());
-            assert_eq!(status, serde_json::from_value(str_value.clone()).unwrap());
-            assert_eq!(str_value, serde_json::to_value(status).unwrap());
-            assert_eq!(str_value, format!("{}", status).as_str());
+            assert_eq!(status.to_string(), status_str);
+            assert_eq!(status, status_str.parse().unwrap());
+            assert_eq!(status, serde_json::from_value(status_str.into()).unwrap());
+            assert_eq!(serde_json::to_value(status).unwrap(), status_str);
         }
     }
 }

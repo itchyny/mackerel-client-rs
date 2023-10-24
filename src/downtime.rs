@@ -5,7 +5,8 @@ use crate::monitor::MonitorId;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use std::fmt;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
+use strum::{Display, EnumString};
 
 /// A downtime
 pub type Downtime = Entity<DowntimeValue>;
@@ -52,8 +53,10 @@ pub struct DowntimeRecurrence {
 }
 
 /// A downtime recurrence types
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum DowntimeRecurrenceType {
     Hourly,
     Daily,
@@ -62,20 +65,10 @@ pub enum DowntimeRecurrenceType {
     Yearly,
 }
 
-impl fmt::Display for DowntimeRecurrenceType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            DowntimeRecurrenceType::Hourly => write!(f, "hourly"),
-            DowntimeRecurrenceType::Daily => write!(f, "daily"),
-            DowntimeRecurrenceType::Weekly => write!(f, "weekly"),
-            DowntimeRecurrenceType::Monthly => write!(f, "monthly"),
-            DowntimeRecurrenceType::Yearly => write!(f, "yearly"),
-        }
-    }
-}
-
 /// A downtime recurrence weekday
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
 pub enum DowntimeRecurrenceWeekday {
     Sunday,
     Monday,
@@ -84,20 +77,6 @@ pub enum DowntimeRecurrenceWeekday {
     Thursday,
     Friday,
     Saturday,
-}
-
-impl fmt::Display for DowntimeRecurrenceWeekday {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            DowntimeRecurrenceWeekday::Sunday => write!(f, "Sunday"),
-            DowntimeRecurrenceWeekday::Monday => write!(f, "Monday"),
-            DowntimeRecurrenceWeekday::Tuesday => write!(f, "Tuesday"),
-            DowntimeRecurrenceWeekday::Wednesday => write!(f, "Wednesday"),
-            DowntimeRecurrenceWeekday::Thursday => write!(f, "Thursday"),
-            DowntimeRecurrenceWeekday::Friday => write!(f, "Friday"),
-            DowntimeRecurrenceWeekday::Saturday => write!(f, "Saturday"),
-        }
-    }
 }
 
 #[cfg(test)]

@@ -5,8 +5,8 @@ use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_with::skip_serializing_none;
-use std::fmt;
+use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
+use strum::{Display, EnumString};
 
 /// A monitor
 pub type Monitor = Entity<MonitorValue>;
@@ -127,8 +127,10 @@ impl MonitorValue {
 }
 
 /// Monitor types
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "camelCase")]
 pub enum MonitorType {
     Connectivity,
     Host,
@@ -139,57 +141,27 @@ pub enum MonitorType {
     AnomalyDetection,
 }
 
-impl fmt::Display for MonitorType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            MonitorType::Connectivity => write!(f, "connectivity"),
-            MonitorType::Host => write!(f, "host"),
-            MonitorType::Service => write!(f, "service"),
-            MonitorType::External => write!(f, "external"),
-            MonitorType::Check => write!(f, "check"),
-            MonitorType::Expression => write!(f, "expression"),
-            MonitorType::AnomalyDetection => write!(f, "anomalyDetection"),
-        }
-    }
-}
-
 /// Monitor operators
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
 pub enum Operator {
-    #[serde(rename = ">")]
+    #[strum(serialize = ">")]
     GreaterThan,
-    #[serde(rename = "<")]
+    #[strum(serialize = "<")]
     LessThan,
 }
 
-impl fmt::Display for Operator {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Operator::GreaterThan => write!(f, ">"),
-            Operator::LessThan => write!(f, "<"),
-        }
-    }
-}
-
 /// HTTP methods for external http monitors
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "UPPERCASE")]
 pub enum ExternalMethod {
     Get,
     Post,
     Put,
     Delete,
-}
-
-impl fmt::Display for ExternalMethod {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            ExternalMethod::Get => write!(f, "GET"),
-            ExternalMethod::Post => write!(f, "POST"),
-            ExternalMethod::Put => write!(f, "PUT"),
-            ExternalMethod::Delete => write!(f, "DELETE"),
-        }
-    }
 }
 
 /// HTTP headers for external http monitors
@@ -200,22 +172,14 @@ pub struct ExternalHeader {
 }
 
 /// Anomaly detection sensitivity
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum Sensitivity {
     Insensitive,
     Normal,
     Sensitive,
-}
-
-impl fmt::Display for Sensitivity {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Sensitivity::Insensitive => write!(f, "insensitive"),
-            Sensitivity::Normal => write!(f, "normal"),
-            Sensitivity::Sensitive => write!(f, "sensitive"),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -504,14 +468,17 @@ mod tests {
             (MonitorType::Expression, "expression"),
             (MonitorType::AnomalyDetection, "anomalyDetection"),
         ];
-        for &(monitor_type, type_str) in &test_cases {
-            let str_value = serde_json::Value::String(type_str.to_string());
+        for &(monitor_type, monitor_type_str) in &test_cases {
+            assert_eq!(monitor_type.to_string(), monitor_type_str);
+            assert_eq!(monitor_type, monitor_type_str.parse().unwrap());
             assert_eq!(
                 monitor_type,
-                serde_json::from_value(str_value.clone()).unwrap()
+                serde_json::from_value(monitor_type_str.into()).unwrap()
             );
-            assert_eq!(str_value, serde_json::to_value(monitor_type).unwrap());
-            assert_eq!(str_value, format!("{}", monitor_type).as_str());
+            assert_eq!(
+                serde_json::to_value(monitor_type).unwrap(),
+                monitor_type_str
+            );
         }
     }
 
@@ -519,10 +486,13 @@ mod tests {
     fn test_operators() {
         let test_cases = [(Operator::GreaterThan, ">"), (Operator::LessThan, "<")];
         for &(operator, operator_str) in &test_cases {
-            let str_value = serde_json::Value::String(operator_str.to_string());
-            assert_eq!(operator, serde_json::from_value(str_value.clone()).unwrap());
-            assert_eq!(str_value, serde_json::to_value(operator).unwrap());
-            assert_eq!(str_value, format!("{}", operator).as_str());
+            assert_eq!(operator.to_string(), operator_str);
+            assert_eq!(operator, operator_str.parse().unwrap());
+            assert_eq!(
+                operator,
+                serde_json::from_value(operator_str.into()).unwrap()
+            );
+            assert_eq!(serde_json::to_value(operator).unwrap(), operator_str);
         }
     }
 
@@ -534,11 +504,17 @@ mod tests {
             (ExternalMethod::Put, "PUT"),
             (ExternalMethod::Delete, "DELETE"),
         ];
-        for &(method, method_str) in &test_cases {
-            let str_value = serde_json::Value::String(method_str.to_string());
-            assert_eq!(method, serde_json::from_value(str_value.clone()).unwrap());
-            assert_eq!(str_value, serde_json::to_value(method).unwrap());
-            assert_eq!(str_value, format!("{}", method).as_str());
+        for &(external_method, external_method_str) in &test_cases {
+            assert_eq!(external_method.to_string(), external_method_str);
+            assert_eq!(external_method, external_method_str.parse().unwrap());
+            assert_eq!(
+                external_method,
+                serde_json::from_value(external_method_str.into()).unwrap()
+            );
+            assert_eq!(
+                serde_json::to_value(external_method).unwrap(),
+                external_method_str
+            );
         }
     }
 
@@ -550,13 +526,13 @@ mod tests {
             (Sensitivity::Sensitive, "sensitive"),
         ];
         for &(sensitivity, sensitivity_str) in &test_cases {
-            let str_value = serde_json::Value::String(sensitivity_str.to_string());
+            assert_eq!(sensitivity.to_string(), sensitivity_str);
+            assert_eq!(sensitivity, sensitivity_str.parse().unwrap());
             assert_eq!(
                 sensitivity,
-                serde_json::from_value(str_value.clone()).unwrap()
+                serde_json::from_value(sensitivity_str.into()).unwrap()
             );
-            assert_eq!(str_value, serde_json::to_value(sensitivity).unwrap());
-            assert_eq!(str_value, format!("{}", sensitivity).as_str());
+            assert_eq!(serde_json::to_value(sensitivity).unwrap(), sensitivity_str);
         }
     }
 }

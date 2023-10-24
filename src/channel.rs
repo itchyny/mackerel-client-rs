@@ -4,8 +4,9 @@ use crate::error::*;
 use crate::user::UserId;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
-use std::fmt;
+use strum::{Display, EnumString};
 
 /// A channel
 pub type Channel = Entity<ChannelValue>;
@@ -94,8 +95,10 @@ impl ChannelValue {
 }
 
 /// Channel notification events
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "camelCase")]
 pub enum NotificationEvent {
     Alert,
     AlertGroup,
@@ -103,19 +106,6 @@ pub enum NotificationEvent {
     HostRegister,
     HostRetire,
     Monitor,
-}
-
-impl fmt::Display for NotificationEvent {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            NotificationEvent::Alert => write!(f, "alert"),
-            NotificationEvent::AlertGroup => write!(f, "alertGroup"),
-            NotificationEvent::HostStatus => write!(f, "hostStatus"),
-            NotificationEvent::HostRegister => write!(f, "hostRegister"),
-            NotificationEvent::HostRetire => write!(f, "hostRetire"),
-            NotificationEvent::Monitor => write!(f, "monitor"),
-        }
-    }
 }
 
 #[cfg(test)]

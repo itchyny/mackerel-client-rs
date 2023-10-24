@@ -7,9 +7,10 @@ use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
-use std::fmt;
 use std::net::{Ipv4Addr, Ipv6Addr};
+use strum::{Display, EnumString};
 use url::form_urlencoded;
 
 /// A host
@@ -34,41 +35,25 @@ pub struct Host {
 }
 
 /// Host size
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum HostSize {
     Standard,
     Micro,
 }
 
-impl fmt::Display for HostSize {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            HostSize::Standard => write!(f, "standard"),
-            HostSize::Micro => write!(f, "micro"),
-        }
-    }
-}
-
 /// Host status
-#[derive(PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
 pub enum HostStatus {
     Working,
     Standby,
     Maintenance,
     Poweroff,
-}
-
-impl fmt::Display for HostStatus {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            HostStatus::Working => write!(f, "working"),
-            HostStatus::Standby => write!(f, "standby"),
-            HostStatus::Maintenance => write!(f, "maintenance"),
-            HostStatus::Poweroff => write!(f, "poweroff"),
-        }
-    }
 }
 
 /// A host id
@@ -257,14 +242,14 @@ mod tests {
     #[test]
     fn test_host_sizes() {
         let test_cases = [(HostSize::Standard, "standard"), (HostSize::Micro, "micro")];
-        for &(host_size, status_str) in &test_cases {
-            let str_value = serde_json::Value::String(status_str.to_string());
+        for &(host_size, host_size_str) in &test_cases {
+            assert_eq!(host_size.to_string(), host_size_str);
+            assert_eq!(host_size, host_size_str.parse().unwrap());
             assert_eq!(
                 host_size,
-                serde_json::from_value(str_value.clone()).unwrap()
+                serde_json::from_value(host_size_str.into()).unwrap()
             );
-            assert_eq!(str_value, serde_json::to_value(host_size).unwrap());
-            assert_eq!(str_value, format!("{}", host_size).as_str());
+            assert_eq!(serde_json::to_value(host_size).unwrap(), host_size_str);
         }
     }
 
@@ -276,14 +261,14 @@ mod tests {
             (HostStatus::Maintenance, "maintenance"),
             (HostStatus::Poweroff, "poweroff"),
         ];
-        for &(host_status, status_str) in &test_cases {
-            let str_value = serde_json::Value::String(status_str.to_string());
+        for &(host_status, host_status_str) in &test_cases {
+            assert_eq!(host_status.to_string(), host_status_str);
+            assert_eq!(host_status, host_status_str.parse().unwrap());
             assert_eq!(
                 host_status,
-                serde_json::from_value(str_value.clone()).unwrap()
+                serde_json::from_value(host_status_str.into()).unwrap()
             );
-            assert_eq!(str_value, serde_json::to_value(host_status).unwrap());
-            assert_eq!(str_value, format!("{}", host_status).as_str());
+            assert_eq!(serde_json::to_value(host_status).unwrap(), host_status_str);
         }
     }
 }

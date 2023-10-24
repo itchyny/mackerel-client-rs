@@ -54,15 +54,14 @@ impl std::ops::Deref for ServiceName {
     }
 }
 
-use std::fmt;
-impl fmt::Display for ServiceName {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for ServiceName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.service_name.fmt(f)
     }
 }
 
-impl fmt::Debug for ServiceName {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Debug for ServiceName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("\"")?;
         self.service_name.fmt(f)?;
         f.write_str("\"")

@@ -17,9 +17,8 @@ impl From<&str> for Error {
     }
 }
 
-use std::fmt;
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Error::ApiError(status, message) => {
                 write!(f, "status:{}, message:{}", status, message)
