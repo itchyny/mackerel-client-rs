@@ -9,6 +9,7 @@ use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::fmt;
+use std::net::{Ipv4Addr, Ipv6Addr};
 use url::form_urlencoded;
 
 /// A host
@@ -100,20 +101,20 @@ impl std::ops::Deref for Host {
     }
 }
 
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct HostInterface {
     pub name: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mac_address: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub ipv4_addresses: Vec<String>,
+    pub ipv4_addresses: Vec<Ipv4Addr>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub ipv6_addresses: Vec<String>,
+    pub ipv6_addresses: Vec<Ipv6Addr>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub ip_address: Option<String>,
+    pub ip_address: Option<Ipv4Addr>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub ipv6_address: Option<String>,
+    pub ipv6_address: Option<Ipv6Addr>,
 }
 
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
@@ -182,7 +183,12 @@ mod tests {
                 custom_identifier: Some("custom-identifier".to_string()),
                 meta: HashMap::new(),
                 memo: "host memo".to_string(),
-                interfaces: vec![],
+                interfaces: vec![HostInterface {
+                    name: "lo0".to_string(),
+                    ipv4_addresses: vec!["127.0.0.1".parse().unwrap()],
+                    ipv6_addresses: vec!["fe80::1".parse().unwrap()],
+                    ..HostInterface::default()
+                }],
                 role_fullnames: vec!["ExampleService:ExampleRole".to_string()],
                 checks: vec![
                     HostCheck {
@@ -212,6 +218,13 @@ mod tests {
             "customIdentifier": "custom-identifier",
             "meta": {},
             "memo": "host memo",
+            "interfaces": [
+                {
+                    "name": "lo0",
+                    "ipv4Addresses": ["127.0.0.1"],
+                    "ipv6Addresses": ["fe80::1"],
+                },
+            ],
             "roleFullnames": ["ExampleService:ExampleRole"],
             "checks": [{"name": "check0", "memo": "check0 memo"}, {"name": "check1"}],
         })
