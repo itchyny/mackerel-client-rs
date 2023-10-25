@@ -128,7 +128,7 @@ impl MonitorValue {
     }
 }
 
-/// Monitor types
+/// Monitor type
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
@@ -143,7 +143,7 @@ pub enum MonitorType {
     AnomalyDetection,
 }
 
-/// Monitor operators
+/// Monitor operator
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
@@ -208,7 +208,7 @@ impl Into<String> for MonitorScope {
     }
 }
 
-/// HTTP methods for external http monitors
+/// HTTP method for external http monitor
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
@@ -220,7 +220,7 @@ pub enum ExternalMethod {
     Delete,
 }
 
-/// HTTP headers for external http monitors
+/// HTTP header for external http monitor
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 pub struct ExternalHeader {

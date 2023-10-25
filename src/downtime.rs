@@ -67,7 +67,7 @@ pub struct DowntimeRecurrence {
     pub until: Option<DateTime<Utc>>,
 }
 
-/// A downtime recurrence types
+/// A downtime recurrence type
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]

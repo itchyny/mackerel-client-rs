@@ -43,7 +43,7 @@ pub struct AlertValue {
     pub closed_at: Option<DateTime<Utc>>,
 }
 
-/// Alert statuses
+/// Alert status
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]

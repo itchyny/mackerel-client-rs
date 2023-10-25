@@ -94,7 +94,7 @@ impl ChannelValue {
     }
 }
 
-/// Notification events
+/// Notification event
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]

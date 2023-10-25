@@ -48,7 +48,7 @@ pub struct UserValue {
     pub authority: UserAuthority,
 }
 
-/// Authentication methods
+/// Authentication method
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
