@@ -6,6 +6,7 @@ use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use typed_builder::TypedBuilder;
 
 /// A graph annotation
 pub type GraphAnnotation = Entity<GraphAnnotationValue>;
@@ -14,9 +15,11 @@ pub type GraphAnnotation = Entity<GraphAnnotationValue>;
 pub type GraphAnnotationId = Id<GraphAnnotationValue>;
 
 /// A graph annotation value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct GraphAnnotationValue {
     pub title: String,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub description: String,
     #[serde(with = "chrono::serde::ts_seconds")]
@@ -24,6 +27,7 @@ pub struct GraphAnnotationValue {
     #[serde(with = "chrono::serde::ts_seconds")]
     pub to: DateTime<Utc>,
     pub service: ServiceName,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub roles: Vec<RoleName>,
 }
@@ -34,17 +38,19 @@ mod tests {
     use serde_json::json;
 
     fn graph_annotation_example1() -> GraphAnnotation {
-        GraphAnnotation {
-            id: "abcde1".into(),
-            value: GraphAnnotationValue {
-                title: "Deploy application".to_string(),
-                description: "Graph Annotation Example\nhttps://example.com".to_string(),
-                from: DateTime::from_timestamp(1484000000, 0).unwrap(),
-                to: DateTime::from_timestamp(1484000030, 0).unwrap(),
-                service: "ExampleService".into(),
-                roles: vec!["ExampleRole1".into(), "ExampleRole2".into()],
-            },
-        }
+        GraphAnnotation::builder()
+            .id("abcde1")
+            .value(
+                GraphAnnotationValue::builder()
+                    .title("Deploy application")
+                    .description("Graph Annotation Example\nhttps://example.com")
+                    .from(DateTime::from_timestamp(1484000000, 0).unwrap())
+                    .to(DateTime::from_timestamp(1484000030, 0).unwrap())
+                    .service("ExampleService")
+                    .roles(["ExampleRole1".into(), "ExampleRole2".into()])
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example1() -> serde_json::Value {
@@ -60,17 +66,17 @@ mod tests {
     }
 
     fn graph_annotation_example2() -> GraphAnnotation {
-        GraphAnnotation {
-            id: "abcde2".into(),
-            value: GraphAnnotationValue {
-                title: "Deploy application".to_string(),
-                description: "".to_string(),
-                from: DateTime::from_timestamp(1484000000, 0).unwrap(),
-                to: DateTime::from_timestamp(1484000030, 0).unwrap(),
-                service: "ExampleService".into(),
-                roles: vec![],
-            },
-        }
+        GraphAnnotation::builder()
+            .id("abcde2")
+            .value(
+                GraphAnnotationValue::builder()
+                    .title("Deploy application")
+                    .from(DateTime::from_timestamp(1484000000, 0).unwrap())
+                    .to(DateTime::from_timestamp(1484000030, 0).unwrap())
+                    .service("ExampleService")
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example2() -> serde_json::Value {

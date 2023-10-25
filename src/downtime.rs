@@ -9,6 +9,7 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
+use typed_builder::TypedBuilder;
 
 /// A downtime
 pub type Downtime = Entity<DowntimeValue>;
@@ -17,39 +18,51 @@ pub type Downtime = Entity<DowntimeValue>;
 pub type DowntimeId = Id<DowntimeValue>;
 
 /// A downtime value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct DowntimeValue {
     pub name: String,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
     #[serde(with = "chrono::serde::ts_seconds")]
     pub start: DateTime<Utc>,
     pub duration: u64,
+    #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recurrence: Option<DowntimeRecurrence>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub service_scopes: Vec<ServiceName>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub service_exclude_scopes: Vec<ServiceName>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_scopes: Vec<RoleFullname>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_exclude_scopes: Vec<RoleFullname>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_scopes: Vec<MonitorId>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_exclude_scopes: Vec<MonitorId>,
 }
 
 /// A downtime recurrence
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct DowntimeRecurrence {
     #[serde(rename = "type")]
     pub recurrence_type: DowntimeRecurrenceType,
     pub interval: u64,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub weekdays: Vec<DowntimeRecurrenceWeekday>,
+    #[builder(default, setter(strip_option))]
     #[serde(default, with = "chrono::serde::ts_seconds_option")]
     pub until: Option<DateTime<Utc>>,
 }
@@ -88,22 +101,17 @@ mod tests {
     use serde_json::json;
 
     fn downtime_example1() -> Downtime {
-        Downtime {
-            id: "abcde1".into(),
-            value: DowntimeValue {
-                name: "Example downtime".to_string(),
-                memo: "This is a downtime memo.".to_string(),
-                start: DateTime::from_timestamp(1700000000, 0).unwrap(),
-                duration: 60,
-                recurrence: None,
-                service_scopes: vec![],
-                service_exclude_scopes: vec![],
-                role_scopes: vec![],
-                role_exclude_scopes: vec![],
-                monitor_scopes: vec![],
-                monitor_exclude_scopes: vec![],
-            },
-        }
+        Downtime::builder()
+            .id("abcde1")
+            .value(
+                DowntimeValue::builder()
+                    .name("Example downtime")
+                    .memo("This is a downtime memo.")
+                    .start(DateTime::from_timestamp(1700000000, 0).unwrap())
+                    .duration(60u64)
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example1() -> serde_json::Value {
@@ -117,31 +125,34 @@ mod tests {
     }
 
     fn downtime_example2() -> Downtime {
-        Downtime {
-            id: "abcde2".into(),
-            value: DowntimeValue {
-                name: "Example downtime".to_string(),
-                memo: "".to_string(),
-                start: DateTime::from_timestamp(1700000000, 0).unwrap(),
-                duration: 60,
-                recurrence: Some(DowntimeRecurrence {
-                    recurrence_type: DowntimeRecurrenceType::Weekly,
-                    interval: 30,
-                    weekdays: vec![
-                        DowntimeRecurrenceWeekday::Sunday,
-                        DowntimeRecurrenceWeekday::Tuesday,
-                        DowntimeRecurrenceWeekday::Wednesday,
-                    ],
-                    until: Some(DateTime::from_timestamp(1710000000, 0).unwrap()),
-                }),
-                service_scopes: vec!["service0".into()],
-                service_exclude_scopes: vec!["service1".into()],
-                role_scopes: vec!["service0:role0".into()],
-                role_exclude_scopes: vec!["service1:role1".into()],
-                monitor_scopes: vec!["monitor0".into()],
-                monitor_exclude_scopes: vec!["monitor1".into()],
-            },
-        }
+        Downtime::builder()
+            .id("abcde2")
+            .value(
+                DowntimeValue::builder()
+                    .name("Example downtime")
+                    .start(DateTime::from_timestamp(1700000000, 0).unwrap())
+                    .duration(60u64)
+                    .recurrence(
+                        DowntimeRecurrence::builder()
+                            .recurrence_type(DowntimeRecurrenceType::Weekly)
+                            .interval(30u64)
+                            .weekdays([
+                                DowntimeRecurrenceWeekday::Sunday,
+                                DowntimeRecurrenceWeekday::Tuesday,
+                                DowntimeRecurrenceWeekday::Wednesday,
+                            ])
+                            .until(DateTime::from_timestamp(1710000000, 0).unwrap())
+                            .build(),
+                    )
+                    .service_scopes(["service0".into()])
+                    .service_exclude_scopes(["service1".into()])
+                    .role_scopes(["service0:role0".into()])
+                    .role_exclude_scopes(["service1:role1".into()])
+                    .monitor_scopes(["monitor0".into()])
+                    .monitor_exclude_scopes(["monitor1".into()])
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example2() -> serde_json::Value {

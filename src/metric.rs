@@ -5,9 +5,11 @@ use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use typed_builder::TypedBuilder;
 
 /// A host metric value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct HostMetricValue {
     pub host_id: HostId,
@@ -17,8 +19,8 @@ pub struct HostMetricValue {
 }
 
 /// A service metric value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct ServiceMetricValue {
     pub name: String,
     #[serde(flatten)]
@@ -26,7 +28,8 @@ pub struct ServiceMetricValue {
 }
 
 /// A metric value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct MetricValue {
     #[serde(with = "chrono::serde::ts_seconds")]
     pub time: DateTime<Utc>,
@@ -39,14 +42,16 @@ mod tests {
     use serde_json::json;
 
     fn host_metric_example1() -> HostMetricValue {
-        HostMetricValue {
-            host_id: "abcde1".into(),
-            name: "loadavg.loadavg1".to_string(),
-            value: MetricValue {
-                time: DateTime::from_timestamp(1700000000, 0).unwrap(),
-                value: 1.2,
-            },
-        }
+        HostMetricValue::builder()
+            .host_id("abcde1")
+            .name("loadavg.loadavg1")
+            .value(
+                MetricValue::builder()
+                    .time(DateTime::from_timestamp(1700000000, 0).unwrap())
+                    .value(1.2)
+                    .build(),
+            )
+            .build()
     }
 
     fn host_metric_json_example1() -> serde_json::Value {
@@ -59,13 +64,15 @@ mod tests {
     }
 
     fn service_metric_example1() -> ServiceMetricValue {
-        ServiceMetricValue {
-            name: "custom.metric.name".to_string(),
-            value: MetricValue {
-                time: DateTime::from_timestamp(1700000000, 0).unwrap(),
-                value: 1.3,
-            },
-        }
+        ServiceMetricValue::builder()
+            .name("custom.metric.name")
+            .value(
+                MetricValue::builder()
+                    .time(DateTime::from_timestamp(1700000000, 0).unwrap())
+                    .value(1.3)
+                    .build(),
+            )
+            .build()
     }
 
     fn service_metric_json_example1() -> serde_json::Value {

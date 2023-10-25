@@ -4,12 +4,16 @@ use crate::name::Name;
 use crate::role::RoleName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use typed_builder::TypedBuilder;
 
 /// A service
-#[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct Service {
     pub name: ServiceName,
+    #[builder(default)]
     pub memo: String,
+    #[builder(default)]
     pub roles: Vec<RoleName>,
 }
 
@@ -26,17 +30,17 @@ mod tests {
     use crate::service::*;
     use serde_json::json;
 
-    fn service_example() -> Service {
-        Service {
-            name: "ExampleService".into(),
-            memo: "service memo".to_string(),
-            roles: vec!["role0".into(), "role1".into(), "role2".into()],
-        }
+    fn service_example1() -> Service {
+        Service::builder()
+            .name("ExampleService1")
+            .memo("service memo")
+            .roles(["role0".into(), "role1".into(), "role2".into()])
+            .build()
     }
 
-    fn json_example() -> serde_json::Value {
+    fn json_example1() -> serde_json::Value {
         json!({
-            "name": "ExampleService",
+            "name": "ExampleService1",
             "memo": "service memo",
             "roles": [
                 "role0",
@@ -46,19 +50,39 @@ mod tests {
         })
     }
 
+    fn service_example2() -> Service {
+        Service::builder().name("ExampleService2").build()
+    }
+
+    fn json_example2() -> serde_json::Value {
+        json!({
+            "name": "ExampleService2",
+            "memo": "",
+            "roles": [],
+        })
+    }
+
     #[test]
     fn serialize_service() {
         assert_eq!(
-            json_example(),
-            serde_json::to_value(&service_example()).unwrap()
+            json_example1(),
+            serde_json::to_value(&service_example1()).unwrap()
+        );
+        assert_eq!(
+            json_example2(),
+            serde_json::to_value(&service_example2()).unwrap()
         );
     }
 
     #[test]
     fn deserialize_service() {
         assert_eq!(
-            service_example(),
-            serde_json::from_value(json_example()).unwrap()
+            service_example1(),
+            serde_json::from_value(json_example1()).unwrap()
+        );
+        assert_eq!(
+            service_example2(),
+            serde_json::from_value(json_example2()).unwrap()
         );
     }
 }

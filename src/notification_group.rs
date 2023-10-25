@@ -8,47 +8,67 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
+use typed_builder::TypedBuilder;
 
-/// A notification group
+/// A notification group entity
 pub type NotificationGroup = Entity<NotificationGroupValue>;
 
 /// A notification group id
 pub type NotificationGroupId = Id<NotificationGroupValue>;
 
-/// A notification group id value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+/// A notification group value
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationGroupValue {
     pub name: String,
+    #[builder(default)]
     pub notification_level: NotificationLevel,
+    #[builder(default)]
     pub child_notification_group_ids: Vec<NotificationGroupId>,
+    #[builder(default)]
     pub child_channel_ids: Vec<ChannelId>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitors: Vec<NotificationGroupMonitor>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub services: Vec<NotificationGroupService>,
 }
 
 /// A notification level
 #[derive(
-    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+    PartialEq,
+    Eq,
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Display,
+    EnumString,
+    SerializeDisplay,
+    DeserializeFromStr,
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum NotificationLevel {
+    #[default]
     All,
     Critical,
 }
 
 /// A notification group monitor
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationGroupMonitor {
     pub id: MonitorId,
+    #[builder(default)]
     pub skip_default: bool,
 }
 
 /// A notification group service
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct NotificationGroupService {
     pub name: ServiceName,
@@ -60,17 +80,14 @@ mod tests {
     use serde_json::json;
 
     fn notification_group_example1() -> NotificationGroup {
-        NotificationGroup {
-            id: "abcde1".into(),
-            value: NotificationGroupValue {
-                name: "Example notification group".to_string(),
-                notification_level: NotificationLevel::All,
-                child_notification_group_ids: vec![],
-                child_channel_ids: vec![],
-                monitors: vec![],
-                services: vec![],
-            },
-        }
+        NotificationGroup::builder()
+            .id("abcde1")
+            .value(
+                NotificationGroupValue::builder()
+                    .name("Example notification group")
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example1() -> serde_json::Value {
@@ -84,22 +101,21 @@ mod tests {
     }
 
     fn notification_group_example2() -> NotificationGroup {
-        NotificationGroup {
-            id: "abcde2".into(),
-            value: NotificationGroupValue {
-                name: "Example notification group".to_string(),
-                notification_level: NotificationLevel::Critical,
-                child_notification_group_ids: vec!["abcde3".into()],
-                child_channel_ids: vec!["abcde4".into()],
-                monitors: vec![NotificationGroupMonitor {
-                    id: "abcde5".into(),
-                    skip_default: false,
-                }],
-                services: vec![NotificationGroupService {
-                    name: "ExampleService".into(),
-                }],
-            },
-        }
+        NotificationGroup::builder()
+            .id("abcde2")
+            .value(
+                NotificationGroupValue::builder()
+                    .name("Example notification group")
+                    .notification_level(NotificationLevel::Critical)
+                    .child_notification_group_ids(["abcde3".into()])
+                    .child_channel_ids(["abcde4".into()])
+                    .monitors([NotificationGroupMonitor::builder().id("abcde5").build()])
+                    .services([NotificationGroupService::builder()
+                        .name("ExampleService")
+                        .build()])
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example2() -> serde_json::Value {

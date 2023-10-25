@@ -2,8 +2,10 @@ use fixedstr::str16;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::marker::PhantomData;
+use typed_builder::TypedBuilder;
 
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct Entity<T> {
     pub id: Id<T>,
     #[serde(flatten)]

@@ -9,6 +9,7 @@ use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
 use strum::{Display, EnumString};
+use typed_builder::TypedBuilder;
 
 /// An alert
 pub type Alert = Entity<AlertValue>;
@@ -18,19 +19,26 @@ pub type AlertId = Id<AlertValue>;
 
 /// An alert value
 #[skip_serializing_none]
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct AlertValue {
     pub status: AlertStatus,
+    #[builder(default, setter(strip_option))]
     pub monitor_id: Option<MonitorId>,
     #[serde(rename = "type")]
     pub monitor_type: MonitorType,
+    #[builder(default, setter(strip_option))]
     pub host_id: Option<HostId>,
+    #[builder(default, setter(strip_option))]
     pub value: Option<f64>,
+    #[builder(default, setter(strip_option))]
     pub message: Option<String>,
+    #[builder(default, setter(strip_option))]
     pub reason: Option<String>,
     #[serde(with = "chrono::serde::ts_seconds")]
     pub opened_at: DateTime<Utc>,
+    #[builder(default, setter(strip_option))]
     #[serde(default, with = "chrono::serde::ts_seconds_option")]
     pub closed_at: Option<DateTime<Utc>>,
 }
@@ -54,58 +62,60 @@ mod tests {
     use serde_json::json;
 
     fn alert_example1() -> Alert {
-        Alert {
-            id: "abcde0".into(),
-            value: AlertValue {
-                status: AlertStatus::Critical,
-                monitor_id: Some("abcde2".into()),
-                monitor_type: MonitorType::Connectivity,
-                host_id: Some("abcde1".into()),
-                value: None,
-                message: None,
-                reason: None,
-                opened_at: DateTime::from_timestamp(1690000000, 0).unwrap(),
-                closed_at: Some(DateTime::from_timestamp(1700000000, 0).unwrap()),
-            },
-        }
+        Alert::builder()
+            .id("abcde1")
+            .value(
+                AlertValue::builder()
+                    .status(AlertStatus::Critical)
+                    .monitor_id("abcde2")
+                    .monitor_type(MonitorType::Connectivity)
+                    .host_id("abcde3")
+                    .message("alert message")
+                    .reason("alert close reason")
+                    .opened_at(DateTime::from_timestamp(1690000000, 0).unwrap())
+                    .closed_at(DateTime::from_timestamp(1700000000, 0).unwrap())
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde0",
+            "id": "abcde1",
             "status": "CRITICAL",
             "monitorId": "abcde2",
             "type": "connectivity",
-            "hostId": "abcde1",
+            "hostId": "abcde3",
+            "message": "alert message",
+            "reason": "alert close reason",
             "openedAt": 1690000000,
             "closedAt": 1700000000,
         })
     }
 
     fn alert_example2() -> Alert {
-        Alert {
-            id: "abcde0".into(),
-            value: AlertValue {
-                status: AlertStatus::Warning,
-                monitor_id: Some("abcde2".into()),
-                monitor_type: MonitorType::Host,
-                host_id: Some("abcde1".into()),
-                value: Some(25.0),
-                message: None,
-                reason: None,
-                opened_at: DateTime::from_timestamp(1690000000, 0).unwrap(),
-                closed_at: None,
-            },
-        }
+        Alert::builder()
+            .id("abcde1")
+            .value(
+                AlertValue::builder()
+                    .status(AlertStatus::Warning)
+                    .monitor_id("abcde2")
+                    .monitor_type(MonitorType::Host)
+                    .host_id("abcde3")
+                    .value(25.0)
+                    .opened_at(DateTime::from_timestamp(1690000000, 0).unwrap())
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde0",
+            "id": "abcde1",
             "status": "WARNING",
             "monitorId": "abcde2",
             "type": "host",
-            "hostId": "abcde1",
+            "hostId": "abcde3",
             "value": 25.0,
             "openedAt": 1690000000,
         })

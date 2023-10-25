@@ -6,15 +6,20 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
+use typed_builder::TypedBuilder;
 
 /// A user
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct User {
     pub id: UserId,
+    #[builder(default)]
     pub is_in_registration_process: bool,
+    #[builder(default)]
     #[serde(rename = "isMFAEnabled")]
     pub is_mfa_enabled: bool,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub authentication_methods: Vec<AuthenticationMethod>,
     #[serde(with = "chrono::serde::ts_seconds")]
@@ -34,7 +39,8 @@ impl std::ops::Deref for User {
 pub type UserId = Id<UserValue>;
 
 /// A user value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct UserValue {
     pub screen_name: String,
@@ -75,30 +81,58 @@ mod tests {
     use rstest::rstest;
     use serde_json::json;
 
-    fn user_example() -> User {
-        User {
-            id: "abcde".into(),
-            is_in_registration_process: false,
-            is_mfa_enabled: false,
-            authentication_methods: vec![AuthenticationMethod::Password],
-            joined_at: DateTime::from_timestamp(1630000000, 0).unwrap(),
-            value: UserValue {
-                screen_name: "Example Mackerel".to_string(),
-                email: "mackerel@example.com".to_string(),
-                authority: UserAuthority::Collaborator,
-            },
-        }
+    fn user_example1() -> User {
+        User::builder()
+            .id("abcde1")
+            .joined_at(DateTime::from_timestamp(1630000000, 0).unwrap())
+            .value(
+                UserValue::builder()
+                    .screen_name("Example User 1")
+                    .email("mackerel@example.com")
+                    .authority(UserAuthority::Manager)
+                    .build(),
+            )
+            .build()
     }
 
-    fn json_example() -> serde_json::Value {
+    fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde",
-            "screenName": "Example Mackerel",
+            "id": "abcde1",
+            "screenName": "Example User 1",
             "email": "mackerel@example.com",
-            "authority": "collaborator",
+            "authority": "manager",
             "isInRegistrationProcess": false,
             "isMFAEnabled": false,
-            "authenticationMethods": ["password"],
+            "joinedAt": 1630000000,
+        })
+    }
+
+    fn user_example2() -> User {
+        User::builder()
+            .id("abcde2")
+            .is_in_registration_process(true)
+            .is_mfa_enabled(true)
+            .authentication_methods([AuthenticationMethod::Password, AuthenticationMethod::GitHub])
+            .joined_at(DateTime::from_timestamp(1630000000, 0).unwrap())
+            .value(
+                UserValue::builder()
+                    .screen_name("Example User 2")
+                    .email("mackerel@example.com")
+                    .authority(UserAuthority::Collaborator)
+                    .build(),
+            )
+            .build()
+    }
+
+    fn json_example2() -> serde_json::Value {
+        json!({
+            "id": "abcde2",
+            "screenName": "Example User 2",
+            "email": "mackerel@example.com",
+            "authority": "collaborator",
+            "isInRegistrationProcess": true,
+            "isMFAEnabled": true,
+            "authenticationMethods": ["password", "github"],
             "joinedAt": 1630000000,
         })
     }
@@ -106,16 +140,24 @@ mod tests {
     #[test]
     fn serialize_user() {
         assert_eq!(
-            json_example(),
-            serde_json::to_value(&user_example()).unwrap()
+            json_example1(),
+            serde_json::to_value(&user_example1()).unwrap()
+        );
+        assert_eq!(
+            json_example2(),
+            serde_json::to_value(&user_example2()).unwrap()
         );
     }
 
     #[test]
     fn deserialize_user() {
         assert_eq!(
-            user_example(),
-            serde_json::from_value(json_example()).unwrap()
+            user_example1(),
+            serde_json::from_value(json_example1()).unwrap()
+        );
+        assert_eq!(
+            user_example2(),
+            serde_json::from_value(json_example2()).unwrap()
         );
     }
 

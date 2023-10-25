@@ -5,9 +5,11 @@ use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
+use typed_builder::TypedBuilder;
 
 /// An invitation
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct Invitation {
     #[serde(with = "chrono::serde::ts_seconds")]
@@ -24,7 +26,8 @@ impl std::ops::Deref for Invitation {
 }
 
 /// An invitation value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct InvitationValue {
     pub email: String,
@@ -37,13 +40,15 @@ mod tests {
     use serde_json::json;
 
     fn invitation_example1() -> Invitation {
-        Invitation {
-            expires_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
-            value: InvitationValue {
-                email: "example1@example.com".to_string(),
-                authority: UserAuthority::Manager,
-            },
-        }
+        Invitation::builder()
+            .expires_at(DateTime::from_timestamp(1700000000, 0).unwrap())
+            .value(
+                InvitationValue::builder()
+                    .email("example1@example.com")
+                    .authority(UserAuthority::Manager)
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example1() -> serde_json::Value {
@@ -55,13 +60,15 @@ mod tests {
     }
 
     fn invitation_example2() -> Invitation {
-        Invitation {
-            expires_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
-            value: InvitationValue {
-                email: "example2@example.com".to_string(),
-                authority: UserAuthority::Collaborator,
-            },
-        }
+        Invitation::builder()
+            .expires_at(DateTime::from_timestamp(1700000000, 0).unwrap())
+            .value(
+                InvitationValue::builder()
+                    .email("example2@example.com")
+                    .authority(UserAuthority::Collaborator)
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example2() -> serde_json::Value {
@@ -73,10 +80,10 @@ mod tests {
     }
 
     fn invitation_example3() -> InvitationValue {
-        InvitationValue {
-            email: "example3@example.com".to_string(),
-            authority: UserAuthority::Viewer,
-        }
+        InvitationValue::builder()
+            .email("example3@example.com")
+            .authority(UserAuthority::Viewer)
+            .build()
     }
 
     fn json_example3() -> serde_json::Value {

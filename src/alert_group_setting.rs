@@ -6,6 +6,7 @@ use crate::role::RoleFullname;
 use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use typed_builder::TypedBuilder;
 
 /// An alert group setting
 pub type AlertGroupSetting = Entity<AlertGroupSettingValue>;
@@ -14,18 +15,24 @@ pub type AlertGroupSetting = Entity<AlertGroupSettingValue>;
 pub type AlertGroupSettingId = Id<AlertGroupSettingValue>;
 
 /// An alert group setting value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct AlertGroupSettingValue {
     pub name: String,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub service_scopes: Vec<ServiceName>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_scopes: Vec<RoleFullname>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_scopes: Vec<MonitorId>,
+    #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub notification_interval: Option<u64>,
 }
@@ -36,45 +43,44 @@ mod tests {
     use serde_json::json;
 
     fn alert_group_setting_example1() -> AlertGroupSetting {
-        AlertGroupSetting {
-            id: "abcde1".into(),
-            value: AlertGroupSettingValue {
-                name: "Example alert group setting".to_string(),
-                memo: "This is an alert group setting memo.".to_string(),
-                service_scopes: vec![],
-                role_scopes: vec![],
-                monitor_scopes: vec![],
-                notification_interval: None,
-            },
-        }
+        AlertGroupSetting::builder()
+            .id("abcde1")
+            .value(
+                AlertGroupSettingValue::builder()
+                    .name("Example alert group setting")
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example1() -> serde_json::Value {
         json!({
             "id": "abcde1",
             "name": "Example alert group setting",
-            "memo": "This is an alert group setting memo.",
         })
     }
 
     fn alert_group_setting_example2() -> AlertGroupSetting {
-        AlertGroupSetting {
-            id: "abcde2".into(),
-            value: AlertGroupSettingValue {
-                name: "Example alert group setting".to_string(),
-                memo: "".to_string(),
-                service_scopes: vec!["ExampleService".into()],
-                role_scopes: vec!["ExampleService:ExampleRole".into()],
-                monitor_scopes: vec!["monitor0".into()],
-                notification_interval: Some(60),
-            },
-        }
+        AlertGroupSetting::builder()
+            .id("abcde2")
+            .value(
+                AlertGroupSettingValue::builder()
+                    .name("Example alert group setting")
+                    .memo("This is an alert group setting memo.")
+                    .service_scopes(["ExampleService".into()])
+                    .role_scopes(["ExampleService:ExampleRole".into()])
+                    .monitor_scopes(["monitor0".into()])
+                    .notification_interval(60u64)
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example2() -> serde_json::Value {
         json!({
             "id": "abcde2",
             "name": "Example alert group setting",
+            "memo": "This is an alert group setting memo.",
             "serviceScopes": ["ExampleService"],
             "roleScopes": ["ExampleService:ExampleRole"],
             "monitorScopes": ["monitor0"],

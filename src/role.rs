@@ -5,11 +5,14 @@ use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use typed_builder::TypedBuilder;
 
 /// A role
-#[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct Role {
     pub name: RoleName,
+    #[builder(default)]
     pub memo: String,
 }
 
@@ -106,33 +109,52 @@ mod tests {
     use rstest::rstest;
     use serde_json::json;
 
-    fn role_example() -> Role {
-        Role {
-            name: "ExampleRole".into(),
-            memo: "role memo".to_string(),
-        }
+    fn role_example1() -> Role {
+        Role::builder()
+            .name("ExampleRole1")
+            .memo("role memo")
+            .build()
     }
 
-    fn json_example() -> serde_json::Value {
+    fn json_example1() -> serde_json::Value {
         json!({
-            "name": "ExampleRole",
+            "name": "ExampleRole1",
             "memo": "role memo"
+        })
+    }
+
+    fn role_example2() -> Role {
+        Role::builder().name("ExampleRole2").build()
+    }
+
+    fn json_example2() -> serde_json::Value {
+        json!({
+            "name": "ExampleRole2",
+            "memo": ""
         })
     }
 
     #[test]
     fn serialize_role() {
         assert_eq!(
-            json_example(),
-            serde_json::to_value(&role_example()).unwrap()
+            json_example1(),
+            serde_json::to_value(&role_example1()).unwrap()
+        );
+        assert_eq!(
+            json_example2(),
+            serde_json::to_value(&role_example2()).unwrap()
         );
     }
 
     #[test]
     fn deserialize_role() {
         assert_eq!(
-            role_example(),
-            serde_json::from_value(json_example()).unwrap()
+            role_example1(),
+            serde_json::from_value(json_example1()).unwrap()
+        );
+        assert_eq!(
+            role_example2(),
+            serde_json::from_value(json_example2()).unwrap()
         );
     }
 

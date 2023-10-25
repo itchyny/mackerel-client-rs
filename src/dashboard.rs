@@ -8,6 +8,7 @@ use chrono::{DateTime, Duration, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DurationSeconds};
+use typed_builder::TypedBuilder;
 
 /// A dashboard
 pub type Dashboard = Entity<DashboardValue>;
@@ -16,12 +17,15 @@ pub type Dashboard = Entity<DashboardValue>;
 pub type DashboardId = Id<DashboardValue>;
 
 /// A dashboard value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct DashboardValue {
     pub title: String,
+    #[builder(default)]
     pub memo: String,
     pub url_path: String,
+    #[builder(default)]
     #[serde(default)]
     pub widgets: Vec<DashboardWidget>,
 }
@@ -133,86 +137,88 @@ mod tests {
     use serde_json::json;
 
     fn dashboard_example() -> Dashboard {
-        Dashboard {
-            id: "abcde1".into(),
-            value: DashboardValue {
-                title: "This is a dashboard".to_string(),
-                memo: "This is a dashboard memo.".to_string(),
-                url_path: "example".to_string(),
-                widgets: vec![
-                    DashboardWidget::Graph {
-                        title: "Graph title".to_string(),
-                        graph: DashboardGraph::Host {
-                            host_id: "abcde1".into(),
-                            name: "loadavg5".to_string(),
+        Dashboard::builder()
+            .id("abcde1")
+            .value(
+                DashboardValue::builder()
+                    .title("This is a dashboard")
+                    .memo("This is a dashboard memo.")
+                    .url_path("example")
+                    .widgets([
+                        DashboardWidget::Graph {
+                            title: "Graph title".to_string(),
+                            graph: DashboardGraph::Host {
+                                host_id: "abcde1".into(),
+                                name: "loadavg5".to_string(),
+                            },
+                            range: Some(DashboardRange::Relative {
+                                period: Duration::seconds(86400),
+                                offset: Duration::seconds(-3600),
+                            }),
+                            layout: DashboardLayout {
+                                x: 0,
+                                y: 0,
+                                width: 8,
+                                height: 6,
+                            },
                         },
-                        range: Some(DashboardRange::Relative {
-                            period: Duration::seconds(86400),
-                            offset: Duration::seconds(-3600),
-                        }),
-                        layout: DashboardLayout {
-                            x: 0,
-                            y: 0,
-                            width: 8,
-                            height: 6,
+                        DashboardWidget::Graph {
+                            title: "Graph title".to_string(),
+                            graph: DashboardGraph::Role {
+                                role_fullname: "service:role".into(),
+                                name: "cpu.{user,iowait,system}".to_string(),
+                                is_stacked: true,
+                            },
+                            range: Some(DashboardRange::Absolute {
+                                start: DateTime::from_timestamp(1630000000, 0).unwrap(),
+                                end: DateTime::from_timestamp(1630003600, 0).unwrap(),
+                            }),
+                            layout: DashboardLayout {
+                                x: 8,
+                                y: 0,
+                                width: 8,
+                                height: 6,
+                            },
                         },
-                    },
-                    DashboardWidget::Graph {
-                        title: "Graph title".to_string(),
-                        graph: DashboardGraph::Role {
+                        DashboardWidget::Value {
+                            title: "Metric value title".to_string(),
+                            metric: DashboardMetric::Host {
+                                host_id: "abcde1".into(),
+                                name: "cpu.user.percentage".to_string(),
+                            },
+                            fraction_size: Some(4),
+                            suffix: Some("%".to_string()),
+                            layout: DashboardLayout {
+                                x: 16,
+                                y: 0,
+                                width: 8,
+                                height: 6,
+                            },
+                        },
+                        DashboardWidget::Markdown {
+                            title: "Markdown title".to_string(),
+                            markdown: "# This is a markdown widget".to_string(),
+                            layout: DashboardLayout {
+                                x: 0,
+                                y: 6,
+                                width: 8,
+                                height: 6,
+                            },
+                        },
+                        DashboardWidget::AlertStatus {
+                            title: "Alert status title".to_string(),
                             role_fullname: "service:role".into(),
-                            name: "cpu.{user,iowait,system}".to_string(),
-                            is_stacked: true,
+                            layout: DashboardLayout {
+                                x: 8,
+                                y: 6,
+                                width: 8,
+                                height: 6,
+                            },
                         },
-                        range: Some(DashboardRange::Absolute {
-                            start: DateTime::from_timestamp(1630000000, 0).unwrap(),
-                            end: DateTime::from_timestamp(1630003600, 0).unwrap(),
-                        }),
-                        layout: DashboardLayout {
-                            x: 8,
-                            y: 0,
-                            width: 8,
-                            height: 6,
-                        },
-                    },
-                    DashboardWidget::Value {
-                        title: "Metric value title".to_string(),
-                        metric: DashboardMetric::Host {
-                            host_id: "abcde1".into(),
-                            name: "cpu.user.percentage".to_string(),
-                        },
-                        fraction_size: Some(4),
-                        suffix: Some("%".to_string()),
-                        layout: DashboardLayout {
-                            x: 16,
-                            y: 0,
-                            width: 8,
-                            height: 6,
-                        },
-                    },
-                    DashboardWidget::Markdown {
-                        title: "Markdown title".to_string(),
-                        markdown: "# This is a markdown widget".to_string(),
-                        layout: DashboardLayout {
-                            x: 0,
-                            y: 6,
-                            width: 8,
-                            height: 6,
-                        },
-                    },
-                    DashboardWidget::AlertStatus {
-                        title: "Alert status title".to_string(),
-                        role_fullname: "service:role".into(),
-                        layout: DashboardLayout {
-                            x: 8,
-                            y: 6,
-                            width: 8,
-                            height: 6,
-                        },
-                    },
-                ],
-            },
-        }
+                    ])
+                    .build(),
+            )
+            .build()
     }
 
     fn json_example() -> serde_json::Value {

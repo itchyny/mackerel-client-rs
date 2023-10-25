@@ -11,10 +11,12 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use strum::{Display, EnumString};
+use typed_builder::TypedBuilder;
 use url::form_urlencoded;
 
 /// A host
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct Host {
     pub id: HostId,
@@ -22,13 +24,16 @@ pub struct Host {
     pub created_at: DateTime<Utc>,
     pub size: HostSize,
     pub status: HostStatus,
+    #[builder(default)]
     pub is_retired: bool,
+    #[builder(default, setter(strip_option))]
     #[serde(
         default,
         with = "chrono::serde::ts_seconds_option",
         skip_serializing_if = "Option::is_none"
     )]
     pub retired_at: Option<DateTime<Utc>>,
+    #[builder(default)]
     pub roles: HashMap<ServiceName, Vec<RoleName>>,
     #[serde(flatten)]
     pub value: HostValue,
@@ -60,21 +65,29 @@ pub enum HostStatus {
 pub type HostId = Id<HostValue>;
 
 /// A host value
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct HostValue {
     pub name: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(default, setter(strip_option))]
     pub display_name: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[builder(default, setter(strip_option))]
     pub custom_identifier: Option<String>,
+    #[builder(default)]
     pub meta: HashMap<String, Value>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub interfaces: Vec<HostInterface>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_fullnames: Vec<RoleFullname>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub checks: Vec<HostCheck>,
 }
@@ -86,26 +99,34 @@ impl std::ops::Deref for Host {
     }
 }
 
-#[derive(PartialEq, Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct HostInterface {
     pub name: String,
+    #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mac_address: Option<String>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv4_addresses: Vec<Ipv4Addr>,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv6_addresses: Vec<Ipv6Addr>,
+    #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ip_address: Option<Ipv4Addr>,
+    #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub ipv6_address: Option<Ipv6Addr>,
 }
 
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 pub struct HostCheck {
     pub name: String,
+    #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
 }
@@ -117,25 +138,13 @@ mod tests {
     use serde_json::json;
 
     fn host_example1() -> Host {
-        Host {
-            id: "abcde1".into(),
-            created_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
-            size: HostSize::Standard,
-            status: HostStatus::Working,
-            is_retired: false,
-            retired_at: None,
-            roles: HashMap::new(),
-            value: HostValue {
-                name: "example-host".to_string(),
-                display_name: None,
-                custom_identifier: None,
-                meta: HashMap::new(),
-                memo: "".to_string(),
-                interfaces: vec![],
-                role_fullnames: vec![],
-                checks: vec![],
-            },
-        }
+        Host::builder()
+            .id("abcde1")
+            .created_at(DateTime::from_timestamp(1700000000, 0).unwrap())
+            .size(HostSize::Standard)
+            .status(HostStatus::Working)
+            .value(HostValue::builder().name("example-host").build())
+            .build()
     }
 
     fn host_json_example1() -> serde_json::Value {
@@ -152,42 +161,40 @@ mod tests {
     }
 
     fn host_example2() -> Host {
-        Host {
-            id: "abcde2".into(),
-            created_at: DateTime::from_timestamp(1700000000, 0).unwrap(),
-            size: HostSize::Micro,
-            status: HostStatus::Poweroff,
-            is_retired: true,
-            retired_at: Some(DateTime::from_timestamp(1710000000, 0).unwrap()),
-            roles: HashMap::<_, _>::from_iter([(
-                "ExampleService".into(),
-                vec!["ExampleRole".into()],
-            )]),
-            value: HostValue {
-                name: "example-host".to_string(),
-                display_name: Some("Example host".to_string()),
-                custom_identifier: Some("custom-identifier".to_string()),
-                meta: HashMap::new(),
-                memo: "host memo".to_string(),
-                interfaces: vec![HostInterface {
-                    name: "lo0".to_string(),
-                    ipv4_addresses: vec!["127.0.0.1".parse().unwrap()],
-                    ipv6_addresses: vec!["fe80::1".parse().unwrap()],
-                    ..HostInterface::default()
-                }],
-                role_fullnames: vec!["ExampleService:ExampleRole".into()],
-                checks: vec![
-                    HostCheck {
-                        name: "check0".to_string(),
-                        memo: "check0 memo".to_string(),
-                    },
-                    HostCheck {
-                        name: "check1".to_string(),
-                        memo: "".to_string(),
-                    },
-                ],
-            },
-        }
+        Host::builder()
+            .id("abcde2")
+            .created_at(DateTime::from_timestamp(1700000000, 0).unwrap())
+            .size(HostSize::Micro)
+            .status(HostStatus::Poweroff)
+            .is_retired(true)
+            .retired_at(DateTime::from_timestamp(1710000000, 0).unwrap())
+            .roles([("ExampleService".into(), vec!["ExampleRole".into()])])
+            .value(
+                HostValue::builder()
+                    .name("example-host")
+                    .display_name("Example host")
+                    .custom_identifier("custom-identifier")
+                    .meta([(
+                        "agent-name".to_string(),
+                        serde_json::to_value("mackerel-agent").unwrap(),
+                    )])
+                    .memo("host memo")
+                    .interfaces([HostInterface::builder()
+                        .name("lo0")
+                        .mac_address("00:00:00:00:00:00")
+                        .ipv4_addresses([[127, 0, 0, 1].into()])
+                        .ipv6_addresses([[0xfe80, 0, 0, 0, 0, 0, 0, 1].into()])
+                        .ip_address([127, 0, 0, 1])
+                        .ipv6_address([0xfe80, 0, 0, 0, 0, 0, 0, 1])
+                        .build()])
+                    .role_fullnames(["ExampleService:ExampleRole".into()])
+                    .checks([
+                        HostCheck::builder().name("check0").memo("memo").build(),
+                        HostCheck::builder().name("check1").build(),
+                    ])
+                    .build(),
+            )
+            .build()
     }
 
     fn host_json_example2() -> serde_json::Value {
@@ -202,17 +209,20 @@ mod tests {
             "name": "example-host",
             "displayName": "Example host",
             "customIdentifier": "custom-identifier",
-            "meta": {},
+            "meta": {"agent-name": "mackerel-agent"},
             "memo": "host memo",
             "interfaces": [
                 {
                     "name": "lo0",
+                    "macAddress": "00:00:00:00:00:00",
                     "ipv4Addresses": ["127.0.0.1"],
                     "ipv6Addresses": ["fe80::1"],
+                    "ipAddress": "127.0.0.1",
+                    "ipv6Address": "fe80::1",
                 },
             ],
             "roleFullnames": ["ExampleService:ExampleRole"],
-            "checks": [{"name": "check0", "memo": "check0 memo"}, {"name": "check1"}],
+            "checks": [{"name": "check0", "memo": "memo"}, {"name": "check1"}],
         })
     }
 

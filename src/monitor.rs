@@ -8,6 +8,7 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
+use typed_builder::TypedBuilder;
 
 /// A monitor
 pub type Monitor = Entity<MonitorValue>;
@@ -220,7 +221,8 @@ pub enum ExternalMethod {
 }
 
 /// HTTP headers for external http monitors
-#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct ExternalHeader {
     name: String,
     value: String,
@@ -244,10 +246,10 @@ mod tests {
     use serde_json::json;
 
     fn host_monitor_example() -> Monitor {
-        Monitor {
-            id: "abcde1".into(),
-            value: MonitorValue::Host {
-                name: "Monitor custom.foo.bar".to_string(),
+        Monitor::builder()
+            .id("abcde1")
+            .value(MonitorValue::Host {
+                name: "Example host monitor".to_string(),
                 memo: "Monitor memo".to_string(),
                 duration: 5,
                 metric: "custom.foo.bar".to_string(),
@@ -258,15 +260,15 @@ mod tests {
                 notification_interval: Some(30),
                 scopes: vec!["service0".into()],
                 exclude_scopes: vec!["service0:role3".into()],
-            },
-        }
+            })
+            .build()
     }
 
     fn host_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "host",
             "id": "abcde1",
-            "name": "Monitor custom.foo.bar",
+            "name": "Example host monitor",
             "memo": "Monitor memo",
             "duration": 5,
             "metric": "custom.foo.bar",
@@ -281,34 +283,34 @@ mod tests {
     }
 
     fn connectivity_monitor_example() -> Monitor {
-        Monitor {
-            id: "abcde2".into(),
-            value: MonitorValue::Connectivity {
-                name: "connectivity".to_string(),
+        Monitor::builder()
+            .id("abcde2")
+            .value(MonitorValue::Connectivity {
+                name: "Example connectivity monitor".to_string(),
                 memo: "Monitor memo".to_string(),
                 is_mute: Some(false),
                 notification_interval: None,
                 scopes: vec![],
                 exclude_scopes: vec![],
-            },
-        }
+            })
+            .build()
     }
 
     fn connectivity_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "connectivity",
             "id": "abcde2",
-            "name": "connectivity",
+            "name": "Example connectivity monitor",
             "memo": "Monitor memo",
             "isMute": false
         })
     }
 
     fn service_monitor_example() -> Monitor {
-        Monitor {
-            id: "abcde3".into(),
-            value: MonitorValue::Service {
-                name: "Service count".to_string(),
+        Monitor::builder()
+            .id("abcde3")
+            .value(MonitorValue::Service {
+                name: "Example service monitor".to_string(),
                 memo: "Monitor memo".to_string(),
                 service: "service1".into(),
                 duration: 5,
@@ -318,15 +320,15 @@ mod tests {
                 critical: Some(200.0),
                 is_mute: Some(false),
                 notification_interval: Some(30),
-            },
-        }
+            })
+            .build()
     }
 
     fn service_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "service",
             "id": "abcde3",
-            "name": "Service count",
+            "name": "Example service monitor",
             "memo": "Monitor memo",
             "service": "service1",
             "duration": 5,
@@ -340,18 +342,18 @@ mod tests {
     }
 
     fn external_monitor_example() -> Monitor {
-        Monitor {
-            id: "abcde4".into(),
-            value: MonitorValue::External {
+        Monitor::builder()
+            .id("abcde4")
+            .value(MonitorValue::External {
                 name: "Example external monitor".to_string(),
                 memo: "Monitor memo".to_string(),
                 method: Some(ExternalMethod::Get),
                 url: "https://example.com".to_string(),
                 request_body: Some("Request Body".to_string()),
-                headers: Some(vec![ExternalHeader {
-                    name: "Cache-Control".to_string(),
-                    value: "no-cache".to_string(),
-                }]),
+                headers: Some(vec![ExternalHeader::builder()
+                    .name("Cache-Control")
+                    .value("no-cache")
+                    .build()]),
                 service: Some("service1".into()),
                 response_time_duration: Some(5),
                 response_time_warning: Some(3000.0),
@@ -363,8 +365,8 @@ mod tests {
                 skip_certificate_verification: Some(true),
                 is_mute: Some(true),
                 notification_interval: Some(60),
-            },
-        }
+            })
+            .build()
     }
 
     fn external_monitor_json_example() -> serde_json::Value {
@@ -392,9 +394,9 @@ mod tests {
     }
 
     fn expression_monitor_example() -> Monitor {
-        Monitor {
-            id: "abcde5".into(),
-            value: MonitorValue::Expression {
+        Monitor::builder()
+            .id("abcde5")
+            .value(MonitorValue::Expression {
                 name: "Example expression monitor".to_string(),
                 memo: "Monitor memo".to_string(),
                 expression: "min(role(\"foo:bar\", \"custom.foo.bar\"))".to_string(),
@@ -403,8 +405,8 @@ mod tests {
                 critical: None,
                 is_mute: Some(false),
                 notification_interval: None,
-            },
-        }
+            })
+            .build()
     }
 
     fn expression_monitor_json_example() -> serde_json::Value {
@@ -421,10 +423,10 @@ mod tests {
     }
 
     fn anomaly_detection_monitor_example() -> Monitor {
-        Monitor {
-            id: "abcde6".into(),
-            value: MonitorValue::AnomalyDetection {
-                name: "Example Anomaly Detection monitor".to_string(),
+        Monitor::builder()
+            .id("abcde6")
+            .value(MonitorValue::AnomalyDetection {
+                name: "Example anomaly detection monitor".to_string(),
                 memo: "".to_string(),
                 scopes: vec!["service0:role0".into()],
                 warning_sensitivity: Some(AnomalyDetectionSensitivity::Normal),
@@ -433,15 +435,15 @@ mod tests {
                 training_period_from: Some(DateTime::from_timestamp(1580000000, 0).unwrap()),
                 is_mute: Some(false),
                 notification_interval: None,
-            },
-        }
+            })
+            .build()
     }
 
     fn anomaly_detection_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "anomalyDetection",
             "id": "abcde6",
-            "name": "Example Anomaly Detection monitor",
+            "name": "Example anomaly detection monitor",
             "scopes": ["service0:role0"],
             "warningSensitivity": "normal",
             "criticalSensitivity": "insensitive",
@@ -475,15 +477,15 @@ mod tests {
     fn monitor_name() {
         assert_eq!(
             host_monitor_example().name(),
-            "Monitor custom.foo.bar".to_string()
+            "Example host monitor".to_string()
         );
         assert_eq!(
             connectivity_monitor_example().name(),
-            "connectivity".to_string()
+            "Example connectivity monitor".to_string()
         );
         assert_eq!(
             service_monitor_example().name(),
-            "Service count".to_string()
+            "Example service monitor".to_string()
         );
         assert_eq!(
             external_monitor_example().name(),
@@ -495,7 +497,7 @@ mod tests {
         );
         assert_eq!(
             anomaly_detection_monitor_example().name(),
-            "Example Anomaly Detection monitor".to_string()
+            "Example anomaly detection monitor".to_string()
         );
     }
 
