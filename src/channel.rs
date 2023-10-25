@@ -76,7 +76,7 @@ pub enum ChannelValue {
 
 impl ChannelValue {
     /// Returns the name of the channel.
-    pub fn get_name(&self) -> String {
+    pub fn name(&self) -> String {
         match *self {
             ChannelValue::Email { ref name, .. } => name.clone(),
             ChannelValue::Slack { ref name, .. } => name.clone(),
@@ -349,51 +349,51 @@ mod tests {
     #[test]
     fn channel_name() {
         assert_eq!(
-            email_channel_example().get_name(),
+            email_channel_example().name(),
             "Example Email Channel".to_string(),
         );
         assert_eq!(
-            slack_channel_example().get_name(),
+            slack_channel_example().name(),
             "Example Slack Channel".to_string(),
         );
         assert_eq!(
-            line_channel_example().get_name(),
+            line_channel_example().name(),
             "Example Line Channel".to_string(),
         );
         assert_eq!(
-            chatwork_channel_example().get_name(),
+            chatwork_channel_example().name(),
             "Example Chatwork Channel".to_string(),
         );
         assert_eq!(
-            typetalk_channel_example().get_name(),
+            typetalk_channel_example().name(),
             "Example Typetalk Channel".to_string(),
         );
         assert_eq!(
-            twilio_channel_example().get_name(),
+            twilio_channel_example().name(),
             "Example Twilio Channel".to_string(),
         );
         assert_eq!(
-            pagerduty_channel_example().get_name(),
+            pagerduty_channel_example().name(),
             "Example Pagerduty Channel".to_string(),
         );
         assert_eq!(
-            opsgenie_channel_example().get_name(),
+            opsgenie_channel_example().name(),
             "Example Opsgenie Channel".to_string(),
         );
         assert_eq!(
-            yammer_channel_example().get_name(),
+            yammer_channel_example().name(),
             "Example Yammer Channel".to_string(),
         );
         assert_eq!(
-            microsoft_teams_channel_example().get_name(),
+            microsoft_teams_channel_example().name(),
             "Example MicrosoftTeams Channel".to_string(),
         );
         assert_eq!(
-            webhook_channel_example().get_name(),
+            webhook_channel_example().name(),
             "Example Webhook Channel".to_string(),
         );
         assert_eq!(
-            amazon_event_bridge_channel_example().get_name(),
+            amazon_event_bridge_channel_example().name(),
             "Example AmazonEventBridge Channel".to_string(),
         );
     }
