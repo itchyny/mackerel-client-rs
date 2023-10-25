@@ -39,6 +39,13 @@ pub struct Host {
     pub value: HostValue,
 }
 
+impl std::ops::Deref for Host {
+    type Target = HostValue;
+    fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
 /// Host size
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
@@ -90,13 +97,6 @@ pub struct HostValue {
     #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub checks: Vec<HostCheck>,
-}
-
-impl std::ops::Deref for Host {
-    type Target = HostValue;
-    fn deref(&self) -> &Self::Target {
-        &self.value
-    }
 }
 
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
