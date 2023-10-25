@@ -2,6 +2,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::host::HostId;
+use crate::role::RoleFullname;
 use crate::service::ServiceName;
 use chrono::{DateTime, Duration, Utc};
 use reqwest::Method;
@@ -54,7 +55,7 @@ pub enum DashboardWidget {
     #[serde(rename_all = "camelCase")]
     AlertStatus {
         title: String,
-        role_fullname: String,
+        role_fullname: RoleFullname,
         layout: DashboardLayout,
     },
 }
@@ -67,7 +68,7 @@ pub enum DashboardGraph {
     Host { host_id: HostId, name: String },
     #[serde(rename_all = "camelCase")]
     Role {
-        role_fullname: String,
+        role_fullname: RoleFullname,
         name: String,
         is_stacked: bool,
     },
@@ -159,7 +160,7 @@ mod tests {
                     DashboardWidget::Graph {
                         title: "Graph title".to_string(),
                         graph: DashboardGraph::Role {
-                            role_fullname: "service:role".to_string(),
+                            role_fullname: "service:role".into(),
                             name: "cpu.{user,iowait,system}".to_string(),
                             is_stacked: true,
                         },
@@ -201,7 +202,7 @@ mod tests {
                     },
                     DashboardWidget::AlertStatus {
                         title: "Alert status title".to_string(),
-                        role_fullname: "service:role".to_string(),
+                        role_fullname: "service:role".into(),
                         layout: DashboardLayout {
                             x: 8,
                             y: 6,

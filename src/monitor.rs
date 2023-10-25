@@ -1,6 +1,7 @@
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
+use crate::role::RoleFullname;
 use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
@@ -32,9 +33,9 @@ pub enum MonitorValue {
         is_mute: Option<bool>,
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        scopes: Vec<String>,
+        scopes: Vec<MonitorScope>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        exclude_scopes: Vec<String>,
+        exclude_scopes: Vec<MonitorScope>,
     },
     #[serde(rename_all = "camelCase")]
     Connectivity {
@@ -44,9 +45,9 @@ pub enum MonitorValue {
         is_mute: Option<bool>,
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        scopes: Vec<String>,
+        scopes: Vec<MonitorScope>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        exclude_scopes: Vec<String>,
+        exclude_scopes: Vec<MonitorScope>,
     },
     #[serde(rename_all = "camelCase")]
     Service {
@@ -101,7 +102,7 @@ pub enum MonitorValue {
         #[serde(default, skip_serializing_if = "String::is_empty")]
         memo: String,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        scopes: Vec<String>,
+        scopes: Vec<MonitorScope>,
         warning_sensitivity: Option<AnomalyDetectionSensitivity>,
         critical_sensitivity: Option<AnomalyDetectionSensitivity>,
         max_check_attempts: Option<u64>,
@@ -150,6 +151,60 @@ pub enum MonitorOperator {
     GreaterThan,
     #[strum(serialize = "<")]
     LessThan,
+}
+
+/// Monitor scope
+#[derive(PartialEq, Eq, Copy, Clone, Debug, SerializeDisplay, DeserializeFromStr)]
+pub enum MonitorScope {
+    Service(ServiceName),
+    Role(RoleFullname),
+}
+
+#[derive(PartialEq, Eq, Debug)]
+pub struct ParseMonitorScopeError(String);
+
+impl std::fmt::Display for ParseMonitorScopeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "failed to parse monitor scope: {}", self.0)
+    }
+}
+
+impl std::str::FromStr for MonitorScope {
+    type Err = ParseMonitorScopeError;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        s.parse()
+            .map(MonitorScope::Role)
+            .or(s.parse().map(MonitorScope::Service))
+            .map_err(|_| ParseMonitorScopeError(s.to_string()))
+    }
+}
+
+impl From<&str> for MonitorScope {
+    fn from(s: &str) -> Self {
+        s.parse().unwrap()
+    }
+}
+
+impl From<String> for MonitorScope {
+    fn from(s: String) -> Self {
+        s.parse().unwrap()
+    }
+}
+
+impl std::fmt::Display for MonitorScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Service(ref service_name) => service_name.fmt(f),
+            Self::Role(ref role_fullname) => role_fullname.fmt(f),
+        }
+    }
+}
+
+impl Into<String> for MonitorScope {
+    fn into(self: Self) -> String {
+        self.to_string()
+    }
 }
 
 /// HTTP methods for external http monitors
@@ -201,8 +256,8 @@ mod tests {
                 critical: Some(20.0),
                 is_mute: Some(false),
                 notification_interval: Some(30),
-                scopes: vec!["service0".to_string()],
-                exclude_scopes: vec!["service0:role3".to_string()],
+                scopes: vec!["service0".into()],
+                exclude_scopes: vec!["service0:role3".into()],
             },
         }
     }
@@ -371,7 +426,7 @@ mod tests {
             value: MonitorValue::AnomalyDetection {
                 name: "Example Anomaly Detection monitor".to_string(),
                 memo: "".to_string(),
-                scopes: vec!["service0:role0".to_string()],
+                scopes: vec!["service0:role0".into()],
                 warning_sensitivity: Some(AnomalyDetectionSensitivity::Normal),
                 critical_sensitivity: Some(AnomalyDetectionSensitivity::Insensitive),
                 max_check_attempts: Some(3),
@@ -495,6 +550,34 @@ mod tests {
         assert_eq!(
             serde_json::to_value(monitor_operator).unwrap(),
             monitor_operator_str
+        );
+    }
+
+    #[rstest]
+    #[case("ExampleService".into(), "ExampleService")]
+    #[case("ExampleService:ExampleRole".into(), "ExampleService:ExampleRole")]
+    fn test_monitor_scope(#[case] monitor_scope: MonitorScope, #[case] monitor_scope_str: &str) {
+        assert_eq!(monitor_scope.to_string(), monitor_scope_str);
+        assert_eq!(monitor_scope, monitor_scope_str.parse().unwrap());
+        assert_eq!(
+            monitor_scope,
+            serde_json::from_value(monitor_scope_str.into()).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(monitor_scope).unwrap(),
+            monitor_scope_str
+        );
+    }
+
+    #[rstest]
+    #[case("")]
+    #[case(":")]
+    #[case("ExampleService:")]
+    #[case(":ExampleRole")]
+    fn test_monitor_scope_error(#[case] monitor_scope_str: &str) {
+        assert_eq!(
+            Err(ParseMonitorScopeError(monitor_scope_str.to_string())),
+            monitor_scope_str.parse::<MonitorScope>()
         );
     }
 

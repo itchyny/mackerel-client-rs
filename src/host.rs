@@ -1,7 +1,7 @@
 use crate::client;
 use crate::entity::Id;
 use crate::error::*;
-use crate::role::RoleName;
+use crate::role::{RoleFullname, RoleName};
 use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
@@ -74,7 +74,7 @@ pub struct HostValue {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub interfaces: Vec<HostInterface>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub role_fullnames: Vec<String>,
+    pub role_fullnames: Vec<RoleFullname>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub checks: Vec<HostCheck>,
 }
@@ -175,7 +175,7 @@ mod tests {
                     ipv6_addresses: vec!["fe80::1".parse().unwrap()],
                     ..HostInterface::default()
                 }],
-                role_fullnames: vec!["ExampleService:ExampleRole".to_string()],
+                role_fullnames: vec!["ExampleService:ExampleRole".into()],
                 checks: vec![
                     HostCheck {
                         name: "check0".to_string(),
@@ -404,7 +404,7 @@ impl client::Client {
     pub async fn update_host_roles(
         &self,
         host_id: HostId,
-        role_fullnames: Vec<String>,
+        role_fullnames: Vec<RoleFullname>,
     ) -> Result<()> {
         self.request(
             Method::PUT,

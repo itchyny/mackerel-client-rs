@@ -2,6 +2,8 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::monitor::MonitorId;
+use crate::role::RoleFullname;
+use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 
@@ -19,9 +21,9 @@ pub struct AlertGroupSettingValue {
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub service_scopes: Vec<String>,
+    pub service_scopes: Vec<ServiceName>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub role_scopes: Vec<String>,
+    pub role_scopes: Vec<RoleFullname>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_scopes: Vec<MonitorId>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -61,8 +63,8 @@ mod tests {
             value: AlertGroupSettingValue {
                 name: "Example alert group setting".to_string(),
                 memo: "".to_string(),
-                service_scopes: vec!["ExampleService".to_string()],
-                role_scopes: vec!["ExampleService:ExampleRole".to_string()],
+                service_scopes: vec!["ExampleService".into()],
+                role_scopes: vec!["ExampleService:ExampleRole".into()],
                 monitor_scopes: vec!["monitor0".into()],
                 notification_interval: Some(60),
             },

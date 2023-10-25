@@ -2,6 +2,8 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::*;
 use crate::monitor::MonitorId;
+use crate::role::RoleFullname;
+use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -27,13 +29,13 @@ pub struct DowntimeValue {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub recurrence: Option<DowntimeRecurrence>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub service_scopes: Vec<String>,
+    pub service_scopes: Vec<ServiceName>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub service_exclude_scopes: Vec<String>,
+    pub service_exclude_scopes: Vec<ServiceName>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub role_scopes: Vec<String>,
+    pub role_scopes: Vec<RoleFullname>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub role_exclude_scopes: Vec<String>,
+    pub role_exclude_scopes: Vec<RoleFullname>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_scopes: Vec<MonitorId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -132,10 +134,10 @@ mod tests {
                     ],
                     until: Some(DateTime::from_timestamp(1710000000, 0).unwrap()),
                 }),
-                service_scopes: vec!["service0".to_string()],
-                service_exclude_scopes: vec!["service1".to_string()],
-                role_scopes: vec!["service0:role0".to_string()],
-                role_exclude_scopes: vec!["service1:role1".to_string()],
+                service_scopes: vec!["service0".into()],
+                service_exclude_scopes: vec!["service1".into()],
+                role_scopes: vec!["service0:role0".into()],
+                role_exclude_scopes: vec!["service1:role1".into()],
                 monitor_scopes: vec!["monitor0".into()],
                 monitor_exclude_scopes: vec!["monitor1".into()],
             },
