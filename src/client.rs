@@ -24,7 +24,7 @@ pub fn empty_body() -> Option<()> {
 
 impl Client {
     /// Creates a new API client from API key.
-    pub fn new<S: Into<String>>(api_key: S) -> Client {
+    pub fn new(api_key: impl Into<String>) -> Client {
         Self::builder().api_key(api_key).build()
     }
 
@@ -60,19 +60,16 @@ impl Client {
     ///
     /// The entire response body is deserialized as `R`, converted by `converter`
     /// and returns `S`.
-    pub(crate) async fn request<P, B, R, F, S>(
+    pub(crate) async fn request<R, S>(
         &self,
         method: reqwest::Method,
-        path: P,
+        path: impl AsRef<str>,
         queries: Vec<(&str, Vec<&str>)>,
-        body_opt: Option<B>,
-        converter: F,
+        body_opt: Option<impl serde::ser::Serialize>,
+        converter: impl FnOnce(R) -> S,
     ) -> Result<S>
     where
-        P: AsRef<str>,
-        B: serde::ser::Serialize,
         for<'de> R: serde::de::Deserialize<'de>,
-        F: FnOnce(R) -> S,
     {
         let client = reqwest::Client::new();
         let url = self.build_url(path.as_ref(), queries);
