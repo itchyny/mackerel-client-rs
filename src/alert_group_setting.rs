@@ -32,7 +32,7 @@ pub struct AlertGroupSettingValue {
     #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_scopes: Vec<MonitorId>,
-    #[builder(default, setter(strip_option))]
+    #[builder(default, setter(!into, strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub notification_interval: Option<u64>,
 }
@@ -70,7 +70,7 @@ mod tests {
                     .service_scopes(["ExampleService".into()])
                     .role_scopes(["ExampleService:ExampleRole".into()])
                     .monitor_scopes(["monitor0".into()])
-                    .notification_interval(60u64)
+                    .notification_interval(60)
                     .build(),
             )
             .build()

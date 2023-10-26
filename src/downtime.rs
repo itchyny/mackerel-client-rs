@@ -28,6 +28,7 @@ pub struct DowntimeValue {
     pub memo: String,
     #[serde(with = "chrono::serde::ts_seconds")]
     pub start: DateTime<Utc>,
+    #[builder(setter(!into))]
     pub duration: u64,
     #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -58,6 +59,7 @@ pub struct DowntimeValue {
 pub struct DowntimeRecurrence {
     #[serde(rename = "type")]
     pub recurrence_type: DowntimeRecurrenceType,
+    #[builder(setter(!into))]
     pub interval: u64,
     #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -108,7 +110,7 @@ mod tests {
                     .name("Example downtime")
                     .memo("This is a downtime memo.")
                     .start(DateTime::from_timestamp(1700000000, 0).unwrap())
-                    .duration(60u64)
+                    .duration(60)
                     .build(),
             )
             .build()
@@ -131,11 +133,11 @@ mod tests {
                 DowntimeValue::builder()
                     .name("Example downtime")
                     .start(DateTime::from_timestamp(1700000000, 0).unwrap())
-                    .duration(60u64)
+                    .duration(60)
                     .recurrence(
                         DowntimeRecurrence::builder()
                             .recurrence_type(DowntimeRecurrenceType::Weekly)
-                            .interval(30u64)
+                            .interval(30)
                             .weekdays([
                                 DowntimeRecurrenceWeekday::Sunday,
                                 DowntimeRecurrenceWeekday::Tuesday,
