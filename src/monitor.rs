@@ -126,6 +126,18 @@ impl MonitorValue {
             MonitorValue::AnomalyDetection { ref name, .. } => name.clone(),
         }
     }
+
+    /// Returns the memo of the monitor.
+    pub fn memo(&self) -> String {
+        match *self {
+            MonitorValue::Host { ref memo, .. } => memo.clone(),
+            MonitorValue::Connectivity { ref memo, .. } => memo.clone(),
+            MonitorValue::Service { ref memo, .. } => memo.clone(),
+            MonitorValue::External { ref memo, .. } => memo.clone(),
+            MonitorValue::Expression { ref memo, .. } => memo.clone(),
+            MonitorValue::AnomalyDetection { ref memo, .. } => memo.clone(),
+        }
+    }
 }
 
 /// Monitor type
@@ -427,7 +439,7 @@ mod tests {
             .id("abcde6")
             .value(MonitorValue::AnomalyDetection {
                 name: "Example anomaly detection monitor".to_string(),
-                memo: "".to_string(),
+                memo: "Monitor memo".to_string(),
                 scopes: vec!["service0:role0".into()],
                 warning_sensitivity: Some(AnomalyDetectionSensitivity::Normal),
                 critical_sensitivity: Some(AnomalyDetectionSensitivity::Insensitive),
@@ -444,6 +456,7 @@ mod tests {
             "type": "anomalyDetection",
             "id": "abcde6",
             "name": "Example anomaly detection monitor",
+            "memo": "Monitor memo",
             "scopes": ["service0:role0"],
             "warningSensitivity": "normal",
             "criticalSensitivity": "insensitive",
@@ -499,6 +512,16 @@ mod tests {
             anomaly_detection_monitor_example().name(),
             "Example anomaly detection monitor".to_string()
         );
+    }
+
+    #[test]
+    fn monitor_memo() {
+        assert_eq!(&host_monitor_example().memo(), "Monitor memo");
+        assert_eq!(&connectivity_monitor_example().memo(), "Monitor memo");
+        assert_eq!(&service_monitor_example().memo(), "Monitor memo");
+        assert_eq!(&external_monitor_example().memo(), "Monitor memo");
+        assert_eq!(&expression_monitor_example().memo(), "Monitor memo");
+        assert_eq!(&anomaly_detection_monitor_example().memo(), "Monitor memo");
     }
 
     #[test]
