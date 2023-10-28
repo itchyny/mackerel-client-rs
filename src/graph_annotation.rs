@@ -35,6 +35,7 @@ pub struct GraphAnnotationValue {
 #[cfg(test)]
 mod tests {
     use crate::graph_annotation::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn graph_annotation_example1() -> GraphAnnotation {
@@ -89,28 +90,15 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_graph_annotation() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&graph_annotation_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&graph_annotation_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_graph_annotation() {
-        assert_eq!(
-            graph_annotation_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            graph_annotation_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(graph_annotation_example1(), json_example1())]
+    #[case(graph_annotation_example2(), json_example2())]
+    fn test_graph_annotation(
+        #[case] graph_annotation: GraphAnnotation,
+        #[case] json: serde_json::Value,
+    ) {
+        assert_eq!(serde_json::to_value(&graph_annotation).unwrap(), json);
+        assert_eq!(graph_annotation, serde_json::from_value(json).unwrap());
     }
 }
 

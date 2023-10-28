@@ -134,6 +134,7 @@ pub struct DashboardLayout {
 #[cfg(test)]
 mod tests {
     use crate::dashboard::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn dashboard_example() -> Dashboard {
@@ -312,20 +313,11 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_dashboard() {
-        assert_eq!(
-            json_example(),
-            serde_json::to_value(&dashboard_example()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_dashboard() {
-        assert_eq!(
-            dashboard_example(),
-            serde_json::from_value(json_example()).unwrap()
-        );
+    #[rstest]
+    #[case(dashboard_example(), json_example())]
+    fn test_dashboard_json(#[case] dashboard: Dashboard, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&dashboard).unwrap(), json);
+        assert_eq!(dashboard, serde_json::from_value(json).unwrap());
     }
 }
 

@@ -178,28 +178,12 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_downtime() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&downtime_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&downtime_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_downtime() {
-        assert_eq!(
-            downtime_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            downtime_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(downtime_example1(), json_example1())]
+    #[case(downtime_example2(), json_example2())]
+    fn test_downtime_json(#[case] downtime: Downtime, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&downtime).unwrap(), json);
+        assert_eq!(downtime, serde_json::from_value(json).unwrap());
     }
 
     #[rstest]

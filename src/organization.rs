@@ -21,6 +21,7 @@ pub type OrganizationName = Name<Organization>;
 #[cfg(test)]
 mod tests {
     use crate::organization::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn organization_example() -> Organization {
@@ -35,20 +36,11 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_organization() {
-        assert_eq!(
-            json_example(),
-            serde_json::to_value(&organization_example()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_organization() {
-        assert_eq!(
-            organization_example(),
-            serde_json::from_value(json_example()).unwrap()
-        );
+    #[rstest]
+    #[case(organization_example(), json_example())]
+    fn test_organization_json(#[case] organization: Organization, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&organization).unwrap(), json);
+        assert_eq!(organization, serde_json::from_value(json).unwrap());
     }
 }
 

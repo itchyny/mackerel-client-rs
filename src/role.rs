@@ -134,28 +134,12 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_role() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&role_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&role_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_role() {
-        assert_eq!(
-            role_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            role_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(role_example1(), json_example1())]
+    #[case(role_example2(), json_example2())]
+    fn test_role_json(#[case] role: Role, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&role).unwrap(), json);
+        assert_eq!(role, serde_json::from_value(json).unwrap());
     }
 
     #[rstest]

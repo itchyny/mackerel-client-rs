@@ -137,28 +137,12 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_user() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&user_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&user_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_user() {
-        assert_eq!(
-            user_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            user_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(user_example1(), json_example1())]
+    #[case(user_example2(), json_example2())]
+    fn test_user_json(#[case] user: User, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&user).unwrap(), json);
+        assert_eq!(user, serde_json::from_value(json).unwrap());
     }
 
     #[rstest]

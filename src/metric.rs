@@ -39,6 +39,7 @@ pub struct MetricValue {
 #[cfg(test)]
 mod tests {
     use crate::metric::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn host_metric_example1() -> HostMetricValue {
@@ -83,28 +84,17 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_metric_value() {
-        assert_eq!(
-            host_metric_json_example1(),
-            serde_json::to_value(&host_metric_example1()).unwrap()
-        );
-        assert_eq!(
-            service_metric_json_example1(),
-            serde_json::to_value(&service_metric_example1()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_metric_value() {
-        assert_eq!(
-            host_metric_example1(),
-            serde_json::from_value(host_metric_json_example1()).unwrap()
-        );
-        assert_eq!(
-            service_metric_example1(),
-            serde_json::from_value(service_metric_json_example1()).unwrap()
-        );
+    #[rstest]
+    #[case(host_metric_example1(), host_metric_json_example1())]
+    #[case(service_metric_example1(), service_metric_json_example1())]
+    fn test_metric_value<
+        MetricValue: PartialEq + std::fmt::Debug + serde::ser::Serialize + serde::de::DeserializeOwned,
+    >(
+        #[case] metric_value: MetricValue,
+        #[case] json: serde_json::Value,
+    ) {
+        assert_eq!(serde_json::to_value(&metric_value).unwrap(), json);
+        assert_eq!(metric_value, serde_json::from_value(json).unwrap());
     }
 }
 

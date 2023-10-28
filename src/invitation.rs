@@ -37,6 +37,7 @@ pub struct InvitationValue {
 #[cfg(test)]
 mod tests {
     use crate::invitation::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn invitation_example1() -> Invitation {
@@ -79,50 +80,12 @@ mod tests {
         })
     }
 
-    fn invitation_example3() -> InvitationValue {
-        InvitationValue::builder()
-            .email("example3@example.com")
-            .authority(UserAuthority::Viewer)
-            .build()
-    }
-
-    fn json_example3() -> serde_json::Value {
-        json!({
-            "email": "example3@example.com",
-            "authority": "viewer"
-        })
-    }
-
-    #[test]
-    fn serialize_invitation() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&invitation_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&invitation_example2()).unwrap()
-        );
-        assert_eq!(
-            json_example3(),
-            serde_json::to_value(&invitation_example3()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_invitation() {
-        assert_eq!(
-            invitation_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            invitation_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
-        assert_eq!(
-            invitation_example3(),
-            serde_json::from_value(json_example3()).unwrap()
-        );
+    #[rstest]
+    #[case(invitation_example1(), json_example1())]
+    #[case(invitation_example2(), json_example2())]
+    fn test_invitation_json(#[case] invitation: Invitation, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&invitation).unwrap(), json);
+        assert_eq!(invitation, serde_json::from_value(json).unwrap());
     }
 }
 

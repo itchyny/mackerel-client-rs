@@ -121,28 +121,12 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_alert() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&alert_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&alert_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_alert() {
-        assert_eq!(
-            alert_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            alert_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(alert_example1(), json_example1())]
+    #[case(alert_example2(), json_example2())]
+    fn test_alert_json(#[case] alert: Alert, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&alert).unwrap(), json);
+        assert_eq!(alert, serde_json::from_value(json).unwrap());
     }
 
     #[rstest]

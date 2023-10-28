@@ -77,6 +77,7 @@ pub struct NotificationGroupService {
 #[cfg(test)]
 mod tests {
     use crate::notification_group::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn notification_group_example1() -> NotificationGroup {
@@ -130,28 +131,15 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_notification_group() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&notification_group_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&notification_group_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_notification_group() {
-        assert_eq!(
-            notification_group_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            notification_group_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(notification_group_example1(), json_example1())]
+    #[case(notification_group_example2(), json_example2())]
+    fn test_notification_group(
+        #[case] notification_group: NotificationGroup,
+        #[case] json: serde_json::Value,
+    ) {
+        assert_eq!(serde_json::to_value(&notification_group).unwrap(), json);
+        assert_eq!(notification_group, serde_json::from_value(json).unwrap());
     }
 }
 

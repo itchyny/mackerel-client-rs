@@ -466,76 +466,44 @@ mod tests {
         })
     }
 
-    fn monitor_examples() -> Vec<(Monitor, serde_json::Value)> {
-        vec![
-            (host_monitor_example(), host_monitor_json_example()),
-            (
-                connectivity_monitor_example(),
-                connectivity_monitor_json_example(),
-            ),
-            (service_monitor_example(), service_monitor_json_example()),
-            (external_monitor_example(), external_monitor_json_example()),
-            (
-                expression_monitor_example(),
-                expression_monitor_json_example(),
-            ),
-            (
-                anomaly_detection_monitor_example(),
-                anomaly_detection_monitor_json_example(),
-            ),
-        ]
+    #[rstest]
+    #[case(host_monitor_example(), host_monitor_json_example())]
+    #[case(connectivity_monitor_example(), connectivity_monitor_json_example())]
+    #[case(service_monitor_example(), service_monitor_json_example())]
+    #[case(external_monitor_example(), external_monitor_json_example())]
+    #[case(expression_monitor_example(), expression_monitor_json_example())]
+    #[case(
+        anomaly_detection_monitor_example(),
+        anomaly_detection_monitor_json_example()
+    )]
+    fn test_monitor_json(#[case] monitor: Monitor, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&monitor).unwrap(), json);
+        assert_eq!(monitor, serde_json::from_value(json).unwrap());
     }
 
-    #[test]
-    fn monitor_name() {
-        assert_eq!(
-            host_monitor_example().name(),
-            "Example host monitor".to_string()
-        );
-        assert_eq!(
-            connectivity_monitor_example().name(),
-            "Example connectivity monitor".to_string()
-        );
-        assert_eq!(
-            service_monitor_example().name(),
-            "Example service monitor".to_string()
-        );
-        assert_eq!(
-            external_monitor_example().name(),
-            "Example external monitor".to_string()
-        );
-        assert_eq!(
-            expression_monitor_example().name(),
-            "Example expression monitor".to_string()
-        );
-        assert_eq!(
-            anomaly_detection_monitor_example().name(),
-            "Example anomaly detection monitor".to_string()
-        );
+    #[rstest]
+    #[case(host_monitor_example(), "Example host monitor")]
+    #[case(connectivity_monitor_example(), "Example connectivity monitor")]
+    #[case(service_monitor_example(), "Example service monitor")]
+    #[case(external_monitor_example(), "Example external monitor")]
+    #[case(expression_monitor_example(), "Example expression monitor")]
+    #[case(
+        anomaly_detection_monitor_example(),
+        "Example anomaly detection monitor"
+    )]
+    fn test_monitor_name(#[case] monitor: Monitor, #[case] name_str: &str) {
+        assert_eq!(monitor.name(), name_str);
     }
 
-    #[test]
-    fn monitor_memo() {
-        assert_eq!(&host_monitor_example().memo(), "Monitor memo");
-        assert_eq!(&connectivity_monitor_example().memo(), "Monitor memo");
-        assert_eq!(&service_monitor_example().memo(), "Monitor memo");
-        assert_eq!(&external_monitor_example().memo(), "Monitor memo");
-        assert_eq!(&expression_monitor_example().memo(), "Monitor memo");
-        assert_eq!(&anomaly_detection_monitor_example().memo(), "Monitor memo");
-    }
-
-    #[test]
-    fn serialize_monitor() {
-        for (monitor, json) in monitor_examples() {
-            assert_eq!(json, serde_json::to_value(monitor).unwrap());
-        }
-    }
-
-    #[test]
-    fn deserialize_monitor() {
-        for (monitor, json) in monitor_examples() {
-            assert_eq!(monitor, serde_json::from_value(json).unwrap());
-        }
+    #[rstest]
+    #[case(host_monitor_example())]
+    #[case(connectivity_monitor_example())]
+    #[case(service_monitor_example())]
+    #[case(external_monitor_example())]
+    #[case(expression_monitor_example())]
+    #[case(anomaly_detection_monitor_example())]
+    fn test_monitor_memo(#[case] monitor: Monitor) {
+        assert_eq!(monitor.memo(), "Monitor memo");
     }
 
     #[rstest]

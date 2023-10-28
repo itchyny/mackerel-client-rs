@@ -226,28 +226,12 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_host() {
-        assert_eq!(
-            serde_json::to_value(&host_example1()).unwrap(),
-            host_json_example1()
-        );
-        assert_eq!(
-            serde_json::to_value(&host_example2()).unwrap(),
-            host_json_example2()
-        );
-    }
-
-    #[test]
-    fn deserialize_host() {
-        assert_eq!(
-            host_example1(),
-            serde_json::from_value(host_json_example1()).unwrap()
-        );
-        assert_eq!(
-            host_example2(),
-            serde_json::from_value(host_json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(host_example1(), host_json_example1())]
+    #[case(host_example2(), host_json_example2())]
+    fn test_host_json(#[case] host: Host, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&host).unwrap(), json);
+        assert_eq!(host, serde_json::from_value(json).unwrap());
     }
 
     #[rstest]

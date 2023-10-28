@@ -28,6 +28,7 @@ pub type ServiceName = Name<Service>;
 #[cfg(test)]
 mod tests {
     use crate::service::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn service_example1() -> Service {
@@ -62,28 +63,12 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_service() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&service_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&service_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_service() {
-        assert_eq!(
-            service_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            service_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(service_example1(), json_example1())]
+    #[case(service_example2(), json_example2())]
+    fn test_service_json(#[case] service: Service, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&service).unwrap(), json);
+        assert_eq!(service, serde_json::from_value(json).unwrap());
     }
 }
 

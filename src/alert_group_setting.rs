@@ -40,6 +40,7 @@ pub struct AlertGroupSettingValue {
 #[cfg(test)]
 mod tests {
     use crate::alert_group_setting::*;
+    use rstest::rstest;
     use serde_json::json;
 
     fn alert_group_setting_example1() -> AlertGroupSetting {
@@ -88,28 +89,15 @@ mod tests {
         })
     }
 
-    #[test]
-    fn serialize_alert_group_setting() {
-        assert_eq!(
-            json_example1(),
-            serde_json::to_value(&alert_group_setting_example1()).unwrap()
-        );
-        assert_eq!(
-            json_example2(),
-            serde_json::to_value(&alert_group_setting_example2()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_alert_group_setting() {
-        assert_eq!(
-            alert_group_setting_example1(),
-            serde_json::from_value(json_example1()).unwrap()
-        );
-        assert_eq!(
-            alert_group_setting_example2(),
-            serde_json::from_value(json_example2()).unwrap()
-        );
+    #[rstest]
+    #[case(alert_group_setting_example1(), json_example1())]
+    #[case(alert_group_setting_example2(), json_example2())]
+    fn test_alert_group_setting(
+        #[case] alert_group_setting: AlertGroupSetting,
+        #[case] json: serde_json::Value,
+    ) {
+        assert_eq!(serde_json::to_value(&alert_group_setting).unwrap(), json);
+        assert_eq!(alert_group_setting, serde_json::from_value(json).unwrap());
     }
 }
 

@@ -346,160 +346,48 @@ mod tests {
         })
     }
 
-    #[test]
-    fn channel_name() {
-        assert_eq!(
-            email_channel_example().name(),
-            "Example Email Channel".to_string(),
-        );
-        assert_eq!(
-            slack_channel_example().name(),
-            "Example Slack Channel".to_string(),
-        );
-        assert_eq!(
-            line_channel_example().name(),
-            "Example Line Channel".to_string(),
-        );
-        assert_eq!(
-            chatwork_channel_example().name(),
-            "Example Chatwork Channel".to_string(),
-        );
-        assert_eq!(
-            typetalk_channel_example().name(),
-            "Example Typetalk Channel".to_string(),
-        );
-        assert_eq!(
-            twilio_channel_example().name(),
-            "Example Twilio Channel".to_string(),
-        );
-        assert_eq!(
-            pagerduty_channel_example().name(),
-            "Example Pagerduty Channel".to_string(),
-        );
-        assert_eq!(
-            opsgenie_channel_example().name(),
-            "Example Opsgenie Channel".to_string(),
-        );
-        assert_eq!(
-            yammer_channel_example().name(),
-            "Example Yammer Channel".to_string(),
-        );
-        assert_eq!(
-            microsoft_teams_channel_example().name(),
-            "Example MicrosoftTeams Channel".to_string(),
-        );
-        assert_eq!(
-            webhook_channel_example().name(),
-            "Example Webhook Channel".to_string(),
-        );
-        assert_eq!(
-            amazon_event_bridge_channel_example().name(),
-            "Example AmazonEventBridge Channel".to_string(),
-        );
+    #[rstest]
+    #[case(email_channel_example(), email_channel_json_example())]
+    #[case(slack_channel_example(), slack_channel_json_example())]
+    #[case(line_channel_example(), line_channel_json_example())]
+    #[case(chatwork_channel_example(), chatwork_channel_json_example())]
+    #[case(typetalk_channel_example(), typetalk_channel_json_example())]
+    #[case(twilio_channel_example(), twilio_channel_json_example())]
+    #[case(pagerduty_channel_example(), pagerduty_channel_json_example())]
+    #[case(opsgenie_channel_example(), opsgenie_channel_json_example())]
+    #[case(yammer_channel_example(), yammer_channel_json_example())]
+    #[case(
+        microsoft_teams_channel_example(),
+        microsoft_teams_channel_json_example()
+    )]
+    #[case(webhook_channel_example(), webhook_channel_json_example())]
+    #[case(
+        amazon_event_bridge_channel_example(),
+        amazon_event_bridge_json_example()
+    )]
+    fn test_channel_json(#[case] channel: Channel, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&channel).unwrap(), json);
+        assert_eq!(channel, serde_json::from_value(json).unwrap());
     }
 
-    #[test]
-    fn serialize_channel() {
-        assert_eq!(
-            email_channel_json_example(),
-            serde_json::to_value(&email_channel_example()).unwrap()
-        );
-        assert_eq!(
-            slack_channel_json_example(),
-            serde_json::to_value(&slack_channel_example()).unwrap()
-        );
-        assert_eq!(
-            line_channel_json_example(),
-            serde_json::to_value(&line_channel_example()).unwrap()
-        );
-        assert_eq!(
-            chatwork_channel_json_example(),
-            serde_json::to_value(&chatwork_channel_example()).unwrap()
-        );
-        assert_eq!(
-            typetalk_channel_json_example(),
-            serde_json::to_value(&typetalk_channel_example()).unwrap()
-        );
-        assert_eq!(
-            twilio_channel_json_example(),
-            serde_json::to_value(&twilio_channel_example()).unwrap()
-        );
-        assert_eq!(
-            pagerduty_channel_json_example(),
-            serde_json::to_value(&pagerduty_channel_example()).unwrap()
-        );
-        assert_eq!(
-            opsgenie_channel_json_example(),
-            serde_json::to_value(&opsgenie_channel_example()).unwrap()
-        );
-        assert_eq!(
-            yammer_channel_json_example(),
-            serde_json::to_value(&yammer_channel_example()).unwrap()
-        );
-        assert_eq!(
-            microsoft_teams_channel_json_example(),
-            serde_json::to_value(&microsoft_teams_channel_example()).unwrap()
-        );
-        assert_eq!(
-            webhook_channel_json_example(),
-            serde_json::to_value(&webhook_channel_example()).unwrap()
-        );
-        assert_eq!(
-            amazon_event_bridge_json_example(),
-            serde_json::to_value(&amazon_event_bridge_channel_example()).unwrap()
-        );
-    }
-
-    #[test]
-    fn deserialize_channel() {
-        assert_eq!(
-            email_channel_example(),
-            serde_json::from_value(email_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            slack_channel_example(),
-            serde_json::from_value(slack_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            line_channel_example(),
-            serde_json::from_value(line_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            chatwork_channel_example(),
-            serde_json::from_value(chatwork_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            typetalk_channel_example(),
-            serde_json::from_value(typetalk_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            twilio_channel_example(),
-            serde_json::from_value(twilio_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            pagerduty_channel_example(),
-            serde_json::from_value(pagerduty_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            opsgenie_channel_example(),
-            serde_json::from_value(opsgenie_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            yammer_channel_example(),
-            serde_json::from_value(yammer_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            microsoft_teams_channel_example(),
-            serde_json::from_value(microsoft_teams_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            webhook_channel_example(),
-            serde_json::from_value(webhook_channel_json_example()).unwrap()
-        );
-        assert_eq!(
-            amazon_event_bridge_channel_example(),
-            serde_json::from_value(amazon_event_bridge_json_example()).unwrap()
-        );
+    #[rstest]
+    #[case(email_channel_example(), "Example Email Channel")]
+    #[case(slack_channel_example(), "Example Slack Channel")]
+    #[case(line_channel_example(), "Example Line Channel")]
+    #[case(chatwork_channel_example(), "Example Chatwork Channel")]
+    #[case(typetalk_channel_example(), "Example Typetalk Channel")]
+    #[case(twilio_channel_example(), "Example Twilio Channel")]
+    #[case(pagerduty_channel_example(), "Example Pagerduty Channel")]
+    #[case(opsgenie_channel_example(), "Example Opsgenie Channel")]
+    #[case(yammer_channel_example(), "Example Yammer Channel")]
+    #[case(microsoft_teams_channel_example(), "Example MicrosoftTeams Channel")]
+    #[case(webhook_channel_example(), "Example Webhook Channel")]
+    #[case(
+        amazon_event_bridge_channel_example(),
+        "Example AmazonEventBridge Channel"
+    )]
+    fn test_channel_name(#[case] channel: Channel, #[case] name_str: &str) {
+        assert_eq!(channel.name(), name_str);
     }
 
     #[rstest]
