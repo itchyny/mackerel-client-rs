@@ -118,24 +118,24 @@ impl MonitorValue {
     /// Returns the name of the monitor.
     pub fn name(&self) -> String {
         match *self {
-            MonitorValue::Host { ref name, .. } => name.clone(),
-            MonitorValue::Connectivity { ref name, .. } => name.clone(),
-            MonitorValue::Service { ref name, .. } => name.clone(),
-            MonitorValue::External { ref name, .. } => name.clone(),
-            MonitorValue::Expression { ref name, .. } => name.clone(),
-            MonitorValue::AnomalyDetection { ref name, .. } => name.clone(),
+            Self::Host { ref name, .. } => name.clone(),
+            Self::Connectivity { ref name, .. } => name.clone(),
+            Self::Service { ref name, .. } => name.clone(),
+            Self::External { ref name, .. } => name.clone(),
+            Self::Expression { ref name, .. } => name.clone(),
+            Self::AnomalyDetection { ref name, .. } => name.clone(),
         }
     }
 
     /// Returns the memo of the monitor.
     pub fn memo(&self) -> String {
         match *self {
-            MonitorValue::Host { ref memo, .. } => memo.clone(),
-            MonitorValue::Connectivity { ref memo, .. } => memo.clone(),
-            MonitorValue::Service { ref memo, .. } => memo.clone(),
-            MonitorValue::External { ref memo, .. } => memo.clone(),
-            MonitorValue::Expression { ref memo, .. } => memo.clone(),
-            MonitorValue::AnomalyDetection { ref memo, .. } => memo.clone(),
+            Self::Host { ref memo, .. } => memo.clone(),
+            Self::Connectivity { ref memo, .. } => memo.clone(),
+            Self::Service { ref memo, .. } => memo.clone(),
+            Self::External { ref memo, .. } => memo.clone(),
+            Self::Expression { ref memo, .. } => memo.clone(),
+            Self::AnomalyDetection { ref memo, .. } => memo.clone(),
         }
     }
 }

@@ -78,18 +78,18 @@ impl ChannelValue {
     /// Returns the name of the channel.
     pub fn name(&self) -> String {
         match *self {
-            ChannelValue::Email { ref name, .. } => name.clone(),
-            ChannelValue::Slack { ref name, .. } => name.clone(),
-            ChannelValue::Line { ref name, .. } => name.clone(),
-            ChannelValue::Chatwork { ref name, .. } => name.clone(),
-            ChannelValue::Typetalk { ref name, .. } => name.clone(),
-            ChannelValue::Twilio { ref name, .. } => name.clone(),
-            ChannelValue::Pagerduty { ref name, .. } => name.clone(),
-            ChannelValue::Opsgenie { ref name, .. } => name.clone(),
-            ChannelValue::Yammer { ref name, .. } => name.clone(),
-            ChannelValue::MicrosoftTeams { ref name, .. } => name.clone(),
-            ChannelValue::Webhook { ref name, .. } => name.clone(),
-            ChannelValue::AmazonEventBridge { ref name, .. } => name.clone(),
+            Self::Email { ref name, .. } => name.clone(),
+            Self::Slack { ref name, .. } => name.clone(),
+            Self::Line { ref name, .. } => name.clone(),
+            Self::Chatwork { ref name, .. } => name.clone(),
+            Self::Typetalk { ref name, .. } => name.clone(),
+            Self::Twilio { ref name, .. } => name.clone(),
+            Self::Pagerduty { ref name, .. } => name.clone(),
+            Self::Opsgenie { ref name, .. } => name.clone(),
+            Self::Yammer { ref name, .. } => name.clone(),
+            Self::MicrosoftTeams { ref name, .. } => name.clone(),
+            Self::Webhook { ref name, .. } => name.clone(),
+            Self::AmazonEventBridge { ref name, .. } => name.clone(),
         }
     }
 }
