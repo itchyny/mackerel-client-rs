@@ -85,9 +85,9 @@ impl From<String> for RoleFullname {
     }
 }
 
-impl Into<String> for RoleFullname {
-    fn into(self: Self) -> String {
-        self.to_string()
+impl From<RoleFullname> for String {
+    fn from(val: RoleFullname) -> Self {
+        val.to_string()
     }
 }
 

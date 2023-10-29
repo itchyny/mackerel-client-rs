@@ -69,9 +69,9 @@ impl<T> From<String> for Id<T> {
     }
 }
 
-impl<T> Into<String> for Id<T> {
-    fn into(self: Self) -> String {
-        self.0.to_string()
+impl<T> From<Id<T>> for String {
+    fn from(val: Id<T>) -> Self {
+        val.0.to_string()
     }
 }
 

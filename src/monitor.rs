@@ -214,9 +214,9 @@ impl std::fmt::Display for MonitorScope {
     }
 }
 
-impl Into<String> for MonitorScope {
-    fn into(self: Self) -> String {
-        self.to_string()
+impl From<MonitorScope> for String {
+    fn from(val: MonitorScope) -> Self {
+        val.to_string()
     }
 }
 
