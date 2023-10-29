@@ -75,7 +75,7 @@ impl Client {
         let url = self.build_url(path.as_ref(), queries);
         let body_bytes = body_opt
             .map(|b| serde_json::to_vec(&b).unwrap())
-            .unwrap_or(vec![]);
+            .unwrap_or_default();
         let response = {
             let request = client
                 .request(method, url.clone())
