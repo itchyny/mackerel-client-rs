@@ -381,7 +381,7 @@ impl client::Client {
     ) -> Result<()> {
         self.request(
             Method::POST,
-            format!("/api/v0/hosts/bulk-update-statuses"),
+            "/api/v0/hosts/bulk-update-statuses",
             vec![],
             Some(UpdateHostStatusesRequest {
                 ids: host_ids,
@@ -430,7 +430,7 @@ impl client::Client {
     pub async fn retire_hosts(&self, host_ids: Vec<HostId>) -> Result<()> {
         self.request(
             Method::POST,
-            format!("/api/v0/hosts/bulk-retire"),
+            "/api/v0/hosts/bulk-retire",
             vec![],
             Some(HashMap::from([("ids", host_ids)])),
             |_: serde_json::Value| (),
