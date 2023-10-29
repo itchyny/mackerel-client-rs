@@ -1,11 +1,12 @@
-use crate::client;
-use crate::error::*;
-use crate::host::HostId;
-use crate::role::RoleName;
-use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json;
+
+use crate::client;
+use crate::error::Result;
+use crate::host::HostId;
+use crate::role::RoleName;
+use crate::service::ServiceName;
 
 /// A metadata
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]

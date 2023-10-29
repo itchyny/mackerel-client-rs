@@ -1,14 +1,15 @@
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::host::HostId;
-use crate::role::RoleFullname;
-use crate::service::ServiceName;
 use chrono::{DateTime, Duration, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DurationSeconds};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::host::HostId;
+use crate::role::RoleFullname;
+use crate::service::ServiceName;
 
 /// A dashboard
 pub type Dashboard = Entity<DashboardValue>;
@@ -133,7 +134,7 @@ pub struct DashboardLayout {
 
 #[cfg(test)]
 mod tests {
-    use crate::dashboard::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

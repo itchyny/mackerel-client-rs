@@ -1,12 +1,13 @@
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::role::RoleName;
-use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::role::RoleName;
+use crate::service::ServiceName;
 
 /// A graph annotation
 pub type GraphAnnotation = Entity<GraphAnnotationValue>;
@@ -34,7 +35,7 @@ pub struct GraphAnnotationValue {
 
 #[cfg(test)]
 mod tests {
-    use crate::graph_annotation::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

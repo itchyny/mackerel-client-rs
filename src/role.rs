@@ -1,11 +1,12 @@
-use crate::client;
-use crate::error::*;
-use crate::name::Name;
-use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::error::Result;
+use crate::name::Name;
+use crate::service::ServiceName;
 
 /// A role
 #[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -105,7 +106,7 @@ impl std::fmt::Debug for RoleFullname {
 
 #[cfg(test)]
 mod tests {
-    use crate::role::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

@@ -1,8 +1,9 @@
-use crate::client;
-use crate::error::*;
-use crate::name::Name;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+
+use crate::client;
+use crate::error::Result;
+use crate::name::Name;
 
 /// An organization
 #[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
@@ -20,7 +21,7 @@ pub type OrganizationName = Name<Organization>;
 
 #[cfg(test)]
 mod tests {
-    use crate::organization::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

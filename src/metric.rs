@@ -1,11 +1,12 @@
-use crate::client;
-use crate::error::*;
-use crate::host::HostId;
-use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::error::Result;
+use crate::host::HostId;
+use crate::service::ServiceName;
 
 /// A host metric value
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -38,7 +39,7 @@ pub struct MetricValue {
 
 #[cfg(test)]
 mod tests {
-    use crate::metric::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

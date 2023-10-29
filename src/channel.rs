@@ -1,12 +1,13 @@
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::user::UserId;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
 use strum::{Display, EnumString};
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::user::UserId;
 
 /// A channel
 pub type Channel = Entity<ChannelValue>;
@@ -110,7 +111,7 @@ pub enum NotificationEvent {
 
 #[cfg(test)]
 mod tests {
-    use crate::channel::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

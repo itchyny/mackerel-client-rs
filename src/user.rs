@@ -1,12 +1,13 @@
-use crate::client;
-use crate::entity::Id;
-use crate::error::*;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::Id;
+use crate::error::Result;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -77,7 +78,7 @@ pub enum UserAuthority {
 
 #[cfg(test)]
 mod tests {
-    use crate::user::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

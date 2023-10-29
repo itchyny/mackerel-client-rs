@@ -1,14 +1,15 @@
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::role::RoleFullname;
-use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::role::RoleFullname;
+use crate::service::ServiceName;
 
 /// A monitor
 pub type Monitor = Entity<MonitorValue>;
@@ -253,7 +254,7 @@ pub enum AnomalyDetectionSensitivity {
 
 #[cfg(test)]
 mod tests {
-    use crate::monitor::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

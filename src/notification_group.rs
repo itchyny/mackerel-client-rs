@@ -1,14 +1,15 @@
 use crate::channel::ChannelId;
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::monitor::MonitorId;
-use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::monitor::MonitorId;
+use crate::service::ServiceName;
 
 /// A notification group entity
 pub type NotificationGroup = Entity<NotificationGroupValue>;
@@ -76,7 +77,7 @@ pub struct NotificationGroupService {
 
 #[cfg(test)]
 mod tests {
-    use crate::notification_group::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

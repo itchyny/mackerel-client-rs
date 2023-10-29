@@ -1,10 +1,11 @@
 //! Mackerel API client
-use crate::error::*;
 use reqwest;
 use serde;
 use serde_json;
 use typed_builder::TypedBuilder;
 use url;
+
+use crate::error::{Error, Result};
 
 /// Represents an API client for Mackerel.
 #[derive(Debug, TypedBuilder)]

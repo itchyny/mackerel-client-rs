@@ -1,15 +1,16 @@
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::monitor::MonitorId;
-use crate::role::RoleFullname;
-use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::monitor::MonitorId;
+use crate::role::RoleFullname;
+use crate::service::ServiceName;
 
 /// A downtime
 pub type Downtime = Entity<DowntimeValue>;
@@ -98,7 +99,7 @@ pub enum DowntimeRecurrenceWeekday {
 
 #[cfg(test)]
 mod tests {
-    use crate::downtime::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

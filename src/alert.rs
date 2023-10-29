@@ -1,8 +1,3 @@
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::host::HostId;
-use crate::monitor::{MonitorId, MonitorType};
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -10,6 +5,12 @@ use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::host::HostId;
+use crate::monitor::{MonitorId, MonitorType};
 
 /// An alert
 pub type Alert = Entity<AlertValue>;
@@ -57,7 +58,7 @@ pub enum AlertStatus {
 
 #[cfg(test)]
 mod tests {
-    use crate::alert::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

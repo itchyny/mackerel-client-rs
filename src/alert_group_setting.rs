@@ -1,12 +1,13 @@
-use crate::client;
-use crate::entity::{Entity, Id};
-use crate::error::*;
-use crate::monitor::MonitorId;
-use crate::role::RoleFullname;
-use crate::service::ServiceName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::entity::{Entity, Id};
+use crate::error::Result;
+use crate::monitor::MonitorId;
+use crate::role::RoleFullname;
+use crate::service::ServiceName;
 
 /// An alert group setting
 pub type AlertGroupSetting = Entity<AlertGroupSettingValue>;
@@ -39,7 +40,7 @@ pub struct AlertGroupSettingValue {
 
 #[cfg(test)]
 mod tests {
-    use crate::alert_group_setting::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

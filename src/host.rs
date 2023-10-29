@@ -1,8 +1,3 @@
-use crate::client;
-use crate::entity::Id;
-use crate::error::*;
-use crate::role::{RoleFullname, RoleName};
-use crate::service::ServiceName;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
@@ -13,6 +8,12 @@ use std::net::{Ipv4Addr, Ipv6Addr};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 use url::form_urlencoded;
+
+use crate::client;
+use crate::entity::Id;
+use crate::error::Result;
+use crate::role::{RoleFullname, RoleName};
+use crate::service::ServiceName;
 
 /// A host
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -133,7 +134,7 @@ pub struct HostCheck {
 
 #[cfg(test)]
 mod tests {
-    use crate::host::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

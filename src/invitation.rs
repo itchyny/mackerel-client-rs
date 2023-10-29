@@ -1,11 +1,12 @@
-use crate::client;
-use crate::error::*;
-use crate::user::UserAuthority;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use std::collections::HashMap;
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::error::Result;
+use crate::user::UserAuthority;
 
 /// An invitation
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -36,7 +37,7 @@ pub struct InvitationValue {
 
 #[cfg(test)]
 mod tests {
-    use crate::invitation::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 

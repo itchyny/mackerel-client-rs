@@ -1,10 +1,11 @@
-use crate::client;
-use crate::error::*;
-use crate::name::Name;
-use crate::role::RoleName;
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
+
+use crate::client;
+use crate::error::Result;
+use crate::name::Name;
+use crate::role::RoleName;
 
 /// A service
 #[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -27,7 +28,7 @@ pub type ServiceName = Name<Service>;
 
 #[cfg(test)]
 mod tests {
-    use crate::service::*;
+    use super::*;
     use rstest::rstest;
     use serde_json::json;
 
