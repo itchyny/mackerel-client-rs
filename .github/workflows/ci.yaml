@@ -17,7 +17,5 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    - name: Install Rust nightly toolchain
-      uses: dtolnay/rust-toolchain@nightly
     - name: Test
       run: cargo test
