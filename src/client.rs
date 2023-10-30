@@ -7,7 +7,7 @@ use url;
 
 use crate::error::{Error, Result};
 
-/// Represents an API client for Mackerel.
+/// An API client for Mackerel.
 #[derive(Debug, TypedBuilder)]
 #[builder(field_defaults(setter(into)))]
 pub struct Client {
@@ -18,8 +18,8 @@ pub struct Client {
     user_agent: String,
 }
 
-/// Empty body to avoid type ambiguity.
-pub fn empty_body() -> Option<()> {
+// Empty body to avoid type ambiguity.
+pub(crate) fn empty_body() -> Option<()> {
     None
 }
 
