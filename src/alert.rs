@@ -156,9 +156,9 @@ impl client::Client {
     /// See <https://mackerel.io/api-docs/entry/alerts#get>.
     pub async fn list_open_alerts(
         &self,
-        cursor_opt: Option<String>,
+        cursor_opt: Option<AlertId>,
         limit: usize,
-    ) -> Result<(Vec<Alert>, Option<String>)> {
+    ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.list_alerts("false", cursor_opt, limit).await
     }
 
@@ -167,18 +167,18 @@ impl client::Client {
     /// See <https://mackerel.io/api-docs/entry/alerts#get>.
     pub async fn list_closed_alerts(
         &self,
-        cursor_opt: Option<String>,
+        cursor_opt: Option<AlertId>,
         limit: usize,
-    ) -> Result<(Vec<Alert>, Option<String>)> {
+    ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.list_alerts("true", cursor_opt, limit).await
     }
 
     async fn list_alerts(
         &self,
         with_closed: &str,
-        cursor_opt: Option<String>,
+        cursor_opt: Option<AlertId>,
         limit: usize,
-    ) -> Result<(Vec<Alert>, Option<String>)> {
+    ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.request(
             Method::GET,
             "/api/v0/alerts",
@@ -188,7 +188,7 @@ impl client::Client {
                 ("limit", vec![limit.to_string().as_str()]),
             ],
             client::empty_body(),
-            response! { alerts: Vec<Alert>, nextId: Option<String> },
+            response! { alerts: Vec<Alert>, nextId: Option<AlertId> },
         )
         .await
     }

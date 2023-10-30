@@ -57,6 +57,14 @@ impl<T> std::str::FromStr for Id<T> {
     }
 }
 
+impl<T> std::ops::Deref for Id<T> {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 impl<T> From<&str> for Id<T> {
     fn from(s: &str) -> Self {
         s.parse().unwrap()
