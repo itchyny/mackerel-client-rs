@@ -1,12 +1,14 @@
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
+use typed_builder::TypedBuilder;
 
 use crate::client;
 use crate::error::Result;
 use crate::name::Name;
 
 /// An organization
-#[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
 pub struct Organization {
     pub name: OrganizationName,
 }
@@ -26,9 +28,7 @@ mod tests {
     use serde_json::json;
 
     fn organization_example() -> Organization {
-        Organization {
-            name: "ExampleOrganization".into(),
-        }
+        Organization::builder().name("ExampleOrganization").build()
     }
 
     fn json_example() -> serde_json::Value {
@@ -55,7 +55,7 @@ impl client::Client {
             "/api/v0/org",
             vec![],
             client::empty_body(),
-            |org| org,
+            |organization| organization,
         )
         .await
     }
