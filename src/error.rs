@@ -1,5 +1,5 @@
 /// Error type
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 pub enum Error {
     ApiError(reqwest::StatusCode, String),
     MsgError(String),
