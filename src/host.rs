@@ -12,6 +12,7 @@ use url::form_urlencoded;
 use crate::client;
 use crate::entity::Id;
 use crate::error::Result;
+use crate::response;
 use crate::role::{RoleFullname, RoleName};
 use crate::service::ServiceName;
 
@@ -264,35 +265,10 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct CreateHostResponse {
-    id: HostId,
-}
-
-#[derive(Deserialize)]
-struct GetHostResponse {
-    host: Host,
-}
-
-#[derive(Deserialize)]
-struct GetHostByCustomIdentifierResponse {
-    host: Option<Host>,
-}
-
-#[derive(Deserialize)]
-struct ListHostsResponse {
-    hosts: Vec<Host>,
-}
-
 #[derive(Serialize)]
 struct UpdateHostStatusesRequest {
     ids: Vec<HostId>,
     status: HostStatus,
-}
-
-#[derive(Deserialize)]
-struct ListMetricNamesResponse {
-    names: Vec<String>,
 }
 
 impl client::Client {
@@ -305,7 +281,7 @@ impl client::Client {
             "/api/v0/hosts",
             vec![],
             Some(host_value),
-            |res: CreateHostResponse| res.id,
+            response! { id: HostId },
         )
         .await
     }
@@ -319,7 +295,7 @@ impl client::Client {
             format!("/api/v0/hosts/{}", host_id),
             vec![],
             client::empty_body(),
-            |res: GetHostResponse| res.host,
+            response! { host: Host },
         )
         .await
     }
@@ -339,7 +315,7 @@ impl client::Client {
             ),
             vec![],
             client::empty_body(),
-            |res: GetHostByCustomIdentifierResponse| res.host,
+            response! { host: Option<Host> },
         )
         .await
     }
@@ -448,7 +424,7 @@ impl client::Client {
             "/api/v0/hosts",
             vec![],
             client::empty_body(),
-            |res: ListHostsResponse| res.hosts,
+            response! { hosts: Vec<Host> },
         )
         .await
     }
@@ -462,7 +438,7 @@ impl client::Client {
             format!("/api/v0/hosts/{}/metric-names", host_id),
             vec![],
             client::empty_body(),
-            |res: ListMetricNamesResponse| res.names,
+            response! { names: Vec<String> },
         )
         .await
     }

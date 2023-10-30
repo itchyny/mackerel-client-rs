@@ -5,6 +5,7 @@ use serde_json;
 use crate::client;
 use crate::error::Result;
 use crate::host::HostId;
+use crate::response;
 use crate::role::RoleName;
 use crate::service::ServiceName;
 
@@ -13,11 +14,6 @@ use crate::service::ServiceName;
 #[serde(rename_all = "camelCase")]
 pub struct Metadata {
     pub namespace: String,
-}
-
-#[derive(Deserialize)]
-struct ListMetadataResponse {
-    metadata: Vec<Metadata>,
 }
 
 impl client::Client {
@@ -81,7 +77,7 @@ impl client::Client {
             format!("/api/v0/hosts/{}/metadata", host_id),
             vec![],
             client::empty_body(),
-            |res: ListMetadataResponse| res.metadata,
+            response! { metadata: Vec<Metadata> },
         )
         .await
     }
@@ -150,7 +146,7 @@ impl client::Client {
             format!("/api/v0/services/{}/metadata", service_name),
             vec![],
             client::empty_body(),
-            |res: ListMetadataResponse| res.metadata,
+            response! { metadata: Vec<Metadata> },
         )
         .await
     }
@@ -238,7 +234,7 @@ impl client::Client {
             ),
             vec![],
             client::empty_body(),
-            |res: ListMetadataResponse| res.metadata,
+            response! { metadata: Vec<Metadata> },
         )
         .await
     }

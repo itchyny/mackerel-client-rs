@@ -8,6 +8,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::host::HostId;
+use crate::response;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -322,11 +323,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListDashboardsResponse {
-    dashboards: Vec<Dashboard>,
-}
-
 impl client::Client {
     /// Fetches all the dashboards.
     ///
@@ -337,7 +333,7 @@ impl client::Client {
             "/api/v0/dashboards",
             vec![],
             client::empty_body(),
-            |res: ListDashboardsResponse| res.dashboards,
+            response! { dashboards: Vec<Dashboard> },
         )
         .await
     }

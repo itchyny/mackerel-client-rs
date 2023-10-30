@@ -46,3 +46,14 @@ pub mod role;
 pub mod service;
 pub mod user;
 pub use crate::client::Client;
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! response {
+    { $( $field:ident: $type:ty ),+ $(,)? } => {{
+        #[allow(non_snake_case)]
+        #[derive(::serde_derive::Deserialize)]
+        struct Response { $( $field: $type ),* }
+        |response: Response| ($( response.$field ),*)
+    }};
+}

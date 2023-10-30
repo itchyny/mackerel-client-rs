@@ -6,6 +6,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::monitor::MonitorId;
+use crate::response;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -102,12 +103,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ListAlertGroupSettingsResponse {
-    alert_group_settings: Vec<AlertGroupSetting>,
-}
-
 impl client::Client {
     /// Fetches all the alert group settings.
     ///
@@ -118,7 +113,7 @@ impl client::Client {
             "/api/v0/alert-group-settings",
             vec![],
             client::empty_body(),
-            |res: ListAlertGroupSettingsResponse| res.alert_group_settings,
+            response! { alertGroupSettings: Vec<AlertGroupSetting> },
         )
         .await
     }

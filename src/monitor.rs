@@ -8,6 +8,7 @@ use typed_builder::TypedBuilder;
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
+use crate::response;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -623,11 +624,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListMonitorsResponse {
-    monitors: Vec<Monitor>,
-}
-
 impl client::Client {
     /// Fetches all the monitors.
     ///
@@ -638,7 +634,7 @@ impl client::Client {
             "/api/v0/monitors",
             vec![],
             client::empty_body(),
-            |res: ListMonitorsResponse| res.monitors,
+            response! { monitors: Vec<Monitor> },
         )
         .await
     }

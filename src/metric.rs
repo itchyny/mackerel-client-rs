@@ -6,6 +6,7 @@ use typed_builder::TypedBuilder;
 use crate::client;
 use crate::error::Result;
 use crate::host::HostId;
+use crate::response;
 use crate::service::ServiceName;
 
 /// A host metric value
@@ -99,11 +100,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListMetricValuesResponse {
-    metrics: Vec<MetricValue>,
-}
-
 impl client::Client {
     /// Posts host metric values.
     ///
@@ -141,7 +137,7 @@ impl client::Client {
                 ("to", vec![&to.timestamp().to_string()]),
             ],
             client::empty_body(),
-            |res: ListMetricValuesResponse| res.metrics,
+            response! { metrics: Vec<MetricValue> },
         )
         .await
     }
@@ -183,7 +179,7 @@ impl client::Client {
                 ("to", vec![&to.timestamp().to_string()]),
             ],
             client::empty_body(),
-            |res: ListMetricValuesResponse| res.metrics,
+            response! { metrics: Vec<MetricValue> },
         )
         .await
     }

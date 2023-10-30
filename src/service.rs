@@ -5,6 +5,7 @@ use typed_builder::TypedBuilder;
 use crate::client;
 use crate::error::Result;
 use crate::name::Name;
+use crate::response;
 use crate::role::RoleName;
 
 /// A service
@@ -73,16 +74,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListServiceResponse {
-    services: Vec<Service>,
-}
-
-#[derive(Deserialize)]
-struct ListMetricNamesResponse {
-    names: Vec<String>,
-}
-
 impl client::Client {
     /// Fetches all the services.
     ///
@@ -93,7 +84,7 @@ impl client::Client {
             "/api/v0/services",
             vec![],
             client::empty_body(),
-            |res: ListServiceResponse| res.services,
+            response! { services: Vec<Service> },
         )
         .await
     }
@@ -138,7 +129,7 @@ impl client::Client {
             format!("/api/v0/services/{}/metric-names", service_name),
             vec![],
             client::empty_body(),
-            |res: ListMetricNamesResponse| res.names,
+            response! { names: Vec<String> },
         )
         .await
     }

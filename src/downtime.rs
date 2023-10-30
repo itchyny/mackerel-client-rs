@@ -9,6 +9,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::monitor::MonitorId;
+use crate::response;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -246,11 +247,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListDowntimesResponse {
-    downtimes: Vec<Downtime>,
-}
-
 impl client::Client {
     /// Fetches all the downtimes.
     ///
@@ -261,7 +257,7 @@ impl client::Client {
             "/api/v0/downtimes",
             vec![],
             client::empty_body(),
-            |res: ListDowntimesResponse| res.downtimes,
+            response! { downtimes: Vec<Downtime> },
         )
         .await
     }

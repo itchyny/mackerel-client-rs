@@ -6,6 +6,7 @@ use typed_builder::TypedBuilder;
 use crate::client;
 use crate::error::Result;
 use crate::name::Name;
+use crate::response;
 use crate::service::ServiceName;
 
 /// A role
@@ -180,11 +181,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListRolesResponse {
-    roles: Vec<Role>,
-}
-
 impl client::Client {
     /// Fetches the roles in the specified service.
     ///
@@ -195,7 +191,7 @@ impl client::Client {
             format!("/api/v0/services/{}/roles", service_name),
             vec![],
             client::empty_body(),
-            |res: ListRolesResponse| res.roles,
+            response! { roles: Vec<Role> },
         )
         .await
     }

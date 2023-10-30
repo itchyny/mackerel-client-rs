@@ -11,6 +11,7 @@ use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::host::HostId;
 use crate::monitor::{MonitorId, MonitorType};
+use crate::response;
 
 /// An alert
 pub type Alert = Entity<AlertValue>;
@@ -149,13 +150,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ListAlertsResponse {
-    alerts: Vec<Alert>,
-    next_id: Option<String>,
-}
-
 impl client::Client {
     /// Fetches open alerts.
     ///
@@ -194,7 +188,7 @@ impl client::Client {
                 ("limit", vec![limit.to_string().as_str()]),
             ],
             client::empty_body(),
-            |res: ListAlertsResponse| (res.alerts, res.next_id),
+            response! { alerts: Vec<Alert>, nextId: Option<String> },
         )
         .await
     }

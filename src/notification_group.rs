@@ -9,6 +9,7 @@ use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::monitor::MonitorId;
+use crate::response;
 use crate::service::ServiceName;
 
 /// A notification group entity
@@ -144,12 +145,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ListNotificationGroupsResponse {
-    notification_groups: Vec<NotificationGroup>,
-}
-
 impl client::Client {
     /// Fetches all the notification groups.
     ///
@@ -160,7 +155,7 @@ impl client::Client {
             "/api/v0/notification-groups",
             vec![],
             client::empty_body(),
-            |res: ListNotificationGroupsResponse| res.notification_groups,
+            response! { notificationGroups: Vec<NotificationGroup> },
         )
         .await
     }

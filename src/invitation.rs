@@ -6,6 +6,7 @@ use typed_builder::TypedBuilder;
 
 use crate::client;
 use crate::error::Result;
+use crate::response;
 use crate::user::UserAuthority;
 
 /// An invitation
@@ -90,11 +91,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListInvitationsResponse {
-    invitations: Vec<Invitation>,
-}
-
 impl client::Client {
     /// Fetches all the invitations.
     ///
@@ -105,7 +101,7 @@ impl client::Client {
             "/api/v0/invitations",
             vec![],
             client::empty_body(),
-            |res: ListInvitationsResponse| res.invitations,
+            response! { invitations: Vec<Invitation> },
         )
         .await
     }

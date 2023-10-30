@@ -7,6 +7,7 @@ use strum::{Display, EnumString};
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
+use crate::response;
 use crate::user::UserId;
 
 /// A channel
@@ -415,11 +416,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListChannelResponse {
-    channels: Vec<Channel>,
-}
-
 impl client::Client {
     /// Fetches all the channels.
     ///
@@ -430,7 +426,7 @@ impl client::Client {
             "/api/v0/channels",
             vec![],
             client::empty_body(),
-            |res: ListChannelResponse| res.channels,
+            response! { channels: Vec<Channel> },
         )
         .await
     }

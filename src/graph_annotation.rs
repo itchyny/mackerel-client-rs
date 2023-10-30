@@ -6,6 +6,7 @@ use typed_builder::TypedBuilder;
 use crate::client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
+use crate::response;
 use crate::role::RoleName;
 use crate::service::ServiceName;
 
@@ -103,12 +104,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct ListGraphAnnotationsResponse {
-    graph_annotations: Vec<GraphAnnotation>,
-}
-
 impl client::Client {
     /// Fetches graph annotations.
     ///
@@ -128,7 +123,7 @@ impl client::Client {
                 ("to", vec![&to.timestamp().to_string()]),
             ],
             client::empty_body(),
-            |res: ListGraphAnnotationsResponse| res.graph_annotations,
+            response! { graphAnnotations: Vec<GraphAnnotation> },
         )
         .await
     }

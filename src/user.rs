@@ -8,6 +8,7 @@ use typed_builder::TypedBuilder;
 use crate::client;
 use crate::entity::Id;
 use crate::error::Result;
+use crate::response;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -195,11 +196,6 @@ mod tests {
     }
 }
 
-#[derive(Deserialize)]
-struct ListUsersResponse {
-    users: Vec<User>,
-}
-
 impl client::Client {
     /// Fetches all the users.
     ///
@@ -210,7 +206,7 @@ impl client::Client {
             "/api/v0/users",
             vec![],
             client::empty_body(),
-            |res: ListUsersResponse| res.users,
+            response! { users: Vec<User> },
         )
         .await
     }
