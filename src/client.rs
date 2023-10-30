@@ -16,6 +16,8 @@ pub struct Client {
     api_base: String,
     #[builder(default = format!("mackerel-client-rs/{}", env!("CARGO_PKG_VERSION")))]
     user_agent: String,
+    #[builder(default = reqwest::Client::new(), setter(skip))]
+    client: reqwest::Client,
 }
 
 // Empty body to avoid type ambiguity.
@@ -70,13 +72,13 @@ impl Client {
     where
         for<'de> R: serde::de::Deserialize<'de>,
     {
-        let client = reqwest::Client::new();
         let url = self.build_url(path.as_ref(), queries);
         let body_bytes = body_opt
             .map(|b| serde_json::to_vec(&b).unwrap())
             .unwrap_or_default();
         let response = {
-            let request = client
+            let request = self
+                .client
                 .request(method, url.clone())
                 .headers(self.new_headers())
                 .body(body_bytes);
