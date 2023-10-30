@@ -35,7 +35,7 @@ impl<T> std::str::FromStr for Name<T> {
         if !(2..=63).contains(&s.len())
             || !s
                 .chars()
-                .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+                .all(|c| matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '-' | '_'))
         {
             return Err(ParseNameError(s.to_string()));
         }
