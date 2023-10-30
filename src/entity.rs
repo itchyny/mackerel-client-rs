@@ -12,6 +12,13 @@ pub struct Entity<T> {
     pub value: T,
 }
 
+impl<T> Entity<T> {
+    /// Creates a new [`Entity`].
+    pub fn new(id: Id<T>, value: T) -> Entity<T> {
+        Entity { id, value }
+    }
+}
+
 impl<T> std::ops::Deref for Entity<T> {
     type Target = T;
 
@@ -98,5 +105,45 @@ impl<T> std::fmt::Debug for Id<T> {
 impl<T> std::hash::Hash for Id<T> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.0.hash(state);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use std::collections::{HashMap, HashSet};
+
+    #[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
+    struct Value {
+        x: i64,
+    }
+
+    #[test]
+    fn entity() {
+        let value = Value { x: 1 };
+        let entity = Entity::<Value>::new("id0".into(), value.clone());
+        assert_eq!(
+            entity,
+            Entity::<Value>::builder().id("id0").value(value).build(),
+        );
+        assert_eq!(entity.x, 1);
+        let json = json!({"id": "id0", "x": 1});
+        assert_eq!(serde_json::to_value(&entity).unwrap(), json);
+        assert_eq!(entity, serde_json::from_value(json).unwrap());
+    }
+
+    #[test]
+    fn id() {
+        let id = Id::<Value>::from("id0");
+        assert_eq!(id, "id0".into());
+        assert_eq!(HashMap::from([(id, 1)]).get(&id), Some(&1));
+        assert_eq!(HashSet::from([id]).iter().next(), Some(&id));
+        assert_eq!(id.to_string(), "id0");
+        assert_eq!(format!("{}", id), "id0");
+        assert_eq!(format!("{:?}", id), r#""id0""#);
+        assert_eq!(id, "id0".parse().unwrap());
+        assert_eq!(id, serde_json::from_value(json!("id0")).unwrap());
+        assert_eq!(serde_json::to_value(id).unwrap(), json!("id0"));
     }
 }
