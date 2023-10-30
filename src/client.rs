@@ -112,8 +112,9 @@ impl Client {
                     value
                         .get("error")
                         .map(|err| err.get("message").unwrap_or(err))
-                        .and_then(|val| val.as_str().map(|s| s.to_string()))
+                        .and_then(serde_json::Value::as_str)
+                        .map(str::to_owned)
                 });
-        Error::ApiError(status, message_opt.unwrap_or("".to_string()))
+        Error::ApiError(status, message_opt.unwrap_or_default())
     }
 }
