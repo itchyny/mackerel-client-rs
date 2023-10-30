@@ -57,10 +57,6 @@ impl Client {
         headers
     }
 
-    /// Sends a request to the API.
-    ///
-    /// The entire response body is deserialized as `R`, converted by `converter`
-    /// and returns `S`.
     pub(crate) async fn request<R, S>(
         &self,
         method: reqwest::Method,
