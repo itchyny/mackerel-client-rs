@@ -30,8 +30,10 @@ impl Client {
     }
 
     fn build_url(&self, path: &str, queries: Vec<(&str, Vec<&str>)>) -> url::Url {
-        let url_str = self.api_base.clone() + path;
-        let mut url = url::Url::parse(url_str.as_str()).unwrap();
+        let mut url = url::Url::parse(&self.api_base)
+            .unwrap_or_else(|err| panic!("{}: {}", err, self.api_base))
+            .join(path)
+            .unwrap();
         for (name, values) in queries {
             for value in values {
                 url.query_pairs_mut().append_pair(name, value);
