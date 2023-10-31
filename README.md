@@ -1,6 +1,6 @@
 # mackerel-client-rs
-[![CI Status](https://github.com/itchyny/mackerel-client-rs/workflows/CI/badge.svg)](https://github.com/itchyny/mackerel-client-rs/actions)
-[![crates.io](https://img.shields.io/crates/v/mackerel-client.svg)](https://crates.io/crates/mackerel-client)
+[![CI Status](https://github.com/itchyny/mackerel-client-rs/actions/workflows/ci.yaml/badge.svg?branch=main)](https://github.com/itchyny/mackerel-client-rs/actions?query=branch:main)
+[![crates.io](https://img.shields.io/crates/v/mackerel-client.svg)](https://crates.io/crates/mackerel_client)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/itchyny/mackerel-client-rs/blob/master/LICENSE)
 
 ### An API client library for Mackerel written in Rust
