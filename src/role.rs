@@ -62,15 +62,15 @@ impl std::str::FromStr for RoleFullname {
     fn from_str(s: &str) -> core::result::Result<Self, Self::Err> {
         let (service_name_str, role_name_str) = s
             .split_once(':')
-            .ok_or(ParseRoleFullnameError(s.to_string()))?;
+            .ok_or(ParseRoleFullnameError(s.to_owned()))?;
         Ok(RoleFullname::new(
             service_name_str
                 .parse()
-                .map_err(|_| ParseRoleFullnameError(s.to_string()))?,
+                .map_err(|_| ParseRoleFullnameError(s.to_owned()))?,
             role_name_str
                 .trim_start()
                 .parse()
-                .map_err(|_| ParseRoleFullnameError(s.to_string()))?,
+                .map_err(|_| ParseRoleFullnameError(s.to_owned()))?,
         ))
     }
 }

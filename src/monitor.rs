@@ -191,7 +191,7 @@ impl std::str::FromStr for MonitorScope {
         s.parse()
             .map(MonitorScope::Role)
             .or(s.parse().map(MonitorScope::Service))
-            .map_err(|_| ParseMonitorScopeError(s.to_string()))
+            .map_err(|_| ParseMonitorScopeError(s.to_owned()))
     }
 }
 

@@ -90,7 +90,7 @@ impl Client {
         }
         .send()
         .await
-        .map_err(|e| format!("failed to send request: {}", e))?;
+        .map_err(|e| Error::MsgError(format!("failed to send request: {}", e)))?;
         if !response.status().is_success() {
             return Err(self.api_error(response).await);
         }
@@ -98,7 +98,7 @@ impl Client {
             .json::<R>()
             .await
             .map(converter)
-            .map_err(|e| format!("JSON deserialization failed: {}", e).into())
+            .map_err(|e| Error::MsgError(format!("JSON deserialization failed: {}", e)))
     }
 
     async fn api_error(&self, response: reqwest::Response) -> Error {

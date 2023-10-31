@@ -5,18 +5,6 @@ pub enum Error {
     MsgError(String),
 }
 
-impl From<String> for Error {
-    fn from(s: String) -> Self {
-        Error::MsgError(s)
-    }
-}
-
-impl From<&str> for Error {
-    fn from(s: &str) -> Self {
-        Error::MsgError(s.to_string())
-    }
-}
-
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
