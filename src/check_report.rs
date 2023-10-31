@@ -1,13 +1,13 @@
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use std::collections::HashMap;
 use typed_builder::TypedBuilder;
 
 use crate::alert::AlertStatus;
-use crate::client;
+use crate::client::Client;
 use crate::error::Result;
 use crate::host::HostId;
+use crate::macros::*;
 
 /// A check report
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -104,7 +104,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Creates a new check report.
     ///
     /// See <https://mackerel.io/api-docs/entry/check-monitoring#post>.
@@ -112,9 +112,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/monitoring/checks/report",
-            vec![],
-            Some(HashMap::from([("reports", check_reports)])),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body! { reports: Vec<CheckReport> = check_reports },
+            response_body!(),
         )
         .await
     }

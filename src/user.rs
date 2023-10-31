@@ -5,10 +5,10 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::Id;
 use crate::error::Result;
-use crate::response;
+use crate::macros::*;
 
 /// A user
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -196,7 +196,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the users.
     ///
     /// See <https://mackerel.io/api-docs/entry/users#list>.
@@ -204,9 +204,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/users",
-            vec![],
-            client::empty_body(),
-            response! { users: Vec<User> },
+            query_params![],
+            request_body![],
+            response_body! { users: Vec<User> },
         )
         .await
     }
@@ -218,9 +218,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/users/{}", user_id),
-            vec![],
-            client::empty_body(),
-            |user| user,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

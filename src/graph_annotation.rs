@@ -3,10 +3,10 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
-use crate::response;
+use crate::macros::*;
 use crate::role::RoleName;
 use crate::service::ServiceName;
 
@@ -104,7 +104,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches graph annotations.
     ///
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#get>.
@@ -117,13 +117,13 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/graph-annotations",
-            vec![
-                ("service", vec![&service]),
-                ("from", vec![&from.timestamp().to_string()]),
-                ("to", vec![&to.timestamp().to_string()]),
-            ],
-            client::empty_body(),
-            response! { graphAnnotations: Vec<GraphAnnotation> },
+            query_params! {
+                service = service,
+                from = from.timestamp().to_string(),
+                to = to.timestamp().to_string(),
+            },
+            request_body![],
+            response_body! { graphAnnotations: Vec<GraphAnnotation> },
         )
         .await
     }
@@ -138,9 +138,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/graph-annotations",
-            vec![],
-            Some(graph_annotation_value),
-            |graph_annotation| graph_annotation,
+            query_params![],
+            request_body!(graph_annotation_value),
+            response_body!(..),
         )
         .await
     }
@@ -156,9 +156,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/graph-annotations/{}", graph_annontation_id),
-            vec![],
-            Some(graph_annotation_value),
-            |graph_annotation| graph_annotation,
+            query_params![],
+            request_body!(graph_annotation_value),
+            response_body!(..),
         )
         .await
     }
@@ -173,9 +173,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/graph-annotations/{}", graph_annotation_id),
-            vec![],
-            client::empty_body(),
-            |graph_annotation| graph_annotation,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

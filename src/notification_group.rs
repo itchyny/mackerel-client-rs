@@ -5,11 +5,11 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
+use crate::macros::*;
 use crate::monitor::MonitorId;
-use crate::response;
 use crate::service::ServiceName;
 
 /// A notification group entity
@@ -145,7 +145,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the notification groups.
     ///
     /// See <https://mackerel.io/api-docs/entry/notification-groups#get>.
@@ -153,9 +153,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/notification-groups",
-            vec![],
-            client::empty_body(),
-            response! { notificationGroups: Vec<NotificationGroup> },
+            query_params![],
+            request_body![],
+            response_body! { notificationGroups: Vec<NotificationGroup> },
         )
         .await
     }
@@ -170,9 +170,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/notification-groups",
-            vec![],
-            Some(notification_group_value),
-            |notification_group| notification_group,
+            query_params![],
+            request_body!(notification_group_value),
+            response_body!(..),
         )
         .await
     }
@@ -188,9 +188,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/notification-groups/{}", notification_group_id),
-            vec![],
-            Some(notification_group_value),
-            |notification_group| notification_group,
+            query_params![],
+            request_body!(notification_group_value),
+            response_body!(..),
         )
         .await
     }
@@ -205,9 +205,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/notification-groups/{}", notification_group_id),
-            vec![],
-            client::empty_body(),
-            |notification_group| notification_group,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

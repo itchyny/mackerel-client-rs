@@ -2,8 +2,9 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::error::Result;
+use crate::macros::*;
 use crate::name::Name;
 
 /// An organization
@@ -45,7 +46,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Retrieve the information on the organization.
     ///
     /// See <https://mackerel.io/api-docs/entry/organizations#get>.
@@ -53,9 +54,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/org",
-            vec![],
-            client::empty_body(),
-            |organization| organization,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

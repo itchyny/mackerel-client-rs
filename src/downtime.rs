@@ -5,11 +5,11 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
+use crate::macros::*;
 use crate::monitor::MonitorId;
-use crate::response;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -247,7 +247,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the downtimes.
     ///
     /// See <https://mackerel.io/api-docs/entry/downtimes#list>.
@@ -255,9 +255,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/downtimes",
-            vec![],
-            client::empty_body(),
-            response! { downtimes: Vec<Downtime> },
+            query_params![],
+            request_body![],
+            response_body! { downtimes: Vec<Downtime> },
         )
         .await
     }
@@ -269,9 +269,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/downtimes",
-            vec![],
-            Some(downtime_value),
-            |downtime| downtime,
+            query_params![],
+            request_body!(downtime_value),
+            response_body!(..),
         )
         .await
     }
@@ -287,9 +287,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/downtimes/{}", downtime_id),
-            vec![],
-            Some(downtime_value),
-            |downtime| downtime,
+            query_params![],
+            request_body!(downtime_value),
+            response_body!(..),
         )
         .await
     }
@@ -301,9 +301,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/downtimes/{}", downtime_id),
-            vec![],
-            client::empty_body(),
-            |downtime| downtime,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

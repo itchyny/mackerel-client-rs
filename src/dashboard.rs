@@ -4,11 +4,11 @@ use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DurationSeconds};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::host::HostId;
-use crate::response;
+use crate::macros::*;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -323,7 +323,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the dashboards.
     ///
     /// See <https://mackerel.io/api-docs/entry/dashboards#list>.
@@ -331,9 +331,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/dashboards",
-            vec![],
-            client::empty_body(),
-            response! { dashboards: Vec<Dashboard> },
+            query_params![],
+            request_body![],
+            response_body! { dashboards: Vec<Dashboard> },
         )
         .await
     }
@@ -345,9 +345,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/dashboards",
-            vec![],
-            Some(dashboard_value),
-            |dashboard| dashboard,
+            query_params![],
+            request_body!(dashboard_value),
+            response_body!(..),
         )
         .await
     }
@@ -359,9 +359,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/dashboards/{}", dashboard_id),
-            vec![],
-            client::empty_body(),
-            |dashboard| dashboard,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
@@ -377,9 +377,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/dashboards/{}", dashboard_id),
-            vec![],
-            Some(dashboard_value),
-            |dashboard| dashboard,
+            query_params![],
+            request_body!(dashboard_value),
+            response_body!(..),
         )
         .await
     }
@@ -391,9 +391,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/dashboards/{}", dashboard_id),
-            vec![],
-            client::empty_body(),
-            |dashboard| dashboard,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

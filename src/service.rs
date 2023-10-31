@@ -2,10 +2,10 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::error::Result;
+use crate::macros::*;
 use crate::name::Name;
-use crate::response;
 use crate::role::RoleName;
 
 /// A service
@@ -74,7 +74,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the services.
     ///
     /// See <https://mackerel.io/api-docs/entry/services#list>.
@@ -82,9 +82,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/services",
-            vec![],
-            client::empty_body(),
-            response! { services: Vec<Service> },
+            query_params![],
+            request_body![],
+            response_body! { services: Vec<Service> },
         )
         .await
     }
@@ -96,9 +96,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/services",
-            vec![],
-            Some(service),
-            |service| service,
+            query_params![],
+            request_body!(service),
+            response_body!(..),
         )
         .await
     }
@@ -110,9 +110,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/services/{}", service_name),
-            vec![],
-            client::empty_body(),
-            |service| service,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
@@ -127,9 +127,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/services/{}/metric-names", service_name),
-            vec![],
-            client::empty_body(),
-            response! { names: Vec<String> },
+            query_params![],
+            request_body![],
+            response_body! { names: Vec<String> },
         )
         .await
     }

@@ -1,12 +1,11 @@
 use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
-use std::collections::HashMap;
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::error::Result;
-use crate::response;
+use crate::macros::*;
 use crate::user::UserAuthority;
 
 /// An invitation
@@ -91,7 +90,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the invitations.
     ///
     /// See <https://mackerel.io/api-docs/entry/invitations#list>.
@@ -99,9 +98,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/invitations",
-            vec![],
-            client::empty_body(),
-            response! { invitations: Vec<Invitation> },
+            query_params![],
+            request_body![],
+            response_body! { invitations: Vec<Invitation> },
         )
         .await
     }
@@ -113,9 +112,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/invitations",
-            vec![],
-            Some(invitation_value),
-            |invitation: Invitation| invitation,
+            query_params![],
+            request_body!(invitation_value),
+            response_body!(..),
         )
         .await
     }
@@ -127,9 +126,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/invitations/revoke",
-            vec![],
-            Some(HashMap::from([("email", email)])),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body! { email: String = email },
+            response_body!(),
         )
         .await
     }

@@ -2,16 +2,15 @@ use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
-use std::collections::HashMap;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::host::HostId;
+use crate::macros::*;
 use crate::monitor::{MonitorId, MonitorType};
-use crate::response;
 
 /// An alert
 pub type Alert = Entity<AlertValue>;
@@ -150,7 +149,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches open alerts.
     ///
     /// See <https://mackerel.io/api-docs/entry/alerts#get>.
@@ -182,13 +181,13 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/alerts",
-            vec![
-                ("withClosed", vec![with_closed]),
-                ("nextId", cursor_opt.as_deref().into_iter().collect()),
-                ("limit", vec![limit.to_string().as_str()]),
-            ],
-            client::empty_body(),
-            response! { alerts: Vec<Alert>, nextId: Option<AlertId> },
+            query_params! {
+                withClosed = with_closed,
+                nextId = cursor_opt.as_deref().unwrap_or_default(),
+                limit = limit.to_string(),
+            },
+            request_body![],
+            response_body! { alerts: Vec<Alert>, nextId: Option<AlertId> },
         )
         .await
     }
@@ -200,9 +199,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/alerts/{}", alert_id),
-            vec![],
-            client::empty_body(),
-            |alert| alert,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
@@ -214,9 +213,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/alerts/{}", alert_id),
-            vec![],
-            Some(HashMap::from([("memo", memo)])),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body! { memo: String = memo },
+            response_body!(),
         )
         .await
     }
@@ -228,9 +227,9 @@ impl client::Client {
         self.request(
             Method::POST,
             format!("/api/v0/alerts/{}/close", alert_id),
-            vec![],
-            Some(HashMap::from([("reason", reason)])),
-            |alert| alert,
+            query_params![],
+            request_body! { reason: String = reason },
+            response_body!(..),
         )
         .await
     }

@@ -2,10 +2,10 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json;
 
-use crate::client;
+use crate::client::Client;
 use crate::error::Result;
 use crate::host::HostId;
-use crate::response;
+use crate::macros::*;
 use crate::role::RoleName;
 use crate::service::ServiceName;
 
@@ -16,7 +16,7 @@ pub struct Metadata {
     pub namespace: String,
 }
 
-impl client::Client {
+impl Client {
     /// Retrieves a host metadata.
     ///
     /// See <https://mackerel.io/api-docs/entry/metadata#hostget>.
@@ -28,9 +28,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
-            vec![],
-            client::empty_body(),
-            |res| res,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
@@ -47,9 +47,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
-            vec![],
-            Some(metadata),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body!(metadata),
+            response_body!(),
         )
         .await
     }
@@ -61,9 +61,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
-            vec![],
-            client::empty_body(),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body![],
+            response_body!(),
         )
         .await
     }
@@ -75,9 +75,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metadata", host_id),
-            vec![],
-            client::empty_body(),
-            response! { metadata: Vec<Metadata> },
+            query_params![],
+            request_body![],
+            response_body! { metadata: Vec<Metadata> },
         )
         .await
     }
@@ -93,9 +93,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/services/{}/metadata/{}", service_name, namespace),
-            vec![],
-            client::empty_body(),
-            |res| res,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
@@ -112,9 +112,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/services/{}/metadata/{}", service_name, namespace),
-            vec![],
-            Some(metadata),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body!(metadata),
+            response_body!(),
         )
         .await
     }
@@ -130,9 +130,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/services/{}/metadata/{}", service_name, namespace),
-            vec![],
-            client::empty_body(),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body![],
+            response_body!(),
         )
         .await
     }
@@ -144,9 +144,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/services/{}/metadata", service_name),
-            vec![],
-            client::empty_body(),
-            response! { metadata: Vec<Metadata> },
+            query_params![],
+            request_body![],
+            response_body! { metadata: Vec<Metadata> },
         )
         .await
     }
@@ -166,9 +166,9 @@ impl client::Client {
                 "/api/v0/services/{}/roles/{}/metadata/{}",
                 service_name, role_name, namespace
             ),
-            vec![],
-            client::empty_body(),
-            |res| res,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
@@ -189,9 +189,9 @@ impl client::Client {
                 "/api/v0/services/{}/roles/{}/metadata/{}",
                 service_name, role_name, namespace
             ),
-            vec![],
-            Some(metadata),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body!(metadata),
+            response_body!(),
         )
         .await
     }
@@ -211,9 +211,9 @@ impl client::Client {
                 "/api/v0/services/{}/roles/{}/metadata/{}",
                 service_name, role_name, namespace
             ),
-            vec![],
-            client::empty_body(),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body![],
+            response_body!(),
         )
         .await
     }
@@ -232,9 +232,9 @@ impl client::Client {
                 "/api/v0/services/{}/roles/{}/metadata",
                 service_name, role_name,
             ),
-            vec![],
-            client::empty_body(),
-            response! { metadata: Vec<Metadata> },
+            query_params![],
+            request_body![],
+            response_body! { metadata: Vec<Metadata> },
         )
         .await
     }

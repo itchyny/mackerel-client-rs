@@ -2,11 +2,11 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
+use crate::macros::*;
 use crate::monitor::MonitorId;
-use crate::response;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -103,7 +103,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the alert group settings.
     ///
     /// See <https://mackerel.io/api-docs/entry/alert-group-settings#list>.
@@ -111,9 +111,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/alert-group-settings",
-            vec![],
-            client::empty_body(),
-            response! { alertGroupSettings: Vec<AlertGroupSetting> },
+            query_params![],
+            request_body![],
+            response_body! { alertGroupSettings: Vec<AlertGroupSetting> },
         )
         .await
     }
@@ -128,9 +128,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/alert-group-settings",
-            vec![],
-            Some(alert_group_setting_value),
-            |alert_group_setting| alert_group_setting,
+            query_params![],
+            request_body!(alert_group_setting_value),
+            response_body!(..),
         )
         .await
     }
@@ -145,9 +145,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
-            vec![],
-            client::empty_body(),
-            |alert_group_setting| alert_group_setting,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
@@ -163,9 +163,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
-            vec![],
-            Some(alert_group_setting_value),
-            |alert_group_setting| alert_group_setting,
+            query_params![],
+            request_body!(alert_group_setting_value),
+            response_body!(..),
         )
         .await
     }
@@ -180,9 +180,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
-            vec![],
-            client::empty_body(),
-            |alert_group_setting| alert_group_setting,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

@@ -4,10 +4,10 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
 use strum::{Display, EnumString};
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
-use crate::response;
+use crate::macros::*;
 use crate::user::UserId;
 
 /// A channel
@@ -416,7 +416,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the channels.
     ///
     /// See <https://mackerel.io/api-docs/entry/channels#get>.
@@ -424,9 +424,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/channels",
-            vec![],
-            client::empty_body(),
-            response! { channels: Vec<Channel> },
+            query_params![],
+            request_body![],
+            response_body! { channels: Vec<Channel> },
         )
         .await
     }
@@ -438,9 +438,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/channels",
-            vec![],
-            Some(channel_value),
-            |channel| channel,
+            query_params![],
+            request_body!(channel_value),
+            response_body!(..),
         )
         .await
     }
@@ -452,9 +452,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/channels/{}", channel_id),
-            vec![],
-            client::empty_body(),
-            |channel| channel,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }

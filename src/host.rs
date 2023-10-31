@@ -9,12 +9,12 @@ use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 use url::form_urlencoded;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::Id;
 use crate::error::Result;
+use crate::macros::*;
 use crate::role::{RoleFullname, RoleName};
 use crate::service::ServiceName;
-use crate::{request, response};
 
 /// A host
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -265,7 +265,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Creates a new host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#create>.
@@ -273,9 +273,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/hosts",
-            vec![],
-            Some(host_value),
-            response! { id: HostId },
+            query_params![],
+            request_body!(host_value),
+            response_body! { id: HostId },
         )
         .await
     }
@@ -287,9 +287,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}", host_id),
-            vec![],
-            client::empty_body(),
-            response! { host: Host },
+            query_params![],
+            request_body![],
+            response_body! { host: Host },
         )
         .await
     }
@@ -307,9 +307,9 @@ impl client::Client {
                 "/api/v0/hosts-by-custom-identifier/{}",
                 form_urlencoded::byte_serialize(custom_identifier.as_bytes()).collect::<String>(),
             ),
-            vec![],
-            client::empty_body(),
-            response! { host: Option<Host> },
+            query_params![],
+            request_body![],
+            response_body! { host: Option<Host> },
         )
         .await
     }
@@ -321,9 +321,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/hosts/{}", host_id),
-            vec![],
-            Some(host_value),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body!(host_value),
+            response_body!(),
         )
         .await
     }
@@ -335,9 +335,9 @@ impl client::Client {
         self.request(
             Method::POST,
             format!("/api/v0/hosts/{}/status", host_id),
-            vec![],
-            Some(HashMap::from([("status", host_status)])),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body! { status: HostStatus = host_status },
+            response_body!(),
         )
         .await
     }
@@ -353,12 +353,12 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/hosts/bulk-update-statuses",
-            vec![],
-            Some(request! {
+            query_params![],
+            request_body! {
                 ids: Vec<HostId> = host_ids,
                 status: HostStatus = host_status,
-            }),
-            |_: serde_json::Value| (),
+            },
+            response_body!(),
         )
         .await
     }
@@ -374,9 +374,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/hosts/{}/role-fullnames", host_id),
-            vec![],
-            Some(HashMap::from([("roleFullnames", role_fullnames)])),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body! { roleFullnames: Vec<RoleFullname> = role_fullnames },
+            response_body!(),
         )
         .await
     }
@@ -388,9 +388,9 @@ impl client::Client {
         self.request(
             Method::POST,
             format!("/api/v0/hosts/{}/retire", host_id),
-            vec![],
-            client::empty_body(),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body![],
+            response_body!(),
         )
         .await
     }
@@ -402,9 +402,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/hosts/bulk-retire",
-            vec![],
-            Some(HashMap::from([("ids", host_ids)])),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body! { ids: Vec<HostId> = host_ids },
+            response_body!(),
         )
         .await
     }
@@ -416,9 +416,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/hosts",
-            vec![],
-            client::empty_body(),
-            response! { hosts: Vec<Host> },
+            query_params![],
+            request_body![],
+            response_body! { hosts: Vec<Host> },
         )
         .await
     }
@@ -430,9 +430,9 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metric-names", host_id),
-            vec![],
-            client::empty_body(),
-            response! { names: Vec<String> },
+            query_params![],
+            request_body![],
+            response_body! { names: Vec<String> },
         )
         .await
     }

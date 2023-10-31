@@ -3,10 +3,10 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::error::Result;
 use crate::host::HostId;
-use crate::response;
+use crate::macros::*;
 use crate::service::ServiceName;
 
 /// A host metric value
@@ -100,7 +100,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Posts host metric values.
     ///
     /// See <https://mackerel.io/api-docs/entry/host-metrics#post>.
@@ -111,9 +111,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/tsdb",
-            vec![],
-            Some(host_metric_values),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body!(host_metric_values),
+            response_body!(),
         )
         .await
     }
@@ -131,13 +131,13 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/hosts/{}/metrics", host_id),
-            vec![
-                ("name", vec![&name]),
-                ("from", vec![&from.timestamp().to_string()]),
-                ("to", vec![&to.timestamp().to_string()]),
-            ],
-            client::empty_body(),
-            response! { metrics: Vec<MetricValue> },
+            query_params! {
+                name = name,
+                from = from.timestamp().to_string(),
+                to = to.timestamp().to_string(),
+            },
+            request_body![],
+            response_body! { metrics: Vec<MetricValue> },
         )
         .await
     }
@@ -153,9 +153,9 @@ impl client::Client {
         self.request(
             Method::POST,
             format!("/api/v0/services/{}/tsdb", service_name),
-            vec![],
-            Some(service_metric_values),
-            |_: serde_json::Value| (),
+            query_params![],
+            request_body!(service_metric_values),
+            response_body!(),
         )
         .await
     }
@@ -173,13 +173,13 @@ impl client::Client {
         self.request(
             Method::GET,
             format!("/api/v0/services/{}/metrics", service_name),
-            vec![
-                ("name", vec![&name]),
-                ("from", vec![&from.timestamp().to_string()]),
-                ("to", vec![&to.timestamp().to_string()]),
-            ],
-            client::empty_body(),
-            response! { metrics: Vec<MetricValue> },
+            query_params! {
+                name = name,
+                from = from.timestamp().to_string(),
+                to = to.timestamp().to_string(),
+            },
+            request_body![],
+            response_body! { metrics: Vec<MetricValue> },
         )
         .await
     }

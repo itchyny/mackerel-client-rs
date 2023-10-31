@@ -5,7 +5,7 @@ use serde_json;
 use typed_builder::TypedBuilder;
 use url;
 
-use crate::error::{Error, Result};
+use crate::error::*;
 
 /// An API client for Mackerel.
 #[derive(Debug, TypedBuilder)]
@@ -20,24 +20,19 @@ pub struct Client {
     client: reqwest::Client,
 }
 
-// Empty body to avoid type ambiguity.
-pub(crate) fn empty_body() -> Option<()> {
-    None
-}
-
 impl Client {
     /// Creates a new API client from API key.
     pub fn new(api_key: impl Into<String>) -> Client {
         Self::builder().api_key(api_key).build()
     }
 
-    fn build_url(&self, path: &str, queries: Vec<(&str, Vec<&str>)>) -> url::Url {
+    fn build_url(&self, path: &str, queries: &[(&str, &str)]) -> url::Url {
         let mut url = url::Url::parse(&self.api_base)
             .unwrap_or_else(|err| panic!("{}: {}", err, self.api_base))
             .join(path)
             .unwrap();
-        for (name, values) in queries {
-            for value in values {
+        for (name, value) in queries {
+            if !value.is_empty() {
                 url.query_pairs_mut().append_pair(name, value);
             }
         }
@@ -65,7 +60,7 @@ impl Client {
         &self,
         method: reqwest::Method,
         path: impl AsRef<str>,
-        queries: Vec<(&str, Vec<&str>)>,
+        queries: &[(&str, &str)],
         body_opt: Option<impl serde::ser::Serialize>,
         converter: impl FnOnce(R) -> S,
     ) -> Result<S>

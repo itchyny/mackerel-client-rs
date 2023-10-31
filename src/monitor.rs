@@ -5,10 +5,10 @@ use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client;
+use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
-use crate::response;
+use crate::macros::*;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -624,7 +624,7 @@ mod tests {
     }
 }
 
-impl client::Client {
+impl Client {
     /// Fetches all the monitors.
     ///
     /// See <https://mackerel.io/api-docs/entry/monitors#get>.
@@ -632,9 +632,9 @@ impl client::Client {
         self.request(
             Method::GET,
             "/api/v0/monitors",
-            vec![],
-            client::empty_body(),
-            response! { monitors: Vec<Monitor> },
+            query_params![],
+            request_body![],
+            response_body! { monitors: Vec<Monitor> },
         )
         .await
     }
@@ -646,9 +646,9 @@ impl client::Client {
         self.request(
             Method::POST,
             "/api/v0/monitors",
-            vec![],
-            Some(monitor_value),
-            |monitor| monitor,
+            query_params![],
+            request_body!(monitor_value),
+            response_body!(..),
         )
         .await
     }
@@ -664,9 +664,9 @@ impl client::Client {
         self.request(
             Method::PUT,
             format!("/api/v0/monitors/{}", monitor_id),
-            vec![],
-            Some(monitor_value),
-            |monitor| monitor,
+            query_params![],
+            request_body!(monitor_value),
+            response_body!(..),
         )
         .await
     }
@@ -678,9 +678,9 @@ impl client::Client {
         self.request(
             Method::DELETE,
             format!("/api/v0/monitors/{}", monitor_id),
-            vec![],
-            client::empty_body(),
-            |monitor| monitor,
+            query_params![],
+            request_body![],
+            response_body!(..),
         )
         .await
     }
