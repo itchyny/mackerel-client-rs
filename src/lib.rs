@@ -32,6 +32,7 @@ pub(crate) mod name;
 pub mod alert;
 pub mod alert_group_setting;
 pub mod channel;
+pub mod check_report;
 pub mod dashboard;
 pub mod downtime;
 pub mod graph_annotation;
