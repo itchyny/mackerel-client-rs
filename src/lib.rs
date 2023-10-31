@@ -50,6 +50,17 @@ pub use crate::client::Client;
 
 #[doc(hidden)]
 #[macro_export]
+macro_rules! request {
+    { $( $field:ident: $type:ty = $value:expr ),+ $(,)? } => {{
+        #[allow(non_snake_case)]
+        #[derive(::serde_derive::Serialize)]
+        struct Request { $( $field: $type ),* }
+        Request { $( $field: $value ),* }
+    }};
+}
+
+#[doc(hidden)]
+#[macro_export]
 macro_rules! response {
     { $( $field:ident: $type:ty ),+ $(,)? } => {{
         #[allow(non_snake_case)]

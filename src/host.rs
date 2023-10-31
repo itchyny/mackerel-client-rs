@@ -12,9 +12,9 @@ use url::form_urlencoded;
 use crate::client;
 use crate::entity::Id;
 use crate::error::Result;
-use crate::response;
 use crate::role::{RoleFullname, RoleName};
 use crate::service::ServiceName;
+use crate::{request, response};
 
 /// A host
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -265,12 +265,6 @@ mod tests {
     }
 }
 
-#[derive(Serialize)]
-struct UpdateHostStatusesRequest {
-    ids: Vec<HostId>,
-    status: HostStatus,
-}
-
 impl client::Client {
     /// Creates a new host.
     ///
@@ -360,9 +354,9 @@ impl client::Client {
             Method::POST,
             "/api/v0/hosts/bulk-update-statuses",
             vec![],
-            Some(UpdateHostStatusesRequest {
-                ids: host_ids,
-                status: host_status,
+            Some(request! {
+                ids: Vec<HostId> = host_ids,
+                status: HostStatus = host_status,
             }),
             |_: serde_json::Value| (),
         )
