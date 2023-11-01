@@ -22,8 +22,8 @@ pub struct Client {
 
 impl Client {
     /// Creates a new API client from API key.
-    pub fn new(api_key: impl Into<String>) -> Client {
-        Self::builder().api_key(api_key).build()
+    pub fn new(api_key: impl AsRef<str>) -> Client {
+        Self::builder().api_key(api_key.as_ref()).build()
     }
 
     fn build_url(&self, path: &str, queries: &[(&str, &str)]) -> url::Url {
