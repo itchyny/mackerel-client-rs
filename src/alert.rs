@@ -158,7 +158,7 @@ impl Client {
         cursor_opt: Option<AlertId>,
         limit: usize,
     ) -> Result<(Vec<Alert>, Option<AlertId>)> {
-        self.list_alerts("false", cursor_opt, limit).await
+        self.list_alerts("", cursor_opt, limit).await
     }
 
     /// Fetches closed alerts.
