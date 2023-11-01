@@ -4,6 +4,8 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::marker::PhantomData;
 use typed_builder::TypedBuilder;
 
+/// An entity represents a value identified by the id.
+/// You can access the value fields without `.value`.
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 pub struct Entity<T> {
@@ -27,10 +29,12 @@ impl<T> std::ops::Deref for Entity<T> {
     }
 }
 
+/// An id represents a unique id of the type `T`.
 #[derive(PartialEq, Eq, DeserializeFromStr, SerializeDisplay)]
 pub struct Id<T>(str16, PhantomData<T>);
 
 impl<T> Id<T> {
+    /// Creates a new [`Id`].
     pub fn new(id: str16) -> Self {
         Self(id, PhantomData)
     }
@@ -64,6 +68,7 @@ impl<T> std::str::FromStr for Id<T> {
     }
 }
 
+#[doc(hidden)]
 impl<T> std::ops::Deref for Id<T> {
     type Target = str;
 
