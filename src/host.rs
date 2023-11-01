@@ -24,6 +24,7 @@ pub struct Host {
     pub id: HostId,
     #[serde(with = "chrono::serde::ts_seconds")]
     pub created_at: DateTime<Utc>,
+    #[builder(default)]
     pub size: HostSize,
     pub status: HostStatus,
     #[builder(default)]
@@ -50,10 +51,20 @@ impl std::ops::Deref for Host {
 
 /// Host size
 #[derive(
-    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+    PartialEq,
+    Eq,
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Display,
+    EnumString,
+    SerializeDisplay,
+    DeserializeFromStr,
 )]
 #[strum(serialize_all = "lowercase")]
 pub enum HostSize {
+    #[default]
     Standard,
     Micro,
 }
@@ -143,7 +154,6 @@ mod tests {
         Host::builder()
             .id("abcde1")
             .created_at(DateTime::from_timestamp(1700000000, 0).unwrap())
-            .size(HostSize::Standard)
             .status(HostStatus::Working)
             .value(HostValue::builder().name("example-host").build())
             .build()
