@@ -16,8 +16,11 @@ pub struct Entity<T> {
 
 impl<T> Entity<T> {
     /// Creates a new [`Entity`].
-    pub fn new(id: Id<T>, value: T) -> Entity<T> {
-        Entity { id, value }
+    pub fn new(id: impl Into<Id<T>>, value: T) -> Entity<T> {
+        Entity {
+            id: id.into(),
+            value,
+        }
     }
 }
 
@@ -127,7 +130,7 @@ mod tests {
     #[test]
     fn entity() {
         let value = Value { x: 1 };
-        let entity = Entity::<Value>::new("id0".into(), value.clone());
+        let entity = Entity::<Value>::new("id0", value.clone());
         assert_eq!(
             entity,
             Entity::<Value>::builder().id("id0").value(value).build(),
