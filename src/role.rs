@@ -228,3 +228,71 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::role::*;
+    use crate::tests::*;
+
+    fn value_example() -> Role {
+        Role::builder()
+            .name("role0")
+            .memo("This is a role memo.")
+            .build()
+    }
+
+    fn json_example() -> serde_json::Value {
+        json!({
+            "name": "role0",
+            "memo": "This is a role memo.",
+        })
+    }
+
+    #[async_std::test]
+    async fn list_roles() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services/service0/roles",
+            response = json!({
+                "roles": [json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_roles("service0".into()).await,
+            Ok(vec![value_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_role() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/services/service0/roles",
+            request = json_example(),
+            response = json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .create_role("service0".into(), value_example())
+                .await,
+            Ok(value_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_role() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/services/service0/roles/role0",
+            response = json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_role("service0".into(), "role0".into())
+                .await,
+            Ok(value_example()),
+        );
+    }
+}

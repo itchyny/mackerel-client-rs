@@ -29,6 +29,8 @@ pub mod entity;
 pub mod error;
 pub(crate) mod macros;
 pub(crate) mod name;
+#[cfg(test)]
+pub(crate) mod tests;
 
 pub mod alert;
 pub mod alert_group_setting;

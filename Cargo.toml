@@ -23,4 +23,6 @@ typed-builder = "0.18.0"
 url = "2.4.1"
 
 [dev-dependencies]
+async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }
+httptest = "0.15.4"
 rstest = "0.18.2"

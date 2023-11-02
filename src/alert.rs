@@ -234,3 +234,119 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use chrono::DateTime;
+    use serde_json::json;
+
+    use crate::alert::*;
+    use crate::monitor::MonitorType;
+    use crate::tests::*;
+
+    fn value_example() -> AlertValue {
+        AlertValue::builder()
+            .status(AlertStatus::Ok)
+            .monitor_type(MonitorType::Host)
+            .reason("alert close reason")
+            .opened_at(DateTime::from_timestamp(1698890400, 0).unwrap())
+            .closed_at(DateTime::from_timestamp(1698894000, 0).unwrap())
+            .build()
+    }
+
+    fn entity_example() -> Alert {
+        Alert {
+            id: AlertId::from("alert1"),
+            value: value_example(),
+        }
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        json!({
+            "id": "alert1",
+            "status": "OK",
+            "type": "host",
+            "reason": "alert close reason",
+            "openedAt": 1698890400,
+            "closedAt": 1698894000,
+        })
+    }
+
+    #[async_std::test]
+    async fn list_open_alerts() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/alerts",
+            query_params = "limit=10",
+            response = json!({ "alerts": [] }),
+        };
+        assert_eq!(
+            test_client!(server).list_open_alerts(None, 10).await,
+            Ok((vec![], None)),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_closed_alerts() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/alerts",
+            query_params = "withClosed=true&limit=1&nextId=alert1",
+            response = json!({
+                "alerts": [entity_json_example()],
+                "nextId": "alert2",
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_closed_alerts(Some("alert1".into()), 1)
+                .await,
+            Ok((vec![entity_example()], Some("alert2".into()))),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_alert() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/alerts/alert1",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).get_alert("alert1".into()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_alert() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/alerts/alert1",
+            request = json!({ "memo": "alert memo" }),
+            response = json!({ "id": "alert1", "memo": "alert memo" }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_alert("alert1".into(), "alert memo".to_owned())
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn close_alert() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/alerts/alert1/close",
+            request = json!({ "reason": "alert close reason" }),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .close_alert("alert1".into(), "alert close reason".to_owned())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+}

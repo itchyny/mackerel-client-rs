@@ -186,10 +186,7 @@ mod tests {
                     .name("example-host")
                     .display_name("Example host")
                     .custom_identifier("custom-identifier")
-                    .meta([(
-                        "agent-name".to_string(),
-                        serde_json::to_value("mackerel-agent").unwrap(),
-                    )])
+                    .meta([("agent-name".to_string(), json!("mackerel-agent"))])
                     .memo("host memo")
                     .interfaces([HostInterface::builder()
                         .name("lo0")
@@ -445,5 +442,245 @@ impl Client {
             response_body! { names: Vec<String> },
         )
         .await
+    }
+}
+
+#[cfg(test)]
+mod client_tests {
+    use chrono::DateTime;
+    use serde_json::json;
+
+    use crate::host::*;
+    use crate::tests::*;
+
+    fn value_example() -> HostValue {
+        HostValue::builder()
+            .name("example-host")
+            .display_name("Example host")
+            .custom_identifier("custom-identifier")
+            .meta([("agent-name".to_string(), json!("mackerel-agent"))])
+            .memo("This is a host memo.")
+            .build()
+    }
+
+    fn entity_example() -> Host {
+        Host::builder()
+            .id("host0")
+            .created_at(DateTime::from_timestamp(1700000000, 0).unwrap())
+            .status(HostStatus::Working)
+            .value(value_example())
+            .build()
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "name": "example-host",
+            "displayName": "Example host",
+            "customIdentifier": "custom-identifier",
+            "meta": { "agent-name": "mackerel-agent" },
+            "memo": "This is a host memo.",
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("host0");
+        json["createdAt"] = json!(1700000000);
+        json["size"] = json!("standard");
+        json["status"] = json!("working");
+        json["isRetired"] = json!(false);
+        json["roles"] = json!({});
+        json
+    }
+
+    #[async_std::test]
+    async fn create_host() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/hosts",
+            request = value_json_example(),
+            response = json!({ "id": "host0" }),
+        };
+        assert_eq!(
+            test_client!(server).create_host(value_example()).await,
+            Ok(HostId::from("host0")),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_host() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts/host0",
+            response = json!({ "host": entity_json_example() }),
+        };
+        assert_eq!(
+            test_client!(server).get_host("host0".into()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_host_by_custom_identifier() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts-by-custom-identifier/test%2Fcustom%3Fidentifier%26",
+            response = json!({ "host": entity_json_example() }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .get_host_by_custom_identifier("test/custom?identifier&".into())
+                .await,
+            Ok(Some(entity_example())),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_host_by_custom_identifier_not_found() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts-by-custom-identifier/not-found",
+            response = json!({ "host": None::<()> }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .get_host_by_custom_identifier("not-found".into())
+                .await,
+            Ok(None),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_host() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/hosts/host0",
+            request = value_json_example(),
+            response = json!({ "id": "host0" }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_host("host0".into(), value_example())
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_host_status() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/hosts/host0/status",
+            request = json!({ "status": "standby" }),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_host_status("host0".into(), HostStatus::Standby)
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_host_statuses() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/hosts/bulk-update-statuses",
+            request = json!({
+                "ids": ["host0", "abcde1", "abcde2"],
+                "status": "standby",
+            }),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_host_statuses(
+                    vec!["host0".into(), "abcde1".into(), "abcde2".into()],
+                    HostStatus::Standby,
+                )
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_host_roles() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/hosts/host0/role-fullnames",
+            request = json!({ "roleFullnames": ["service0:role0"] }),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_host_roles("host0".into(), vec!["service0:role0".into()])
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn retire_host() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/hosts/host0/retire",
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server).retire_host("host0".into()).await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn retire_hosts() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/hosts/bulk-retire",
+            request = json!({ "ids": ["host0", "abcde1", "abcde2"] }),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .retire_hosts(vec!["host0".into(), "abcde1".into(), "abcde2".into()])
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_hosts() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts",
+            response = json!({
+                "hosts": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_hosts().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_host_metric_names() {
+        let metric_names = vec![
+            "custom.metric0".to_owned(),
+            "custom.metric1".to_owned(),
+            "custom.metric2".to_owned(),
+        ];
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts/host0/metric-names",
+            response = json!({ "names": metric_names }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_host_metric_names("host0".into())
+                .await,
+            Ok(metric_names),
+        );
     }
 }

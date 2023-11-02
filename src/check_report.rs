@@ -119,3 +119,52 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use chrono::DateTime;
+
+    use crate::check_report::*;
+    use crate::tests::*;
+
+    #[async_std::test]
+    async fn create_check_report() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/monitoring/checks/report",
+            request = json!({
+                "reports": [
+                    {
+                        "name": "ExampleCheckReport",
+                        "message": "This is an example check message.",
+                        "source": {
+                            "type": "host",
+                            "hostId": "host0",
+                        },
+                        "status": "WARNING",
+                        "occurredAt": 1698890400,
+                        "notificationInterval": 60,
+                        "maxCheckAttempts": 5,
+                    },
+                ],
+            }),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .create_check_report(vec![CheckReport::builder()
+                    .name("ExampleCheckReport")
+                    .message("This is an example check message.")
+                    .source(CheckSource::Host {
+                        host_id: "host0".into(),
+                    })
+                    .status(AlertStatus::Warning)
+                    .occurred_at(DateTime::from_timestamp(1698890400, 0).unwrap())
+                    .notification_interval(60)
+                    .max_check_attempts(5)
+                    .build()])
+                .await,
+            Ok(())
+        );
+    }
+}

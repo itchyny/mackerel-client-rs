@@ -685,3 +685,102 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::monitor::*;
+    use crate::tests::*;
+
+    fn value_example() -> MonitorValue {
+        MonitorValue::Connectivity {
+            name: "Example connectivity monitor".to_string(),
+            memo: "Monitor memo".to_string(),
+            is_mute: Some(false),
+            notification_interval: None,
+            scopes: vec![],
+            exclude_scopes: vec![],
+        }
+    }
+
+    fn entity_example() -> Monitor {
+        Monitor {
+            id: MonitorId::from("monitor0"),
+            value: value_example(),
+        }
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "type": "connectivity",
+            "name": "Example connectivity monitor",
+            "memo": "Monitor memo",
+            "isMute": false
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("monitor0");
+        json
+    }
+
+    #[async_std::test]
+    async fn list_monitors() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/monitors",
+            response = json!({
+                "monitors": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_monitors().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_monitor() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/monitors",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).create_monitor(value_example()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_monitor() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/monitors/monitor0",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_monitor("monitor0".into(), value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_monitor() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/monitors/monitor0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).delete_monitor("monitor0".into()).await,
+            Ok(entity_example()),
+        );
+    }
+}

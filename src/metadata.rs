@@ -239,3 +239,227 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::metadata::*;
+    use crate::tests::*;
+
+    fn metadata_value_example() -> serde_json::Value {
+        json!({ "test": "This is a metadata example." })
+    }
+
+    fn metadata_example() -> Metadata {
+        Metadata {
+            namespace: "namespace0".to_owned(),
+        }
+    }
+
+    fn metadata_json_example() -> serde_json::Value {
+        json!({ "namespace": "namespace0".to_owned() })
+    }
+
+    #[async_std::test]
+    async fn get_host_metadata() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts/host0/metadata/namespace0",
+            response = metadata_value_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .get_host_metadata("host0".into(), "namespace0".to_owned())
+                .await,
+            Ok(metadata_value_example())
+        );
+    }
+
+    #[async_std::test]
+    async fn put_host_metadata() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/hosts/host0/metadata/namespace0",
+            request = metadata_value_example(),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .put_host_metadata(
+                    "host0".into(),
+                    "namespace0".to_owned(),
+                    metadata_value_example()
+                )
+                .await,
+            Ok(())
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_host_metadata() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/hosts/host0/metadata/namespace0",
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_host_metadata("host0".into(), "namespace0".to_owned())
+                .await,
+            Ok(())
+        );
+    }
+
+    #[async_std::test]
+    async fn list_host_metadata() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts/host0/metadata",
+            response = json!({
+                "metadata": [metadata_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_host_metadata("host0".into())
+                .await,
+            Ok(vec![metadata_example()])
+        );
+    }
+
+    #[async_std::test]
+    async fn get_service_metadata() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services/service0/metadata/namespace0",
+            response = metadata_value_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .get_service_metadata("service0".into(), "namespace0".to_owned())
+                .await,
+            Ok(metadata_value_example())
+        );
+    }
+
+    #[async_std::test]
+    async fn put_service_metadata() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/services/service0/metadata/namespace0",
+            request = metadata_value_example(),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .put_service_metadata(
+                    "service0".into(),
+                    "namespace0".to_owned(),
+                    metadata_value_example()
+                )
+                .await,
+            Ok(())
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_service_metadata() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/services/service0/metadata/namespace0",
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_service_metadata("service0".into(), "namespace0".to_owned())
+                .await,
+            Ok(())
+        );
+    }
+
+    #[async_std::test]
+    async fn list_service_metadata() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services/service0/metadata",
+            response = json!({
+                "metadata": [metadata_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_service_metadata("service0".into())
+                .await,
+            Ok(vec![metadata_example()])
+        );
+    }
+
+    #[async_std::test]
+    async fn get_role_metadata() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services/service0/roles/role0/metadata/namespace0",
+            response = metadata_value_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .get_role_metadata("service0".into(), "role0".into(), "namespace0".to_owned())
+                .await,
+            Ok(metadata_value_example())
+        );
+    }
+
+    #[async_std::test]
+    async fn put_role_metadata() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/services/service0/roles/role0/metadata/namespace0",
+            request = metadata_value_example(),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .put_role_metadata(
+                    "service0".into(),
+                    "role0".into(),
+                    "namespace0".to_owned(),
+                    metadata_value_example()
+                )
+                .await,
+            Ok(())
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_role_metadata() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/services/service0/roles/role0/metadata/namespace0",
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_role_metadata("service0".into(), "role0".into(), "namespace0".to_owned())
+                .await,
+            Ok(())
+        );
+    }
+
+    #[async_std::test]
+    async fn list_role_metadata() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services/service0/roles/role0/metadata",
+            response = json!({
+                "metadata": [metadata_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_role_metadata("service0".into(), "role0".into())
+                .await,
+            Ok(vec![metadata_example()])
+        );
+    }
+}

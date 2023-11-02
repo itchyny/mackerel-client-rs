@@ -113,3 +113,49 @@ impl Client {
         Error::ApiError(status, message_opt.unwrap_or_default())
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use crate::error::Error::ApiError;
+    use crate::tests::*;
+
+    #[async_std::test]
+    async fn error() {
+        {
+            let server = test_server! {
+                method = "GET",
+                path = "/api/v0/org",
+                status_code = 400,
+                response = json!({
+                    "error": "This is an error message.",
+                }),
+            };
+            assert_eq!(
+                test_client!(server).get_organization().await,
+                Err(ApiError(
+                    reqwest::StatusCode::BAD_REQUEST,
+                    "This is an error message.".to_owned()
+                )),
+            );
+        }
+        {
+            let server = test_server! {
+                method = GET,
+                path = "/api/v0/org",
+                status_code = 500,
+                response = json!({
+                    "error": {
+                        "message": "This is an error message.",
+                    },
+                }),
+            };
+            assert_eq!(
+                test_client!(server).get_organization().await,
+                Err(ApiError(
+                    reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+                    "This is an error message.".to_owned()
+                )),
+            );
+        }
+    }
+}

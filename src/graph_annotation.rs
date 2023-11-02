@@ -180,3 +180,115 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::graph_annotation::*;
+    use crate::tests::*;
+
+    fn value_example() -> GraphAnnotationValue {
+        GraphAnnotationValue::builder()
+            .title("Example graph annotation")
+            .description("This is a graph annotation description.")
+            .from(DateTime::from_timestamp(1698890400, 0).unwrap())
+            .to(DateTime::from_timestamp(1698894000, 0).unwrap())
+            .service("service0")
+            .roles(["role1".into(), "role2".into()])
+            .build()
+    }
+
+    fn entity_example() -> GraphAnnotation {
+        GraphAnnotation {
+            id: GraphAnnotationId::from("annotation0"),
+            value: value_example(),
+        }
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "title": "Example graph annotation",
+            "description": "This is a graph annotation description.",
+            "from": 1698890400,
+            "to": 1698894000,
+            "service": "service0",
+            "roles": ["role1", "role2"]
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("annotation0");
+        json
+    }
+
+    #[async_std::test]
+    async fn list_graph_annotations() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/graph-annotations",
+            query_params = "service=service0&from=1698850800&to=1698937200",
+            response = json!({
+                "graphAnnotations": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_graph_annotations(
+                    "service0".into(),
+                    DateTime::from_timestamp(1698850800, 0).unwrap(),
+                    DateTime::from_timestamp(1698937200, 0).unwrap(),
+                )
+                .await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_graph_annotation() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/graph-annotations",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .create_graph_annotation(value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_graph_annotation() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/graph-annotations/annotation0",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_graph_annotation("annotation0".into(), value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_graph_annotation() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/graph-annotations/annotation0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_graph_annotation("annotation0".into())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+}

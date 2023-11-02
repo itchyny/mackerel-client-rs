@@ -308,3 +308,108 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::downtime::*;
+    use crate::tests::*;
+
+    fn value_example() -> DowntimeValue {
+        DowntimeValue::builder()
+            .name("Example downtime")
+            .memo("This is a downtime memo.")
+            .start(DateTime::from_timestamp(1698890400, 0).unwrap())
+            .duration(86400)
+            .service_scopes(["service0".into()])
+            .role_scopes(["service1:role1".into()])
+            .monitor_scopes(["monitor2".into()])
+            .build()
+    }
+
+    fn entity_example() -> Downtime {
+        Downtime {
+            id: DowntimeId::from("downtime0"),
+            value: value_example(),
+        }
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "name": "Example downtime",
+            "memo": "This is a downtime memo.",
+            "start": 1698890400,
+            "duration": 86400,
+            "serviceScopes": ["service0"],
+            "roleScopes": ["service1:role1"],
+            "monitorScopes": ["monitor2"],
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("downtime0");
+        json
+    }
+
+    #[async_std::test]
+    async fn list_downtimes() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/downtimes",
+            response = json!({
+                "downtimes": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_downtimes().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_downtime() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/downtimes",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).create_downtime(value_example()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_downtime() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/downtimes/downtime0",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_downtime("downtime0".into(), value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_downtime() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/downtimes/downtime0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_downtime("downtime0".into())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+}

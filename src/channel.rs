@@ -459,3 +459,85 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::channel::*;
+    use crate::tests::*;
+
+    fn value_example() -> ChannelValue {
+        ChannelValue::Email {
+            name: "Example Email Channel".to_string(),
+            emails: vec!["mackerel@example.com".to_string()],
+            user_ids: vec!["user0".into()],
+            events: vec![NotificationEvent::Alert],
+        }
+    }
+
+    fn entity_example() -> Channel {
+        Channel {
+            id: ChannelId::from("channel0"),
+            value: value_example(),
+        }
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "type": "email",
+            "name": "Example Email Channel",
+            "emails": ["mackerel@example.com"],
+            "userIds": ["user0"],
+            "events": ["alert"],
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("channel0");
+        json
+    }
+
+    #[async_std::test]
+    async fn list_channels() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/channels",
+            response = json!({
+                "channels": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_channels().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_channel() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/channels",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).create_channel(value_example()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_channel() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/channels/channel0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).delete_channel("channel0".into()).await,
+            Ok(entity_example()),
+        );
+    }
+}

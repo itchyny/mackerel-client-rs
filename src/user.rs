@@ -225,3 +225,73 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use chrono::DateTime;
+    use serde_json::json;
+
+    use crate::tests::*;
+    use crate::user::*;
+
+    fn value_example() -> UserValue {
+        UserValue::builder()
+            .screen_name("Example User")
+            .email("mackerel@example.com")
+            .authority(UserAuthority::Manager)
+            .build()
+    }
+
+    fn entity_example() -> User {
+        User::builder()
+            .id("user0")
+            .joined_at(DateTime::from_timestamp(1699200000, 0).unwrap())
+            .value(value_example())
+            .build()
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "screenName": "Example User",
+            "email": "mackerel@example.com",
+            "authority": "manager",
+            "isInRegistrationProcess": false,
+            "isMFAEnabled": false,
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("user0");
+        json["joinedAt"] = json!(1699200000);
+        json
+    }
+
+    #[async_std::test]
+    async fn list_users() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/users",
+            response = json!({
+                "users": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_users().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_user() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/users/user0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).delete_user("user0".into()).await,
+            Ok(entity_example()),
+        );
+    }
+}

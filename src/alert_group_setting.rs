@@ -187,3 +187,123 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::alert_group_setting::*;
+    use crate::tests::*;
+
+    fn value_example() -> AlertGroupSettingValue {
+        AlertGroupSettingValue::builder()
+            .name("Example alert group setting")
+            .memo("This is an alert group setting memo.")
+            .service_scopes(["service0".into()])
+            .role_scopes(["service0:role0".into()])
+            .monitor_scopes(["monitor0".into()])
+            .notification_interval(60)
+            .build()
+    }
+
+    fn entity_example() -> AlertGroupSetting {
+        AlertGroupSetting {
+            id: AlertGroupSettingId::from("setting0"),
+            value: value_example(),
+        }
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "name": "Example alert group setting",
+            "memo": "This is an alert group setting memo.",
+            "serviceScopes": ["service0"],
+            "roleScopes": ["service0:role0"],
+            "monitorScopes": ["monitor0"],
+            "notificationInterval": 60,
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("setting0");
+        json
+    }
+
+    #[async_std::test]
+    async fn list_alert_group_settings() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/alert-group-settings",
+            response = json!({
+                "alertGroupSettings": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_alert_group_settings().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_alert_group_setting() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/alert-group-settings",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .create_alert_group_setting(value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_alert_group_setting() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/alert-group-settings/setting0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .get_alert_group_setting("setting0".into())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_alert_group_setting() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/alert-group-settings/setting0",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_alert_group_setting("setting0".into(), value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_alert_group_setting() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/alert-group-settings/setting0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_alert_group_setting("setting0".into())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+}

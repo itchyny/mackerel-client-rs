@@ -212,3 +212,111 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::notification_group::*;
+    use crate::tests::*;
+
+    fn value_example() -> NotificationGroupValue {
+        NotificationGroupValue::builder()
+            .name("Example notification group")
+            .notification_level(NotificationLevel::Critical)
+            .child_notification_group_ids(["group1".into()])
+            .child_channel_ids(["channel0".into()])
+            .monitors([NotificationGroupMonitor::builder()
+                .id("monitor0")
+                .skip_default(true)
+                .build()])
+            .services([NotificationGroupService::builder().name("service0").build()])
+            .build()
+    }
+
+    fn entity_example() -> NotificationGroup {
+        NotificationGroup {
+            id: NotificationGroupId::from("group0"),
+            value: value_example(),
+        }
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "name": "Example notification group",
+            "notificationLevel": "critical",
+            "childNotificationGroupIds": ["group1"],
+            "childChannelIds": ["channel0"],
+            "monitors": [{"id": "monitor0", "skipDefault": true}],
+            "services": [{"name": "service0"}],
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("group0");
+        json
+    }
+
+    #[async_std::test]
+    async fn list_notification_groups() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/notification-groups",
+            response = json!({
+                "notificationGroups": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_notification_groups().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_notification_group() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/notification-groups",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .create_notification_group(value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_notification_group() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/notification-groups/group0",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_notification_group("group0".into(), value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_notification_group() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/notification-groups/group0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_notification_group("group0".into())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+}

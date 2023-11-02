@@ -61,3 +61,25 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use crate::organization::*;
+    use crate::tests::*;
+
+    #[async_std::test]
+    async fn get_organization() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/org",
+            response = json!({ "name": "ExampleOrganization" }),
+        };
+        let organization = Organization {
+            name: OrganizationName::from("ExampleOrganization"),
+        };
+        assert_eq!(
+            test_client!(server).get_organization().await,
+            Ok(organization)
+        );
+    }
+}

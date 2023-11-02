@@ -133,3 +133,86 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use chrono::DateTime;
+    use serde_json::json;
+
+    use crate::invitation::*;
+    use crate::tests::*;
+
+    fn value_example() -> InvitationValue {
+        InvitationValue::builder()
+            .email("mackerel@example.com")
+            .authority(UserAuthority::Manager)
+            .build()
+    }
+
+    fn entity_example() -> Invitation {
+        Invitation::builder()
+            .expires_at(DateTime::from_timestamp(1698937200, 0).unwrap())
+            .value(value_example())
+            .build()
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "email": "mackerel@example.com",
+            "authority": "manager",
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["expiresAt"] = json!(1698937200);
+        json
+    }
+
+    #[async_std::test]
+    async fn list_invitations() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/invitations",
+            response = json!({
+                "invitations": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_invitations().await,
+            Ok(vec![entity_example()])
+        );
+    }
+
+    #[async_std::test]
+    async fn create_invitation() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/invitations",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .create_invitation(value_example())
+                .await,
+            Ok(entity_example())
+        );
+    }
+
+    #[async_std::test]
+    async fn revoke_invitation() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/invitations/revoke",
+            request = json!({ "email": "mackerel@example.com" }),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .revoke_invitation("mackerel@example.com".into())
+                .await,
+            Ok(()),
+        );
+    }
+}

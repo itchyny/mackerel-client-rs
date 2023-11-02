@@ -134,3 +134,88 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::service::*;
+    use crate::tests::*;
+
+    fn value_example() -> Service {
+        Service::builder()
+            .name("service0")
+            .memo("This is a service memo.")
+            .build()
+    }
+
+    fn json_example() -> serde_json::Value {
+        json!({
+            "name": "service0",
+            "memo": "This is a service memo.",
+            "roles": [],
+        })
+    }
+
+    #[async_std::test]
+    async fn list_services() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services",
+            response = json!({
+                "services": [json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_services().await,
+            Ok(vec![value_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_service() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/services",
+            request = json_example(),
+            response = json_example(),
+        };
+        assert_eq!(
+            test_client!(server).create_service(value_example()).await,
+            Ok(value_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_service() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/services/service0",
+            response = json_example(),
+        };
+        assert_eq!(
+            test_client!(server).delete_service("service0".into()).await,
+            Ok(value_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_service_metric_names() {
+        let metric_names = vec![
+            "custom.metric0".to_owned(),
+            "custom.metric1".to_owned(),
+            "custom.metric2".to_owned(),
+        ];
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services/service0/metric-names",
+            response = json!({ "names": metric_names }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_service_metric_names("service0".into())
+                .await,
+            Ok(metric_names),
+        );
+    }
+}

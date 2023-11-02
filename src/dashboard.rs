@@ -398,3 +398,154 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use serde_json::json;
+
+    use crate::dashboard::*;
+    use crate::tests::*;
+
+    fn value_example() -> DashboardValue {
+        DashboardValue::builder()
+            .title("Example dashboard")
+            .memo("This is a dashboard memo.")
+            .url_path("example")
+            .widgets([DashboardWidget::Graph {
+                title: "Graph title".to_string(),
+                graph: DashboardGraph::Host {
+                    host_id: "host0".into(),
+                    name: "loadavg5".to_string(),
+                },
+                range: Some(DashboardRange::Relative {
+                    period: Duration::seconds(86400),
+                    offset: Duration::seconds(-3600),
+                }),
+                layout: DashboardLayout {
+                    x: 0,
+                    y: 0,
+                    width: 8,
+                    height: 6,
+                },
+            }])
+            .build()
+    }
+
+    fn entity_example() -> Dashboard {
+        Dashboard {
+            id: DashboardId::from("dashboard0"),
+            value: value_example(),
+        }
+    }
+
+    fn value_json_example() -> serde_json::Value {
+        json!({
+            "title": "Example dashboard",
+            "memo": "This is a dashboard memo.",
+            "urlPath": "example",
+            "widgets": [
+                {
+                    "type": "graph",
+                    "title": "Graph title",
+                    "graph": {
+                        "type": "host",
+                        "hostId": "host0",
+                        "name": "loadavg5",
+                    },
+                    "range": {
+                        "type": "relative",
+                        "period": 86400,
+                        "offset": -3600,
+                    },
+                    "layout": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 8,
+                        "height": 6,
+                    },
+                },
+            ],
+        })
+    }
+
+    fn entity_json_example() -> serde_json::Value {
+        let mut json = value_json_example();
+        json["id"] = json!("dashboard0");
+        json
+    }
+
+    #[async_std::test]
+    async fn list_dashboards() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/dashboards",
+            response = json!({
+                "dashboards": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_dashboards().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn create_dashboard() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/dashboards",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server).create_dashboard(value_example()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_dashboard() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/dashboards/dashboard0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .get_dashboard("dashboard0".into())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_dashboard() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/dashboards/dashboard0",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_dashboard("dashboard0".into(), value_example())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_dashboard() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/dashboards/dashboard0",
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_dashboard("dashboard0".into())
+                .await,
+            Ok(entity_example()),
+        );
+    }
+}

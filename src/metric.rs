@@ -184,3 +184,194 @@ impl Client {
         .await
     }
 }
+
+#[cfg(test)]
+mod client_tests {
+    use crate::metric::*;
+    use crate::tests::*;
+
+    #[async_std::test]
+    async fn post_host_metric_values() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/tsdb",
+            request = json!([
+                {
+                    "hostId": "host0",
+                    "name": "loadavg1",
+                    "time": 1698894000,
+                    "value": 1.0,
+                },
+                {
+                    "hostId": "host0",
+                    "name": "loadavg5",
+                    "time": 1698894000,
+                    "value": 1.1,
+                },
+                {
+                    "hostId": "host0",
+                    "name": "loadavg15",
+                    "time": 1698894000,
+                    "value": 1.2,
+                },
+            ]),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .post_host_metric_values(vec![
+                    HostMetricValue {
+                        host_id: "host0".into(),
+                        name: "loadavg1".to_owned(),
+                        value: MetricValue {
+                            time: DateTime::from_timestamp(1698894000, 0).unwrap(),
+                            value: 1.0,
+                        },
+                    },
+                    HostMetricValue {
+                        host_id: "host0".into(),
+                        name: "loadavg5".to_owned(),
+                        value: MetricValue {
+                            time: DateTime::from_timestamp(1698894000, 0).unwrap(),
+                            value: 1.1,
+                        },
+                    },
+                    HostMetricValue {
+                        host_id: "host0".into(),
+                        name: "loadavg15".to_owned(),
+                        value: MetricValue {
+                            time: DateTime::from_timestamp(1698894000, 0).unwrap(),
+                            value: 1.2,
+                        },
+                    },
+                ])
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_host_metric_values() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts/host0/metrics",
+            query_params = "name=loadavg5&from=1699999860&to=1700000000",
+            response = json!({
+                "metrics": [
+                    { "time": 1699999860, "value": 1.0 },
+                    { "time": 1699999920, "value": 1.1 },
+                    { "time": 1699999980, "value": 1.2 },
+                ],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_host_metric_values(
+                    "host0".into(),
+                    "loadavg5".to_owned(),
+                    DateTime::from_timestamp(1699999860, 0).unwrap(),
+                    DateTime::from_timestamp(1700000000, 0).unwrap(),
+                )
+                .await,
+            Ok(vec![
+                MetricValue {
+                    time: DateTime::from_timestamp(1699999860, 0).unwrap(),
+                    value: 1.0,
+                },
+                MetricValue {
+                    time: DateTime::from_timestamp(1699999920, 0).unwrap(),
+                    value: 1.1,
+                },
+                MetricValue {
+                    time: DateTime::from_timestamp(1699999980, 0).unwrap(),
+                    value: 1.2,
+                },
+            ]),
+        );
+    }
+
+    #[async_std::test]
+    async fn post_service_metric_values() {
+        let server = test_server! {
+            method = POST,
+            path = "/api/v0/services/service0/tsdb",
+            request = json!([
+                { "name": "custom.metric0", "time": 1698894000, "value": 1.0 },
+                { "name": "custom.metric1", "time": 1698894000, "value": 1.1 },
+                { "name": "custom.metric2", "time": 1698894000, "value": 1.2 },
+            ]),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .post_service_metric_values(
+                    "service0".into(),
+                    vec![
+                        ServiceMetricValue {
+                            name: "custom.metric0".to_owned(),
+                            value: MetricValue {
+                                time: DateTime::from_timestamp(1698894000, 0).unwrap(),
+                                value: 1.0,
+                            },
+                        },
+                        ServiceMetricValue {
+                            name: "custom.metric1".to_owned(),
+                            value: MetricValue {
+                                time: DateTime::from_timestamp(1698894000, 0).unwrap(),
+                                value: 1.1,
+                            },
+                        },
+                        ServiceMetricValue {
+                            name: "custom.metric2".to_owned(),
+                            value: MetricValue {
+                                time: DateTime::from_timestamp(1698894000, 0).unwrap(),
+                                value: 1.2,
+                            },
+                        }
+                    ]
+                )
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_service_metric_values() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/services/service0/metrics",
+            query_params = "name=custom.metric&from=1699999860&to=1700000000",
+            response = json!({
+                "metrics": [
+                    { "time": 1699999860, "value": 1.0 },
+                    { "time": 1699999920, "value": 1.1 },
+                    { "time": 1699999980, "value": 1.2 },
+                ],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_service_metric_values(
+                    "service0".into(),
+                    "custom.metric".to_owned(),
+                    DateTime::from_timestamp(1699999860, 0).unwrap(),
+                    DateTime::from_timestamp(1700000000, 0).unwrap(),
+                )
+                .await,
+            Ok(vec![
+                MetricValue {
+                    time: DateTime::from_timestamp(1699999860, 0).unwrap(),
+                    value: 1.0,
+                },
+                MetricValue {
+                    time: DateTime::from_timestamp(1699999920, 0).unwrap(),
+                    value: 1.1,
+                },
+                MetricValue {
+                    time: DateTime::from_timestamp(1699999980, 0).unwrap(),
+                    value: 1.2,
+                },
+            ]),
+        );
+    }
+}
