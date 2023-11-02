@@ -5,6 +5,7 @@ use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
+use crate::alert::AlertStatus;
 use crate::client::Client;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
@@ -47,6 +48,11 @@ pub enum MonitorValue {
         name: String,
         #[serde(default, skip_serializing_if = "String::is_empty")]
         memo: String,
+        #[serde(
+            default = "AlertStatus::critical",
+            skip_serializing_if = "AlertStatus::is_critical"
+        )]
+        alert_status_on_gone: AlertStatus,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         scopes: Vec<MonitorScope>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -313,6 +319,7 @@ mod tests {
             .value(MonitorValue::Connectivity {
                 name: "Example connectivity monitor".to_string(),
                 memo: "Monitor memo".to_string(),
+                alert_status_on_gone: AlertStatus::Warning,
                 scopes: vec![],
                 exclude_scopes: vec![],
                 notification_interval: None,
@@ -327,6 +334,7 @@ mod tests {
             "id": "abcde2",
             "name": "Example connectivity monitor",
             "memo": "Monitor memo",
+            "alertStatusOnGone": "WARNING",
         })
     }
 
@@ -706,6 +714,7 @@ mod client_tests {
         MonitorValue::Connectivity {
             name: "Example connectivity monitor".to_string(),
             memo: "Monitor memo".to_string(),
+            alert_status_on_gone: AlertStatus::Critical,
             scopes: vec![],
             exclude_scopes: vec![],
             notification_interval: None,

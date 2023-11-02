@@ -56,6 +56,16 @@ pub enum AlertStatus {
     Unknown,
 }
 
+impl AlertStatus {
+    pub(crate) fn critical() -> Self {
+        Self::Critical
+    }
+
+    pub(crate) fn is_critical(&self) -> bool {
+        *self == Self::Critical
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
