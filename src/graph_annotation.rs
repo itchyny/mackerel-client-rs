@@ -10,7 +10,7 @@ use crate::macros::*;
 use crate::role::RoleName;
 use crate::service::ServiceName;
 
-/// A graph annotation
+/// A graph annotation entity
 pub type GraphAnnotation = Entity<GraphAnnotationValue>;
 
 /// A graph annotation id

@@ -12,7 +12,7 @@ use crate::host::HostId;
 use crate::macros::*;
 use crate::monitor::{MonitorId, MonitorType};
 
-/// An alert
+/// An alert entity
 pub type Alert = Entity<AlertValue>;
 
 /// An alert id

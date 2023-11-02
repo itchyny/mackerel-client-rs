@@ -13,7 +13,7 @@ use crate::monitor::MonitorId;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
-/// A downtime
+/// A downtime entity
 pub type Downtime = Entity<DowntimeValue>;
 
 /// A downtime id
@@ -55,7 +55,7 @@ pub struct DowntimeValue {
     pub monitor_exclude_scopes: Vec<MonitorId>,
 }
 
-/// A downtime recurrence
+/// A downtime recurrence setting
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 pub struct DowntimeRecurrence {

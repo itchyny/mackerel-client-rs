@@ -13,7 +13,7 @@ use crate::monitor::MonitorOperator;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
-/// A dashboard
+/// A dashboard entity
 pub type Dashboard = Entity<DashboardValue>;
 
 /// A dashboard id

@@ -18,7 +18,7 @@ use crate::monitor::{MonitorId, MonitorType};
 use crate::role::{RoleFullname, RoleName};
 use crate::service::ServiceName;
 
-/// A host
+/// A host entity
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]

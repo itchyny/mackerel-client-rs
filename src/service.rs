@@ -8,7 +8,7 @@ use crate::macros::*;
 use crate::name::Name;
 use crate::role::RoleName;
 
-/// A service
+/// A service value
 #[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 pub struct Service {

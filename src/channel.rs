@@ -10,7 +10,7 @@ use crate::error::Result;
 use crate::macros::*;
 use crate::user::UserId;
 
-/// A channel
+/// A channel entity
 pub type Channel = Entity<ChannelValue>;
 
 /// A channel id

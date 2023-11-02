@@ -13,7 +13,7 @@ use crate::macros::*;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
-/// A monitor
+/// A monitor entity
 pub type Monitor = Entity<MonitorValue>;
 
 /// A monitor id

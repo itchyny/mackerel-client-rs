@@ -7,7 +7,7 @@ use crate::error::Result;
 use crate::macros::*;
 use crate::name::Name;
 
-/// An organization
+/// An organization value
 #[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 pub struct Organization {

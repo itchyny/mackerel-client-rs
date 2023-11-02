@@ -10,7 +10,7 @@ use crate::monitor::MonitorId;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
-/// An alert group setting
+/// An alert group setting entity
 pub type AlertGroupSetting = Entity<AlertGroupSettingValue>;
 
 /// An alert group setting id

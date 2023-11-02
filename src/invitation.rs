@@ -8,7 +8,7 @@ use crate::error::Result;
 use crate::macros::*;
 use crate::user::UserAuthority;
 
-/// An invitation
+/// An invitation entity
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]

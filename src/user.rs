@@ -10,7 +10,7 @@ use crate::entity::Id;
 use crate::error::Result;
 use crate::macros::*;
 
-/// A user
+/// A user entity
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]

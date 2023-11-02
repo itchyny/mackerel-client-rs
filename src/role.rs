@@ -9,7 +9,7 @@ use crate::macros::*;
 use crate::name::Name;
 use crate::service::ServiceName;
 
-/// A role
+/// A role value
 #[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 pub struct Role {
