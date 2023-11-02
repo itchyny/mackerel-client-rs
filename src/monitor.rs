@@ -32,7 +32,9 @@ pub enum MonitorValue {
         duration: u64,
         metric: String,
         operator: MonitorOperator,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         warning: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
@@ -73,7 +75,9 @@ pub enum MonitorValue {
         duration: u64,
         metric: String,
         operator: MonitorOperator,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         warning: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
@@ -90,18 +94,28 @@ pub enum MonitorValue {
         url: String,
         #[serde(default)]
         method: ExternalMethod,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         request_body: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         headers: Option<Vec<ExternalHeader>>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         service: Option<ServiceName>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         response_time_duration: Option<u64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         response_time_warning: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         response_time_critical: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         contains_string: Option<String>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         certification_expiration_warning: Option<u64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         certification_expiration_critical: Option<u64>,
-        skip_certificate_verification: Option<bool>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        skip_certificate_verification: bool,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
@@ -114,7 +128,9 @@ pub enum MonitorValue {
         memo: String,
         expression: String,
         operator: MonitorOperator,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         warning: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
@@ -128,7 +144,9 @@ pub enum MonitorValue {
         memo: String,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         scopes: Vec<MonitorScope>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         warning_sensitivity: Option<AnomalyDetectionSensitivity>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         critical_sensitivity: Option<AnomalyDetectionSensitivity>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
@@ -414,7 +432,7 @@ mod tests {
                 max_check_attempts: Some(5),
                 certification_expiration_warning: Some(1200),
                 certification_expiration_critical: Some(60),
-                skip_certificate_verification: Some(true),
+                skip_certificate_verification: true,
                 notification_interval: Some(60),
                 is_mute: true,
             })
