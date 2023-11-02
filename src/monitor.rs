@@ -82,6 +82,10 @@ pub enum MonitorValue {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
+        missing_duration_warning: Option<u64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        missing_duration_critical: Option<u64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         is_mute: bool,
@@ -390,6 +394,8 @@ mod tests {
                 warning: Some(100.0),
                 critical: Some(200.0),
                 max_check_attempts: Some(10),
+                missing_duration_warning: Some(60),
+                missing_duration_critical: Some(120),
                 notification_interval: Some(30),
                 is_mute: false,
             })
@@ -409,6 +415,8 @@ mod tests {
             "warning": 100.0,
             "critical": 200.0,
             "maxCheckAttempts": 10,
+            "missingDurationWarning": 60,
+            "missingDurationCritical": 120,
             "notificationInterval": 30,
         })
     }
