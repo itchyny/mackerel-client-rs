@@ -9,10 +9,12 @@ use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 use url::form_urlencoded;
 
+use crate::alert::AlertStatus;
 use crate::client::Client;
 use crate::entity::Id;
 use crate::error::Result;
 use crate::macros::*;
+use crate::monitor::{MonitorId, MonitorType};
 use crate::role::{RoleFullname, RoleName};
 use crate::service::ServiceName;
 
@@ -90,11 +92,11 @@ pub type HostId = Id<HostValue>;
 #[serde(rename_all = "camelCase")]
 pub struct HostValue {
     pub name: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub display_name: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub custom_identifier: Option<String>,
     #[builder(default)]
     pub meta: HashMap<String, Value>,
@@ -139,6 +141,29 @@ pub struct HostInterface {
 #[serde(rename_all = "camelCase")]
 pub struct HostCheck {
     pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+}
+
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+pub struct MonitoredStatus {
+    pub monitor_id: MonitorId,
+    pub status: AlertStatus,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub detail: Option<MonitoredStatusDetail>,
+}
+
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+pub struct MonitoredStatusDetail {
+    #[serde(rename = "type")]
+    pub monitor_type: MonitorType,
+    pub message: String,
     #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
@@ -269,6 +294,57 @@ mod tests {
             serde_json::from_value(host_status_str.into()).unwrap()
         );
         assert_eq!(serde_json::to_value(host_status).unwrap(), host_status_str);
+    }
+
+    fn monitored_status_example1() -> MonitoredStatus {
+        MonitoredStatus::builder()
+            .monitor_id("monitor0")
+            .status(AlertStatus::Ok)
+            .build()
+    }
+
+    fn monitored_status_json_example1() -> serde_json::Value {
+        json!({
+            "monitorId": "monitor0",
+            "status": "OK",
+        })
+    }
+
+    fn monitored_status_example2() -> MonitoredStatus {
+        MonitoredStatus::builder()
+            .monitor_id("monitor0")
+            .status(AlertStatus::Critical)
+            .detail(
+                MonitoredStatusDetail::builder()
+                    .monitor_type(MonitorType::Check)
+                    .message("This is a check monitoring message.")
+                    .memo("This is a check monitoring memo.")
+                    .build(),
+            )
+            .build()
+    }
+
+    fn monitored_status_json_example2() -> serde_json::Value {
+        json!({
+            "monitorId": "monitor0",
+            "status": "CRITICAL",
+            "detail": {
+                "type": "check",
+                "message": "This is a check monitoring message.",
+                "memo": "This is a check monitoring memo.",
+            },
+        })
+    }
+
+    #[rstest]
+    #[case(monitored_status_example1(), monitored_status_json_example1())]
+    #[case(monitored_status_example2(), monitored_status_json_example2())]
+    fn test_monitored_statuses(
+        #[case] monitored_status: MonitoredStatus,
+        #[case] json: serde_json::Value,
+    ) {
+        assert_eq!(serde_json::to_value(&monitored_status).unwrap(), json);
+        assert_eq!(monitored_status, serde_json::from_value(json).unwrap());
     }
 }
 
@@ -443,6 +519,23 @@ impl Client {
         )
         .await
     }
+
+    /// Fetches host monitoring statuses.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/hosts#monitored-statuses>.
+    pub async fn list_host_monitored_statuses(
+        &self,
+        host_id: HostId,
+    ) -> Result<Vec<MonitoredStatus>> {
+        self.request(
+            Method::GET,
+            format!("/api/v0/hosts/{}/monitored-statuses", host_id),
+            query_params![],
+            request_body![],
+            response_body! { monitoredStatuses: Vec<MonitoredStatus> },
+        )
+        .await
+    }
 }
 
 #[cfg(test)]
@@ -450,7 +543,9 @@ mod client_tests {
     use chrono::DateTime;
     use serde_json::json;
 
+    use crate::alert::*;
     use crate::host::*;
+    use crate::monitor::*;
     use crate::tests::*;
 
     fn value_example() -> HostValue {
@@ -681,6 +776,41 @@ mod client_tests {
                 .list_host_metric_names("host0".into())
                 .await,
             Ok(metric_names),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_host_monitored_statuses() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts/host0/monitored-statuses",
+            response = json!({
+                "monitoredStatuses": [
+                    {
+                        "monitorId": "monitor0",
+                        "status": "OK",
+                        "detail": {
+                            "type": "check",
+                            "message": "This is a check monitoring message.",
+                        },
+                    },
+                ],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_host_monitored_statuses("host0".into())
+                .await,
+            Ok(vec![MonitoredStatus::builder()
+                .monitor_id("monitor0")
+                .status(AlertStatus::Ok)
+                .detail(
+                    MonitoredStatusDetail::builder()
+                        .monitor_type(MonitorType::Check)
+                        .message("This is a check monitoring message.")
+                        .build()
+                )
+                .build()]),
         );
     }
 }
