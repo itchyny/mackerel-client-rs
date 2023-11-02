@@ -166,7 +166,7 @@ pub enum MonitorValue {
 }
 
 impl MonitorValue {
-    /// Returns the name of the monitor.
+    /// Returns the `name` of the monitor.
     pub fn name(&self) -> String {
         match *self {
             Self::Host { ref name, .. } => name.clone(),
@@ -178,7 +178,7 @@ impl MonitorValue {
         }
     }
 
-    /// Returns the memo of the monitor.
+    /// Returns the `memo` of the monitor.
     pub fn memo(&self) -> String {
         match *self {
             Self::Host { ref memo, .. } => memo.clone(),
@@ -187,6 +187,18 @@ impl MonitorValue {
             Self::External { ref memo, .. } => memo.clone(),
             Self::Expression { ref memo, .. } => memo.clone(),
             Self::AnomalyDetection { ref memo, .. } => memo.clone(),
+        }
+    }
+
+    /// Returns the `is_mute` of the monitor.
+    pub fn is_mute(&self) -> bool {
+        match *self {
+            Self::Host { is_mute, .. } => is_mute,
+            Self::Connectivity { is_mute, .. } => is_mute,
+            Self::Service { is_mute, .. } => is_mute,
+            Self::External { is_mute, .. } => is_mute,
+            Self::Expression { is_mute, .. } => is_mute,
+            Self::AnomalyDetection { is_mute, .. } => is_mute,
         }
     }
 }
@@ -574,6 +586,17 @@ mod tests {
     #[case(anomaly_detection_monitor_example())]
     fn test_monitor_memo(#[case] monitor: Monitor) {
         assert_eq!(monitor.memo(), "Monitor memo");
+    }
+
+    #[rstest]
+    #[case(host_monitor_example(), false)]
+    #[case(connectivity_monitor_example(), false)]
+    #[case(service_monitor_example(), false)]
+    #[case(external_monitor_example(), true)]
+    #[case(expression_monitor_example(), true)]
+    #[case(anomaly_detection_monitor_example(), true)]
+    fn test_monitor_is_mute(#[case] monitor: Monitor, #[case] is_mute: bool) {
+        assert_eq!(monitor.is_mute(), is_mute);
     }
 
     #[rstest]
