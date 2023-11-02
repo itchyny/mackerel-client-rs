@@ -9,6 +9,7 @@ use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::host::HostId;
 use crate::macros::*;
+use crate::monitor::MonitorOperator;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;
 
@@ -41,15 +42,28 @@ pub enum DashboardWidget {
     Graph {
         title: String,
         graph: DashboardGraph,
-        range: Option<DashboardRange>,
+        #[serde(rename = "range", default, skip_serializing_if = "Option::is_none")]
+        time_range: Option<DashboardTimeRange>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        value_range: Option<DashboardValueRange>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        reference_lines: Vec<DashboardReferenceLine>,
         layout: DashboardLayout,
     },
     #[serde(rename_all = "camelCase")]
     Value {
         title: String,
         metric: DashboardMetric,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         fraction_size: Option<u64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         suffix: Option<String>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_new_version: bool,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        shows_trend: bool,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        format_rules: Vec<DashboardFormatRule>,
         layout: DashboardLayout,
     },
     #[serde(rename_all = "camelCase")]
@@ -94,22 +108,25 @@ pub enum DashboardGraph {
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardMetric {
     #[serde(rename_all = "camelCase")]
-    Host { host_id: HostId, name: String },
+    Host {
+        host_id: HostId,
+        name: String,
+    },
     #[serde(rename_all = "camelCase")]
     Service {
         service_name: ServiceName,
         name: String,
     },
-    #[serde(rename_all = "camelCase")]
-    Expression { expression: String },
-    #[serde(rename_all = "camelCase")]
+    Expression {
+        expression: String,
+    },
     Unknown {},
 }
 
-/// A dashboard range
+/// A dashboard time range
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "camelCase")]
-pub enum DashboardRange {
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum DashboardTimeRange {
     Relative {
         #[serde(with = "serde_with::As::<DurationSeconds<i64>>")]
         period: Duration,
@@ -122,6 +139,28 @@ pub enum DashboardRange {
         #[serde(with = "chrono::serde::ts_seconds")]
         end: DateTime<Utc>,
     },
+}
+
+/// A dashboard value range
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+pub struct DashboardValueRange {
+    pub min: Option<f64>,
+    pub max: Option<f64>,
+}
+
+/// A dashboard reference line
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+pub struct DashboardReferenceLine {
+    pub label: String,
+    pub value: f64,
+}
+
+/// A dashboard format rule
+#[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
+pub struct DashboardFormatRule {
+    pub name: String,
+    pub threshold: f64,
+    pub operator: MonitorOperator,
 }
 
 /// A dashboard layout
@@ -154,10 +193,18 @@ mod tests {
                                 host_id: "abcde1".into(),
                                 name: "loadavg5".to_string(),
                             },
-                            range: Some(DashboardRange::Relative {
+                            time_range: Some(DashboardTimeRange::Relative {
                                 period: Duration::seconds(86400),
                                 offset: Duration::seconds(-3600),
                             }),
+                            value_range: Some(DashboardValueRange {
+                                min: Some(0.0),
+                                max: Some(20.0),
+                            }),
+                            reference_lines: vec![DashboardReferenceLine {
+                                label: "critical".to_owned(),
+                                value: 15.0,
+                            }],
                             layout: DashboardLayout {
                                 x: 0,
                                 y: 0,
@@ -172,10 +219,12 @@ mod tests {
                                 name: "cpu.{user,iowait,system}".to_string(),
                                 is_stacked: true,
                             },
-                            range: Some(DashboardRange::Absolute {
+                            time_range: Some(DashboardTimeRange::Absolute {
                                 start: DateTime::from_timestamp(1630000000, 0).unwrap(),
                                 end: DateTime::from_timestamp(1630003600, 0).unwrap(),
                             }),
+                            value_range: None,
+                            reference_lines: vec![],
                             layout: DashboardLayout {
                                 x: 8,
                                 y: 0,
@@ -191,6 +240,13 @@ mod tests {
                             },
                             fraction_size: Some(4),
                             suffix: Some("%".to_string()),
+                            is_new_version: true,
+                            shows_trend: true,
+                            format_rules: vec![DashboardFormatRule {
+                                name: "heavy usage".to_owned(),
+                                threshold: 80.0,
+                                operator: MonitorOperator::GreaterThan,
+                            }],
                             layout: DashboardLayout {
                                 x: 16,
                                 y: 0,
@@ -244,6 +300,16 @@ mod tests {
                         "period": 86400,
                         "offset": -3600,
                     },
+                    "valueRange": {
+                        "min": 0.0,
+                        "max": 20.0,
+                    },
+                    "referenceLines": [
+                        {
+                            "label": "critical",
+                            "value": 15.0,
+                        },
+                    ],
                     "layout": {
                         "x": 0,
                         "y": 0,
@@ -282,6 +348,15 @@ mod tests {
                     },
                     "fractionSize": 4,
                     "suffix": "%",
+                    "isNewVersion": true,
+                    "showsTrend": true,
+                    "formatRules": [
+                        {
+                            "name": "heavy usage",
+                            "threshold": 80.0,
+                            "operator": ">",
+                        },
+                    ],
                     "layout": {
                         "x": 16,
                         "y": 0,
@@ -417,10 +492,18 @@ mod client_tests {
                     host_id: "host0".into(),
                     name: "loadavg5".to_string(),
                 },
-                range: Some(DashboardRange::Relative {
+                time_range: Some(DashboardTimeRange::Relative {
                     period: Duration::seconds(86400),
                     offset: Duration::seconds(-3600),
                 }),
+                value_range: Some(DashboardValueRange {
+                    min: Some(0.0),
+                    max: Some(20.0),
+                }),
+                reference_lines: vec![DashboardReferenceLine {
+                    label: "critical".to_owned(),
+                    value: 15.0,
+                }],
                 layout: DashboardLayout {
                     x: 0,
                     y: 0,
@@ -457,6 +540,16 @@ mod client_tests {
                         "period": 86400,
                         "offset": -3600,
                     },
+                    "valueRange": {
+                        "min": 0.0,
+                        "max": 20.0,
+                    },
+                    "referenceLines": [
+                        {
+                            "label": "critical",
+                            "value": 15.0,
+                        },
+                    ],
                     "layout": {
                         "x": 0,
                         "y": 0,
