@@ -34,6 +34,8 @@ pub enum MonitorValue {
         operator: MonitorOperator,
         warning: Option<f64>,
         critical: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        max_check_attempts: Option<u64>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         scopes: Vec<MonitorScope>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -74,6 +76,8 @@ pub enum MonitorValue {
         warning: Option<f64>,
         critical: Option<f64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
+        max_check_attempts: Option<u64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         is_mute: bool,
@@ -92,6 +96,7 @@ pub enum MonitorValue {
         response_time_warning: Option<f64>,
         response_time_critical: Option<f64>,
         contains_string: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
         certification_expiration_warning: Option<u64>,
         certification_expiration_critical: Option<u64>,
@@ -124,6 +129,7 @@ pub enum MonitorValue {
         scopes: Vec<MonitorScope>,
         warning_sensitivity: Option<AnomalyDetectionSensitivity>,
         critical_sensitivity: Option<AnomalyDetectionSensitivity>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         max_check_attempts: Option<u64>,
         #[serde(default, with = "chrono::serde::ts_seconds_option")]
         training_period_from: Option<DateTime<Utc>>,
@@ -288,6 +294,7 @@ mod tests {
                 operator: MonitorOperator::GreaterThan,
                 warning: Some(10.0),
                 critical: Some(20.0),
+                max_check_attempts: Some(5),
                 scopes: vec!["service0".into()],
                 exclude_scopes: vec!["service0:role3".into()],
                 notification_interval: Some(30),
@@ -307,6 +314,7 @@ mod tests {
             "operator": ">",
             "warning": 10.0,
             "critical": 20.0,
+            "maxCheckAttempts": 5,
             "scopes": ["service0"],
             "excludeScopes": ["service0:role3"],
             "notificationInterval": 30,
@@ -350,6 +358,7 @@ mod tests {
                 operator: MonitorOperator::GreaterThan,
                 warning: Some(100.0),
                 critical: Some(200.0),
+                max_check_attempts: Some(10),
                 notification_interval: Some(30),
                 is_mute: false,
             })
@@ -368,6 +377,7 @@ mod tests {
             "operator": ">",
             "warning": 100.0,
             "critical": 200.0,
+            "maxCheckAttempts": 10,
             "notificationInterval": 30,
         })
     }
