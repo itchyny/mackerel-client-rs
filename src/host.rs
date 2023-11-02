@@ -271,6 +271,7 @@ mod tests {
     #[rstest]
     #[case(HostSize::Standard, "standard")]
     #[case(HostSize::Micro, "micro")]
+    #[case(HostSize::default(), "standard")]
     fn test_host_size(#[case] host_size: HostSize, #[case] host_size_str: &str) {
         assert_eq!(host_size.to_string(), host_size_str);
         assert_eq!(host_size, host_size_str.parse().unwrap());
