@@ -95,9 +95,11 @@ pub enum MonitorValue {
         #[serde(default)]
         method: ExternalMethod,
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        request_body: Option<String>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
         headers: Option<Vec<ExternalHeader>>,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        request_body: String,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        follow_redirect: bool,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         service: Option<ServiceName>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -419,11 +421,12 @@ mod tests {
                 memo: "Monitor memo".to_string(),
                 url: "https://example.com".to_string(),
                 method: ExternalMethod::Get,
-                request_body: Some("Request Body".to_string()),
                 headers: Some(vec![ExternalHeader::builder()
                     .name("Cache-Control")
                     .value("no-cache")
                     .build()]),
+                request_body: "Request Body".to_owned(),
+                follow_redirect: true,
                 service: Some("service1".into()),
                 response_time_duration: Some(5),
                 response_time_warning: Some(3000.0),
@@ -447,8 +450,9 @@ mod tests {
             "memo": "Monitor memo",
             "url": "https://example.com",
             "method": "GET",
-            "requestBody": "Request Body",
             "headers": [{ "name": "Cache-Control", "value": "no-cache" }],
+            "requestBody": "Request Body",
+            "followRedirect": true,
             "service": "service1",
             "responseTimeDuration": 5,
             "responseTimeWarning": 3000.0,
