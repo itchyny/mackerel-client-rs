@@ -33,24 +33,28 @@ pub enum MonitorValue {
         operator: MonitorOperator,
         warning: Option<f64>,
         critical: Option<f64>,
-        is_mute: Option<bool>,
-        notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         scopes: Vec<MonitorScope>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         exclude_scopes: Vec<MonitorScope>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        notification_interval: Option<u64>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_mute: bool,
     },
     #[serde(rename_all = "camelCase")]
     Connectivity {
         name: String,
         #[serde(default, skip_serializing_if = "String::is_empty")]
         memo: String,
-        is_mute: Option<bool>,
-        notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         scopes: Vec<MonitorScope>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         exclude_scopes: Vec<MonitorScope>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        notification_interval: Option<u64>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_mute: bool,
     },
     #[serde(rename_all = "camelCase")]
     Service {
@@ -63,8 +67,10 @@ pub enum MonitorValue {
         operator: MonitorOperator,
         warning: Option<f64>,
         critical: Option<f64>,
-        is_mute: Option<bool>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_mute: bool,
     },
     #[serde(rename_all = "camelCase")]
     External {
@@ -84,8 +90,10 @@ pub enum MonitorValue {
         certification_expiration_warning: Option<u64>,
         certification_expiration_critical: Option<u64>,
         skip_certificate_verification: Option<bool>,
-        is_mute: Option<bool>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_mute: bool,
     },
     #[serde(rename_all = "camelCase")]
     Expression {
@@ -96,8 +104,10 @@ pub enum MonitorValue {
         operator: MonitorOperator,
         warning: Option<f64>,
         critical: Option<f64>,
-        is_mute: Option<bool>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_mute: bool,
     },
     #[serde(rename_all = "camelCase")]
     AnomalyDetection {
@@ -111,8 +121,10 @@ pub enum MonitorValue {
         max_check_attempts: Option<u64>,
         #[serde(default, with = "chrono::serde::ts_seconds_option")]
         training_period_from: Option<DateTime<Utc>>,
-        is_mute: Option<bool>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_mute: bool,
     },
 }
 
@@ -270,10 +282,10 @@ mod tests {
                 operator: MonitorOperator::GreaterThan,
                 warning: Some(10.0),
                 critical: Some(20.0),
-                is_mute: Some(false),
-                notification_interval: Some(30),
                 scopes: vec!["service0".into()],
                 exclude_scopes: vec!["service0:role3".into()],
+                notification_interval: Some(30),
+                is_mute: false,
             })
             .build()
     }
@@ -289,10 +301,9 @@ mod tests {
             "operator": ">",
             "warning": 10.0,
             "critical": 20.0,
-            "isMute": false,
-            "notificationInterval": 30,
             "scopes": ["service0"],
-            "excludeScopes": ["service0:role3"]
+            "excludeScopes": ["service0:role3"],
+            "notificationInterval": 30,
         })
     }
 
@@ -302,10 +313,10 @@ mod tests {
             .value(MonitorValue::Connectivity {
                 name: "Example connectivity monitor".to_string(),
                 memo: "Monitor memo".to_string(),
-                is_mute: Some(false),
-                notification_interval: None,
                 scopes: vec![],
                 exclude_scopes: vec![],
+                notification_interval: None,
+                is_mute: false,
             })
             .build()
     }
@@ -316,7 +327,6 @@ mod tests {
             "id": "abcde2",
             "name": "Example connectivity monitor",
             "memo": "Monitor memo",
-            "isMute": false
         })
     }
 
@@ -332,8 +342,8 @@ mod tests {
                 operator: MonitorOperator::GreaterThan,
                 warning: Some(100.0),
                 critical: Some(200.0),
-                is_mute: Some(false),
                 notification_interval: Some(30),
+                is_mute: false,
             })
             .build()
     }
@@ -350,8 +360,7 @@ mod tests {
             "operator": ">",
             "warning": 100.0,
             "critical": 200.0,
-            "isMute": false,
-            "notificationInterval": 30
+            "notificationInterval": 30,
         })
     }
 
@@ -377,8 +386,8 @@ mod tests {
                 certification_expiration_warning: Some(1200),
                 certification_expiration_critical: Some(60),
                 skip_certificate_verification: Some(true),
-                is_mute: Some(true),
                 notification_interval: Some(60),
+                is_mute: true,
             })
             .build()
     }
@@ -402,8 +411,8 @@ mod tests {
             "certificationExpirationWarning": 1200,
             "certificationExpirationCritical": 60,
             "skipCertificateVerification": true,
+            "notificationInterval": 60,
             "isMute": true,
-            "notificationInterval": 60
         })
     }
 
@@ -417,8 +426,8 @@ mod tests {
                 operator: MonitorOperator::LessThan,
                 warning: Some(10.0),
                 critical: None,
-                is_mute: Some(false),
                 notification_interval: None,
+                is_mute: true,
             })
             .build()
     }
@@ -432,7 +441,7 @@ mod tests {
             "expression": "min(role(\"foo:bar\", \"custom.foo.bar\"))",
             "operator": "<",
             "warning": 10.0,
-            "isMute": false
+            "isMute": true
         })
     }
 
@@ -447,8 +456,8 @@ mod tests {
                 critical_sensitivity: Some(AnomalyDetectionSensitivity::Insensitive),
                 max_check_attempts: Some(3),
                 training_period_from: Some(DateTime::from_timestamp(1580000000, 0).unwrap()),
-                is_mute: Some(false),
                 notification_interval: None,
+                is_mute: true,
             })
             .build()
     }
@@ -464,7 +473,7 @@ mod tests {
             "criticalSensitivity": "insensitive",
             "maxCheckAttempts": 3,
             "trainingPeriodFrom": 1580000000,
-            "isMute": false
+            "isMute": true
         })
     }
 
@@ -697,10 +706,10 @@ mod client_tests {
         MonitorValue::Connectivity {
             name: "Example connectivity monitor".to_string(),
             memo: "Monitor memo".to_string(),
-            is_mute: Some(false),
-            notification_interval: None,
             scopes: vec![],
             exclude_scopes: vec![],
+            notification_interval: None,
+            is_mute: false,
         }
     }
 
@@ -716,7 +725,6 @@ mod client_tests {
             "type": "connectivity",
             "name": "Example connectivity monitor",
             "memo": "Monitor memo",
-            "isMute": false
         })
     }
 
