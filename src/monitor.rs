@@ -87,8 +87,9 @@ pub enum MonitorValue {
         name: String,
         #[serde(default, skip_serializing_if = "String::is_empty")]
         memo: String,
-        method: Option<ExternalMethod>,
         url: String,
+        #[serde(default)]
+        method: ExternalMethod,
         request_body: Option<String>,
         headers: Option<Vec<ExternalHeader>>,
         service: Option<ServiceName>,
@@ -248,10 +249,20 @@ impl From<MonitorScope> for String {
 
 /// HTTP method for external http monitor
 #[derive(
-    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+    PartialEq,
+    Eq,
+    Copy,
+    Clone,
+    Default,
+    Debug,
+    Display,
+    EnumString,
+    SerializeDisplay,
+    DeserializeFromStr,
 )]
 #[strum(serialize_all = "UPPERCASE")]
 pub enum ExternalMethod {
+    #[default]
     Get,
     Post,
     Put,
@@ -388,8 +399,8 @@ mod tests {
             .value(MonitorValue::External {
                 name: "Example external monitor".to_string(),
                 memo: "Monitor memo".to_string(),
-                method: Some(ExternalMethod::Get),
                 url: "https://example.com".to_string(),
+                method: ExternalMethod::Get,
                 request_body: Some("Request Body".to_string()),
                 headers: Some(vec![ExternalHeader::builder()
                     .name("Cache-Control")
@@ -416,8 +427,8 @@ mod tests {
             "id": "abcde4",
             "name": "Example external monitor",
             "memo": "Monitor memo",
-            "method": "GET",
             "url": "https://example.com",
+            "method": "GET",
             "requestBody": "Request Body",
             "headers": [{ "name": "Cache-Control", "value": "no-cache" }],
             "service": "service1",
@@ -608,6 +619,7 @@ mod tests {
     #[case(ExternalMethod::Post, "POST")]
     #[case(ExternalMethod::Put, "PUT")]
     #[case(ExternalMethod::Delete, "DELETE")]
+    #[case(ExternalMethod::default(), "GET")]
     fn test_external_method(
         #[case] external_method: ExternalMethod,
         #[case] external_method_str: &str,
