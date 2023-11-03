@@ -33,7 +33,7 @@ impl<T> std::ops::Deref for Entity<T> {
 }
 
 /// An id represents a unique id of the type `T`.
-#[derive(PartialEq, Eq, DeserializeFromStr, SerializeDisplay)]
+#[derive(DeserializeFromStr, SerializeDisplay)]
 pub struct Id<T>(str16, PhantomData<T>);
 
 impl<T> Id<T> {
@@ -50,6 +50,14 @@ impl<T> Clone for Id<T> {
         *self
     }
 }
+
+impl<T> PartialEq for Id<T> {
+    fn eq(&self, other: &Self) -> bool {
+        *self.0 == *other.0
+    }
+}
+
+impl<T> Eq for Id<T> {}
 
 #[derive(PartialEq, Eq, Debug)]
 pub struct ParseIdError(String);
@@ -122,18 +130,19 @@ mod tests {
     use serde_json::json;
     use std::collections::{HashMap, HashSet};
 
-    #[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
-    struct Value {
-        x: i64,
-    }
-
     #[test]
     fn entity() {
-        let value = Value { x: 1 };
-        let entity = Entity::<Value>::new("id0", value.clone());
+        #[derive(PartialEq, Debug, Serialize, Deserialize)]
+        struct Value {
+            x: i64,
+        }
+        let entity = Entity::<Value>::new("id0", Value { x: 1 });
         assert_eq!(
             entity,
-            Entity::<Value>::builder().id("id0").value(value).build(),
+            Entity::<Value>::builder()
+                .id("id0")
+                .value(Value { x: 1 })
+                .build(),
         );
         assert_eq!(entity.x, 1);
         let json = json!({"id": "id0", "x": 1});
@@ -143,6 +152,10 @@ mod tests {
 
     #[test]
     fn id() {
+        struct Value {
+            #[allow(dead_code)]
+            x: i64,
+        }
         let id = Id::<Value>::from("id0");
         assert_eq!(id, "id0".into());
         assert_eq!(HashMap::from([(id, 1)]).get(&id), Some(&1));
