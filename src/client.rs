@@ -12,7 +12,7 @@ use crate::error::*;
 #[builder(field_defaults(setter(into)))]
 pub struct Client {
     api_key: String,
-    #[builder(default = "https://api.mackerelio.com".to_string())]
+    #[builder(default = "https://api.mackerelio.com".to_owned())]
     api_base: String,
     #[builder(default = format!("mackerel-client-rs/{}", env!("CARGO_PKG_VERSION")))]
     user_agent: String,
@@ -22,6 +22,20 @@ pub struct Client {
 
 impl Client {
     /// Creates a new API client from API key.
+    /// ```rust
+    /// use mackerel_client::Client;
+    ///
+    /// let client = Client::new("<Mackerel-API-KEY>");
+    /// ```
+    /// If you want to configure the API base, use [`Client::builder()`].
+    /// ```rust
+    /// use mackerel_client::Client;
+    ///
+    /// let client = Client::builder()
+    ///     .api_key("<Mackerel-API-KEY>")
+    ///     .api_base("https://api.mackerelio.com")
+    ///     .build();
+    /// ```
     pub fn new(api_key: impl AsRef<str>) -> Client {
         Self::builder().api_key(api_key.as_ref()).build()
     }
