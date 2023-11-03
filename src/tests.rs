@@ -26,6 +26,7 @@ macro_rules! test_server {
         use ::std::{boxed::Box, vec::Vec};
         #[allow(unused_imports)]
         use ::serde_json::json;
+        let _ = pretty_env_logger::try_init();
         let config = TestServerConfig {
             $( $field: $value.try_into().unwrap_or_else(|e| {
                 panic!("failed to convert {:?} into {}: {}", $value, stringify!($field), e);
