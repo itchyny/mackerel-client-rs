@@ -76,7 +76,7 @@ macro_rules! test_client {
     ($server:expr) => {
         $crate::Client::builder()
             .api_key("")
-            .api_base(&$server.url_str("/"))
+            .api_base($server.url_str("/"))
             .build()
     };
 }
