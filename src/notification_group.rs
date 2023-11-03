@@ -165,7 +165,7 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/notification-groups#create>.
     pub async fn create_notification_group(
         &self,
-        notification_group_value: NotificationGroupValue,
+        notification_group_value: &NotificationGroupValue,
     ) -> Result<NotificationGroup> {
         self.request(
             Method::POST,
@@ -182,12 +182,15 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/notification-groups#update>.
     pub async fn update_notification_group(
         &self,
-        notification_group_id: NotificationGroupId,
-        notification_group_value: NotificationGroupValue,
+        notification_group_id: impl Into<NotificationGroupId>,
+        notification_group_value: &NotificationGroupValue,
     ) -> Result<NotificationGroup> {
         self.request(
             Method::PUT,
-            format!("/api/v0/notification-groups/{}", notification_group_id),
+            format!(
+                "/api/v0/notification-groups/{}",
+                notification_group_id.into()
+            ),
             query_params![],
             request_body!(notification_group_value),
             response_body!(..),
@@ -200,11 +203,14 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/notification-groups#delete>.
     pub async fn delete_notification_group(
         &self,
-        notification_group_id: NotificationGroupId,
+        notification_group_id: impl Into<NotificationGroupId>,
     ) -> Result<NotificationGroup> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/notification-groups/{}", notification_group_id),
+            format!(
+                "/api/v0/notification-groups/{}",
+                notification_group_id.into()
+            ),
             query_params![],
             request_body![],
             response_body!(..),
@@ -283,7 +289,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .create_notification_group(value_example())
+                .create_notification_group(&value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -296,10 +302,17 @@ mod client_tests {
             path = "/api/v0/notification-groups/group0",
             request = value_json_example(),
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_notification_group("group0".into(), value_example())
+                .update_notification_group("group0", &value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_notification_group(NotificationGroupId::from("group0"), &value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -311,10 +324,17 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/notification-groups/group0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .delete_notification_group("group0".into())
+                .delete_notification_group("group0")
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_notification_group(NotificationGroupId::from("group0"))
                 .await,
             Ok(entity_example()),
         );

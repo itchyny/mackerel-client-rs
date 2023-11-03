@@ -106,13 +106,13 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/host-metrics#post>.
     pub async fn post_host_metric_values(
         &self,
-        host_metric_values: Vec<HostMetricValue>,
+        host_metric_values: impl IntoIterator<Item = HostMetricValue>,
     ) -> Result<()> {
         self.request(
             Method::POST,
             "/api/v0/tsdb",
             query_params![],
-            request_body!(host_metric_values),
+            request_body!(host_metric_values.into_iter().collect::<Vec<_>>()),
             response_body!(),
         )
         .await
@@ -123,18 +123,18 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/host-metrics#get>.
     pub async fn list_host_metric_values(
         &self,
-        host_id: HostId,
-        name: String,
-        from: DateTime<Utc>,
-        to: DateTime<Utc>,
+        host_id: impl Into<HostId>,
+        metric_name: impl AsRef<str>,
+        from: impl Into<DateTime<Utc>>,
+        to: impl Into<DateTime<Utc>>,
     ) -> Result<Vec<MetricValue>> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}/metrics", host_id),
+            format!("/api/v0/hosts/{}/metrics", host_id.into()),
             query_params! {
-                name = name,
-                from = from.timestamp().to_string(),
-                to = to.timestamp().to_string(),
+                name = metric_name.as_ref(),
+                from = from.into().timestamp().to_string(),
+                to = to.into().timestamp().to_string(),
             },
             request_body![],
             response_body! { metrics: Vec<MetricValue> },
@@ -147,14 +147,14 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/service-metrics#post>.
     pub async fn post_service_metric_values(
         &self,
-        service_name: ServiceName,
-        service_metric_values: Vec<ServiceMetricValue>,
+        service_name: impl Into<ServiceName>,
+        service_metric_values: impl IntoIterator<Item = ServiceMetricValue>,
     ) -> Result<()> {
         self.request(
             Method::POST,
-            format!("/api/v0/services/{}/tsdb", service_name),
+            format!("/api/v0/services/{}/tsdb", service_name.into()),
             query_params![],
-            request_body!(service_metric_values),
+            request_body!(service_metric_values.into_iter().collect::<Vec<_>>()),
             response_body!(),
         )
         .await
@@ -165,18 +165,18 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/service-metrics#get>.
     pub async fn list_service_metric_values(
         &self,
-        service_name: ServiceName,
-        name: String,
-        from: DateTime<Utc>,
-        to: DateTime<Utc>,
+        service_name: impl Into<ServiceName>,
+        metric_name: impl AsRef<str>,
+        from: impl Into<DateTime<Utc>>,
+        to: impl Into<DateTime<Utc>>,
     ) -> Result<Vec<MetricValue>> {
         self.request(
             Method::GET,
-            format!("/api/v0/services/{}/metrics", service_name),
+            format!("/api/v0/services/{}/metrics", service_name.into()),
             query_params! {
-                name = name,
-                from = from.timestamp().to_string(),
-                to = to.timestamp().to_string(),
+                name = metric_name.as_ref(),
+                from = from.into().timestamp().to_string(),
+                to = to.into().timestamp().to_string(),
             },
             request_body![],
             response_body! { metrics: Vec<MetricValue> },
@@ -219,7 +219,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .post_host_metric_values(vec![
+                .post_host_metric_values([
                     HostMetricValue {
                         host_id: "host0".into(),
                         name: "loadavg1".to_owned(),
@@ -267,8 +267,8 @@ mod client_tests {
         assert_eq!(
             test_client!(server)
                 .list_host_metric_values(
-                    "host0".into(),
-                    "loadavg5".to_owned(),
+                    "host0",
+                    "loadavg5",
                     DateTime::from_timestamp(1699999860, 0).unwrap(),
                     DateTime::from_timestamp(1700000000, 0).unwrap(),
                 )
@@ -305,8 +305,8 @@ mod client_tests {
         assert_eq!(
             test_client!(server)
                 .post_service_metric_values(
-                    "service0".into(),
-                    vec![
+                    "service0",
+                    [
                         ServiceMetricValue {
                             name: "custom.metric0".to_owned(),
                             value: MetricValue {
@@ -352,8 +352,8 @@ mod client_tests {
         assert_eq!(
             test_client!(server)
                 .list_service_metric_values(
-                    "service0".into(),
-                    "custom.metric".to_owned(),
+                    "service0",
+                    "custom.metric",
                     DateTime::from_timestamp(1699999860, 0).unwrap(),
                     DateTime::from_timestamp(1700000000, 0).unwrap(),
                 )

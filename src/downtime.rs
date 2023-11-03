@@ -265,7 +265,7 @@ impl Client {
     /// Creates a new downtime.
     ///
     /// See <https://mackerel.io/api-docs/entry/downtimes#create>.
-    pub async fn create_downtime(&self, downtime_value: DowntimeValue) -> Result<Downtime> {
+    pub async fn create_downtime(&self, downtime_value: &DowntimeValue) -> Result<Downtime> {
         self.request(
             Method::POST,
             "/api/v0/downtimes",
@@ -281,12 +281,12 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/downtimes#update>.
     pub async fn update_downtime(
         &self,
-        downtime_id: DowntimeId,
-        downtime_value: DowntimeValue,
+        downtime_id: impl Into<DowntimeId>,
+        downtime_value: &DowntimeValue,
     ) -> Result<Downtime> {
         self.request(
             Method::PUT,
-            format!("/api/v0/downtimes/{}", downtime_id),
+            format!("/api/v0/downtimes/{}", downtime_id.into()),
             query_params![],
             request_body!(downtime_value),
             response_body!(..),
@@ -297,10 +297,10 @@ impl Client {
     /// Deletes a downtime.
     ///
     /// See <https://mackerel.io/api-docs/entry/downtimes#delete>.
-    pub async fn delete_downtime(&self, downtime_id: DowntimeId) -> Result<Downtime> {
+    pub async fn delete_downtime(&self, downtime_id: impl Into<DowntimeId>) -> Result<Downtime> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/downtimes/{}", downtime_id),
+            format!("/api/v0/downtimes/{}", downtime_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -377,7 +377,7 @@ mod client_tests {
             response = entity_json_example(),
         };
         assert_eq!(
-            test_client!(server).create_downtime(value_example()).await,
+            test_client!(server).create_downtime(&value_example()).await,
             Ok(entity_example()),
         );
     }
@@ -389,10 +389,17 @@ mod client_tests {
             path = "/api/v0/downtimes/downtime0",
             request = value_json_example(),
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_downtime("downtime0".into(), value_example())
+                .update_downtime("downtime0", &value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_downtime(DowntimeId::from("downtime0"), &value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -404,10 +411,15 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/downtimes/downtime0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
+            test_client!(server).delete_downtime("downtime0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
             test_client!(server)
-                .delete_downtime("downtime0".into())
+                .delete_downtime(DowntimeId::from("downtime0"))
                 .await,
             Ok(entity_example()),
         );

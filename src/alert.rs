@@ -165,7 +165,7 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/alerts#get>.
     pub async fn list_open_alerts(
         &self,
-        cursor_opt: Option<AlertId>,
+        cursor_opt: Option<impl Into<AlertId>>,
         limit: usize,
     ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.list_alerts("", cursor_opt, limit).await
@@ -176,7 +176,7 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/alerts#get>.
     pub async fn list_closed_alerts(
         &self,
-        cursor_opt: Option<AlertId>,
+        cursor_opt: Option<impl Into<AlertId>>,
         limit: usize,
     ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.list_alerts("true", cursor_opt, limit).await
@@ -185,7 +185,7 @@ impl Client {
     async fn list_alerts(
         &self,
         with_closed: &str,
-        cursor_opt: Option<AlertId>,
+        cursor_opt: Option<impl Into<AlertId>>,
         limit: usize,
     ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.request(
@@ -193,7 +193,7 @@ impl Client {
             "/api/v0/alerts",
             query_params! {
                 withClosed = with_closed,
-                nextId = cursor_opt.as_deref().unwrap_or_default(),
+                nextId = cursor_opt.map(|cursor| cursor.into()).as_deref().unwrap_or_default(),
                 limit = limit.to_string(),
             },
             request_body![],
@@ -205,10 +205,10 @@ impl Client {
     /// Gets an alert.
     ///
     /// See <https://mackerel.io/api-docs/entry/alerts#get>.
-    pub async fn get_alert(&self, alert_id: AlertId) -> Result<Alert> {
+    pub async fn get_alert(&self, alert_id: impl Into<AlertId>) -> Result<Alert> {
         self.request(
             Method::GET,
-            format!("/api/v0/alerts/{}", alert_id),
+            format!("/api/v0/alerts/{}", alert_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -219,12 +219,16 @@ impl Client {
     /// Updates an alert.
     ///
     /// See <https://mackerel.io/api-docs/entry/alerts#update>.
-    pub async fn update_alert(&self, alert_id: AlertId, memo: String) -> Result<()> {
+    pub async fn update_alert(
+        &self,
+        alert_id: impl Into<AlertId>,
+        memo: impl AsRef<str>,
+    ) -> Result<()> {
         self.request(
             Method::PUT,
-            format!("/api/v0/alerts/{}", alert_id),
+            format!("/api/v0/alerts/{}", alert_id.into()),
             query_params![],
-            request_body! { memo: String = memo },
+            request_body! { memo: String = memo.as_ref().to_owned() },
             response_body!(),
         )
         .await
@@ -233,12 +237,16 @@ impl Client {
     /// Closes the specified alert.
     ///
     /// See <https://mackerel.io/api-docs/entry/alerts#close>.
-    pub async fn close_alert(&self, alert_id: AlertId, reason: String) -> Result<Alert> {
+    pub async fn close_alert(
+        &self,
+        alert_id: impl Into<AlertId>,
+        reason: impl AsRef<str>,
+    ) -> Result<Alert> {
         self.request(
             Method::POST,
-            format!("/api/v0/alerts/{}/close", alert_id),
+            format!("/api/v0/alerts/{}/close", alert_id.into()),
             query_params![],
-            request_body! { reason: String = reason },
+            request_body! { reason: String = reason.as_ref().to_owned() },
             response_body!(..),
         )
         .await
@@ -291,7 +299,9 @@ mod client_tests {
             response = json!({ "alerts": [] }),
         };
         assert_eq!(
-            test_client!(server).list_open_alerts(None, 10).await,
+            test_client!(server)
+                .list_open_alerts(None::<AlertId>, 10)
+                .await,
             Ok((vec![], None)),
         );
     }
@@ -306,12 +316,19 @@ mod client_tests {
                 "alerts": [entity_json_example()],
                 "nextId": "alert2",
             }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .list_closed_alerts(Some("alert1".into()), 1)
+                .list_closed_alerts(Some("alert1"), 1)
                 .await,
             Ok((vec![entity_example()], Some("alert2".into()))),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_closed_alerts(Some(AlertId::from("alert1")), 1)
+                .await,
+            Ok((vec![entity_example()], Some(AlertId::from("alert2")))),
         );
     }
 
@@ -321,9 +338,16 @@ mod client_tests {
             method = GET,
             path = "/api/v0/alerts/alert1",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
-            test_client!(server).get_alert("alert1".into()).await,
+            test_client!(server).get_alert("alert1").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .get_alert(AlertId::from("alert1"))
+                .await,
             Ok(entity_example()),
         );
     }
@@ -335,10 +359,17 @@ mod client_tests {
             path = "/api/v0/alerts/alert1",
             request = json!({ "memo": "alert memo" }),
             response = json!({ "id": "alert1", "memo": "alert memo" }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_alert("alert1".into(), "alert memo".to_owned())
+                .update_alert("alert1", "alert memo")
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_alert(AlertId::from("alert1"), String::from("alert memo"))
                 .await,
             Ok(()),
         );
@@ -351,10 +382,17 @@ mod client_tests {
             path = "/api/v0/alerts/alert1/close",
             request = json!({ "reason": "alert close reason" }),
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .close_alert("alert1".into(), "alert close reason".to_owned())
+                .close_alert("alert1", "alert close reason")
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .close_alert(AlertId::from("alert1"), String::from("alert close reason"))
                 .await,
             Ok(entity_example()),
         );

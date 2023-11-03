@@ -416,7 +416,7 @@ impl Client {
     /// Creates a new dashboard.
     ///
     /// See <https://mackerel.io/api-docs/entry/dashboards#create>.
-    pub async fn create_dashboard(&self, dashboard_value: DashboardValue) -> Result<Dashboard> {
+    pub async fn create_dashboard(&self, dashboard_value: &DashboardValue) -> Result<Dashboard> {
         self.request(
             Method::POST,
             "/api/v0/dashboards",
@@ -430,10 +430,10 @@ impl Client {
     /// Gets a dashboard.
     ///
     /// See <https://mackerel.io/api-docs/entry/dashboards#get>.
-    pub async fn get_dashboard(&self, dashboard_id: DashboardId) -> Result<Dashboard> {
+    pub async fn get_dashboard(&self, dashboard_id: impl Into<DashboardId>) -> Result<Dashboard> {
         self.request(
             Method::GET,
-            format!("/api/v0/dashboards/{}", dashboard_id),
+            format!("/api/v0/dashboards/{}", dashboard_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -446,12 +446,12 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/dashboards#update>.
     pub async fn update_dashboard(
         &self,
-        dashboard_id: DashboardId,
-        dashboard_value: DashboardValue,
+        dashboard_id: impl Into<DashboardId>,
+        dashboard_value: &DashboardValue,
     ) -> Result<Dashboard> {
         self.request(
             Method::PUT,
-            format!("/api/v0/dashboards/{}", dashboard_id),
+            format!("/api/v0/dashboards/{}", dashboard_id.into()),
             query_params![],
             request_body!(dashboard_value),
             response_body!(..),
@@ -462,10 +462,13 @@ impl Client {
     /// Deletes a dashboard.
     ///
     /// See <https://mackerel.io/api-docs/entry/dashboards#delete>.
-    pub async fn delete_dashboard(&self, dashboard_id: DashboardId) -> Result<Dashboard> {
+    pub async fn delete_dashboard(
+        &self,
+        dashboard_id: impl Into<DashboardId>,
+    ) -> Result<Dashboard> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/dashboards/{}", dashboard_id),
+            format!("/api/v0/dashboards/{}", dashboard_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -591,7 +594,9 @@ mod client_tests {
             response = entity_json_example(),
         };
         assert_eq!(
-            test_client!(server).create_dashboard(value_example()).await,
+            test_client!(server)
+                .create_dashboard(&value_example())
+                .await,
             Ok(entity_example()),
         );
     }
@@ -602,10 +607,15 @@ mod client_tests {
             method = GET,
             path = "/api/v0/dashboards/dashboard0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
+            test_client!(server).get_dashboard("dashboard0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
             test_client!(server)
-                .get_dashboard("dashboard0".into())
+                .get_dashboard(DashboardId::from("dashboard0"))
                 .await,
             Ok(entity_example()),
         );
@@ -618,10 +628,17 @@ mod client_tests {
             path = "/api/v0/dashboards/dashboard0",
             request = value_json_example(),
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_dashboard("dashboard0".into(), value_example())
+                .update_dashboard("dashboard0", &value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_dashboard(DashboardId::from("dashboard0"), &value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -633,10 +650,15 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/dashboards/dashboard0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
+            test_client!(server).delete_dashboard("dashboard0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
             test_client!(server)
-                .delete_dashboard("dashboard0".into())
+                .delete_dashboard(DashboardId::from("dashboard0"))
                 .await,
             Ok(entity_example()),
         );

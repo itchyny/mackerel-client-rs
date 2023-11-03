@@ -734,7 +734,7 @@ impl Client {
     /// Creates a new monitor.
     ///
     /// See <https://mackerel.io/api-docs/entry/monitors#create>.
-    pub async fn create_monitor(&self, monitor_value: MonitorValue) -> Result<Monitor> {
+    pub async fn create_monitor(&self, monitor_value: &MonitorValue) -> Result<Monitor> {
         self.request(
             Method::POST,
             "/api/v0/monitors",
@@ -750,12 +750,12 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/monitors#update>.
     pub async fn update_monitor(
         &self,
-        monitor_id: MonitorId,
-        monitor_value: MonitorValue,
+        monitor_id: impl Into<MonitorId>,
+        monitor_value: &MonitorValue,
     ) -> Result<Monitor> {
         self.request(
             Method::PUT,
-            format!("/api/v0/monitors/{}", monitor_id),
+            format!("/api/v0/monitors/{}", monitor_id.into()),
             query_params![],
             request_body!(monitor_value),
             response_body!(..),
@@ -766,10 +766,10 @@ impl Client {
     /// Deletes a monitor.
     ///
     /// See <https://mackerel.io/api-docs/entry/monitors#delete>.
-    pub async fn delete_monitor(&self, monitor_id: MonitorId) -> Result<Monitor> {
+    pub async fn delete_monitor(&self, monitor_id: impl Into<MonitorId>) -> Result<Monitor> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/monitors/{}", monitor_id),
+            format!("/api/v0/monitors/{}", monitor_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -842,7 +842,7 @@ mod client_tests {
             response = entity_json_example(),
         };
         assert_eq!(
-            test_client!(server).create_monitor(value_example()).await,
+            test_client!(server).create_monitor(&value_example()).await,
             Ok(entity_example()),
         );
     }
@@ -854,10 +854,17 @@ mod client_tests {
             path = "/api/v0/monitors/monitor0",
             request = value_json_example(),
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_monitor("monitor0".into(), value_example())
+                .update_monitor("monitor0", &value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_monitor(MonitorId::from("monitor0"), &value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -869,9 +876,16 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/monitors/monitor0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
-            test_client!(server).delete_monitor("monitor0".into()).await,
+            test_client!(server).delete_monitor("monitor0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_monitor(MonitorId::from("monitor0"))
+                .await,
             Ok(entity_example()),
         );
     }

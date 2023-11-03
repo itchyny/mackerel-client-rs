@@ -434,7 +434,7 @@ impl Client {
     /// Creates a new channel.
     ///
     /// See <https://mackerel.io/api-docs/entry/channels#create>.
-    pub async fn create_channel(&self, channel_value: ChannelValue) -> Result<Channel> {
+    pub async fn create_channel(&self, channel_value: &ChannelValue) -> Result<Channel> {
         self.request(
             Method::POST,
             "/api/v0/channels",
@@ -448,10 +448,10 @@ impl Client {
     /// Deletes a channel.
     ///
     /// See <https://mackerel.io/api-docs/entry/channels#delete>.
-    pub async fn delete_channel(&self, channel_id: ChannelId) -> Result<Channel> {
+    pub async fn delete_channel(&self, channel_id: impl Into<ChannelId>) -> Result<Channel> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/channels/{}", channel_id),
+            format!("/api/v0/channels/{}", channel_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -523,7 +523,7 @@ mod client_tests {
             response = entity_json_example(),
         };
         assert_eq!(
-            test_client!(server).create_channel(value_example()).await,
+            test_client!(server).create_channel(&value_example()).await,
             Ok(entity_example()),
         );
     }
@@ -534,9 +534,16 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/channels/channel0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
-            test_client!(server).delete_channel("channel0".into()).await,
+            test_client!(server).delete_channel("channel0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_channel(ChannelId::from("channel0"))
+                .await,
             Ok(entity_example()),
         );
     }

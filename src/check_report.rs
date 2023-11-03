@@ -108,12 +108,18 @@ impl Client {
     /// Creates a new check report.
     ///
     /// See <https://mackerel.io/api-docs/entry/check-monitoring#post>.
-    pub async fn create_check_report(&self, check_reports: Vec<CheckReport>) -> Result<()> {
+    pub async fn create_check_report(
+        &self,
+        check_reports: impl IntoIterator<Item = CheckReport>,
+    ) -> Result<()> {
         self.request(
             Method::POST,
             "/api/v0/monitoring/checks/report",
             query_params![],
-            request_body! { reports: Vec<CheckReport> = check_reports },
+            request_body! {
+                reports: Vec<CheckReport> = check_reports
+                    .into_iter().collect::<Vec<_>>(),
+            },
             response_body!(),
         )
         .await
@@ -152,7 +158,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .create_check_report(vec![CheckReport::builder()
+                .create_check_report([CheckReport::builder()
                     .name("ExampleCheckReport")
                     .message("This is an example check message.")
                     .source(CheckSource::Host {

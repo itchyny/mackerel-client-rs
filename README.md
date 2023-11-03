@@ -24,10 +24,10 @@ async fn main() {
     println!("{:?}", client.list_invitations().await);
 
     println!("{:?}", client.list_services().await);
-    println!("{:?}", client.list_service_metric_names("<Service-Name>".into()).await);
+    println!("{:?}", client.list_service_metric_names("<Service-Name>").await);
 
     println!("{:?}", client.list_monitors().await);
-    println!("{:?}", client.delete_monitor("<Monitor-ID>".into()).await);
+    println!("{:?}", client.delete_monitor("<Monitor-ID>").await);
 }
 ```
 

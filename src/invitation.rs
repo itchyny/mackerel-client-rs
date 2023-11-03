@@ -108,7 +108,10 @@ impl Client {
     /// Creates a new invitation.
     ///
     /// See <https://mackerel.io/api-docs/entry/invitations#create>.
-    pub async fn create_invitation(&self, invitation_value: InvitationValue) -> Result<Invitation> {
+    pub async fn create_invitation(
+        &self,
+        invitation_value: &InvitationValue,
+    ) -> Result<Invitation> {
         self.request(
             Method::POST,
             "/api/v0/invitations",
@@ -122,12 +125,12 @@ impl Client {
     /// Revokes an invitation.
     ///
     /// See <https://mackerel.io/api-docs/entry/invitations#revoke>.
-    pub async fn revoke_invitation(&self, email: String) -> Result<()> {
+    pub async fn revoke_invitation(&self, email: impl AsRef<str>) -> Result<()> {
         self.request(
             Method::POST,
             "/api/v0/invitations/revoke",
             query_params![],
-            request_body! { email: String = email },
+            request_body! { email: String = email.as_ref().to_owned() },
             response_body!(),
         )
         .await
@@ -194,7 +197,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .create_invitation(value_example())
+                .create_invitation(&value_example())
                 .await,
             Ok(entity_example())
         );
@@ -207,10 +210,17 @@ mod client_tests {
             path = "/api/v0/invitations/revoke",
             request = json!({ "email": "mackerel@example.com" }),
             response = json!({ "success": true }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .revoke_invitation("mackerel@example.com".into())
+                .revoke_invitation("mackerel@example.com")
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .revoke_invitation(String::from("mackerel@example.com"))
                 .await,
             Ok(()),
         );

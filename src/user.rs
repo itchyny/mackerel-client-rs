@@ -214,10 +214,10 @@ impl Client {
     /// Delete the user from the organization.
     ///
     /// See <https://mackerel.io/api-docs/entry/users#delete>.
-    pub async fn delete_user(&self, user_id: UserId) -> Result<User> {
+    pub async fn delete_user(&self, user_id: impl Into<UserId>) -> Result<User> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/users/{}", user_id),
+            format!("/api/v0/users/{}", user_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -288,9 +288,16 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/users/user0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
-            test_client!(server).delete_user("user0".into()).await,
+            test_client!(server).delete_user("user0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_user(UserId::from("user0"))
+                .await,
             Ok(entity_example()),
         );
     }

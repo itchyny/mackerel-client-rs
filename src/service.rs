@@ -92,7 +92,7 @@ impl Client {
     /// Creates a new service.
     ///
     /// See <https://mackerel.io/api-docs/entry/services#create>.
-    pub async fn create_service(&self, service: Service) -> Result<Service> {
+    pub async fn create_service(&self, service: &Service) -> Result<Service> {
         self.request(
             Method::POST,
             "/api/v0/services",
@@ -106,10 +106,10 @@ impl Client {
     /// Deletes a service.
     ///
     /// See <https://mackerel.io/api-docs/entry/services#delete>.
-    pub async fn delete_service(&self, service_name: ServiceName) -> Result<Service> {
+    pub async fn delete_service(&self, service_name: impl Into<ServiceName>) -> Result<Service> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/services/{}", service_name),
+            format!("/api/v0/services/{}", service_name.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -122,11 +122,11 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/services#metric-names>.
     pub async fn list_service_metric_names(
         &self,
-        service_name: ServiceName,
+        service_name: impl Into<ServiceName>,
     ) -> Result<Vec<String>> {
         self.request(
             Method::GET,
-            format!("/api/v0/services/{}/metric-names", service_name),
+            format!("/api/v0/services/{}/metric-names", service_name.into()),
             query_params![],
             request_body![],
             response_body! { names: Vec<String> },
@@ -181,7 +181,7 @@ mod client_tests {
             response = json_example(),
         };
         assert_eq!(
-            test_client!(server).create_service(value_example()).await,
+            test_client!(server).create_service(&value_example()).await,
             Ok(value_example()),
         );
     }
@@ -192,9 +192,16 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/services/service0",
             response = json_example(),
+            count = 2,
         };
         assert_eq!(
-            test_client!(server).delete_service("service0".into()).await,
+            test_client!(server).delete_service("service0").await,
+            Ok(value_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_service(ServiceName::from("service0"))
+                .await,
             Ok(value_example()),
         );
     }
@@ -210,12 +217,21 @@ mod client_tests {
             method = GET,
             path = "/api/v0/services/service0/metric-names",
             response = json!({ "names": metric_names }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .list_service_metric_names("service0".into())
-                .await,
-            Ok(metric_names),
+                .list_service_metric_names("service0")
+                .await
+                .as_ref(),
+            Ok(&metric_names),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_service_metric_names(ServiceName::from("service0"))
+                .await
+                .as_ref(),
+            Ok(&metric_names),
         );
     }
 }

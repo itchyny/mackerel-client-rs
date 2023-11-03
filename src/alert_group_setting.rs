@@ -123,7 +123,7 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/alert-group-settings#create>.
     pub async fn create_alert_group_setting(
         &self,
-        alert_group_setting_value: AlertGroupSettingValue,
+        alert_group_setting_value: &AlertGroupSettingValue,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::POST,
@@ -140,11 +140,14 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/alert-group-settings#get>.
     pub async fn get_alert_group_setting(
         &self,
-        alert_group_setting_id: AlertGroupSettingId,
+        alert_group_setting_id: impl Into<AlertGroupSettingId>,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::GET,
-            format!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
+            format!(
+                "/api/v0/alert-group-settings/{}",
+                alert_group_setting_id.into()
+            ),
             query_params![],
             request_body![],
             response_body!(..),
@@ -157,12 +160,15 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/alert-group-settings#update>.
     pub async fn update_alert_group_setting(
         &self,
-        alert_group_setting_id: AlertGroupSettingId,
-        alert_group_setting_value: AlertGroupSettingValue,
+        alert_group_setting_id: impl Into<AlertGroupSettingId>,
+        alert_group_setting_value: &AlertGroupSettingValue,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::PUT,
-            format!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
+            format!(
+                "/api/v0/alert-group-settings/{}",
+                alert_group_setting_id.into()
+            ),
             query_params![],
             request_body!(alert_group_setting_value),
             response_body!(..),
@@ -175,11 +181,14 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/alert-group-settings#delete>.
     pub async fn delete_alert_group_setting(
         &self,
-        alert_group_setting_id: AlertGroupSettingId,
+        alert_group_setting_id: impl Into<AlertGroupSettingId>,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
+            format!(
+                "/api/v0/alert-group-settings/{}",
+                alert_group_setting_id.into()
+            ),
             query_params![],
             request_body![],
             response_body!(..),
@@ -255,7 +264,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .create_alert_group_setting(value_example())
+                .create_alert_group_setting(&value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -267,10 +276,17 @@ mod client_tests {
             method = GET,
             path = "/api/v0/alert-group-settings/setting0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .get_alert_group_setting("setting0".into())
+                .get_alert_group_setting("setting0")
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .get_alert_group_setting(AlertGroupSettingId::from("setting0"))
                 .await,
             Ok(entity_example()),
         );
@@ -283,10 +299,17 @@ mod client_tests {
             path = "/api/v0/alert-group-settings/setting0",
             request = value_json_example(),
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_alert_group_setting("setting0".into(), value_example())
+                .update_alert_group_setting("setting0", &value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_alert_group_setting(AlertGroupSettingId::from("setting0"), &value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -298,10 +321,17 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/alert-group-settings/setting0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .delete_alert_group_setting("setting0".into())
+                .delete_alert_group_setting("setting0")
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_alert_group_setting(AlertGroupSettingId::from("setting0"))
                 .await,
             Ok(entity_example()),
         );

@@ -353,7 +353,7 @@ impl Client {
     /// Creates a new host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#create>.
-    pub async fn create_host(&self, host_value: HostValue) -> Result<HostId> {
+    pub async fn create_host(&self, host_value: &HostValue) -> Result<HostId> {
         self.request(
             Method::POST,
             "/api/v0/hosts",
@@ -367,10 +367,10 @@ impl Client {
     /// Gets a host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#get>.
-    pub async fn get_host(&self, host_id: HostId) -> Result<Host> {
+    pub async fn get_host(&self, host_id: impl Into<HostId>) -> Result<Host> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}", host_id),
+            format!("/api/v0/hosts/{}", host_id.into()),
             query_params![],
             request_body![],
             response_body! { host: Host },
@@ -383,13 +383,14 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/hosts#get-by-custom-identifier>.
     pub async fn get_host_by_custom_identifier(
         &self,
-        custom_identifier: String,
+        custom_identifier: impl AsRef<str>,
     ) -> Result<Option<Host>> {
         self.request(
             Method::GET,
             format!(
                 "/api/v0/hosts-by-custom-identifier/{}",
-                form_urlencoded::byte_serialize(custom_identifier.as_bytes()).collect::<String>(),
+                form_urlencoded::byte_serialize(custom_identifier.as_ref().as_bytes())
+                    .collect::<String>(),
             ),
             query_params![],
             request_body![],
@@ -401,10 +402,14 @@ impl Client {
     /// Updates a host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#update-information>.
-    pub async fn update_host(&self, host_id: HostId, host_value: HostValue) -> Result<()> {
+    pub async fn update_host(
+        &self,
+        host_id: impl Into<HostId>,
+        host_value: &HostValue,
+    ) -> Result<()> {
         self.request(
             Method::PUT,
-            format!("/api/v0/hosts/{}", host_id),
+            format!("/api/v0/hosts/{}", host_id.into()),
             query_params![],
             request_body!(host_value),
             response_body!(),
@@ -415,10 +420,14 @@ impl Client {
     /// Updates host status.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#update-status>.
-    pub async fn update_host_status(&self, host_id: HostId, host_status: HostStatus) -> Result<()> {
+    pub async fn update_host_status(
+        &self,
+        host_id: impl Into<HostId>,
+        host_status: HostStatus,
+    ) -> Result<()> {
         self.request(
             Method::POST,
-            format!("/api/v0/hosts/{}/status", host_id),
+            format!("/api/v0/hosts/{}/status", host_id.into()),
             query_params![],
             request_body! { status: HostStatus = host_status },
             response_body!(),
@@ -431,7 +440,7 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/hosts#update-status>.
     pub async fn update_host_statuses(
         &self,
-        host_ids: Vec<HostId>,
+        host_ids: impl IntoIterator<Item = impl Into<HostId>>,
         host_status: HostStatus,
     ) -> Result<()> {
         self.request(
@@ -439,7 +448,10 @@ impl Client {
             "/api/v0/hosts/bulk-update-statuses",
             query_params![],
             request_body! {
-                ids: Vec<HostId> = host_ids,
+                ids: Vec<HostId> = host_ids
+                    .into_iter()
+                    .map(|host_id| host_id.into())
+                    .collect::<Vec<_>>(),
                 status: HostStatus = host_status,
             },
             response_body!(),
@@ -452,14 +464,19 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/hosts#update-roles>.
     pub async fn update_host_roles(
         &self,
-        host_id: HostId,
-        role_fullnames: Vec<RoleFullname>,
+        host_id: impl Into<HostId>,
+        role_fullnames: impl IntoIterator<Item = impl Into<RoleFullname>>,
     ) -> Result<()> {
         self.request(
             Method::PUT,
-            format!("/api/v0/hosts/{}/role-fullnames", host_id),
+            format!("/api/v0/hosts/{}/role-fullnames", host_id.into()),
             query_params![],
-            request_body! { roleFullnames: Vec<RoleFullname> = role_fullnames },
+            request_body! {
+                roleFullnames: Vec<RoleFullname> = role_fullnames
+                    .into_iter()
+                    .map(|role_fullname| role_fullname.into())
+                    .collect::<Vec<_>>(),
+            },
             response_body!(),
         )
         .await
@@ -468,10 +485,10 @@ impl Client {
     /// Retires a host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#retire>.
-    pub async fn retire_host(&self, host_id: HostId) -> Result<()> {
+    pub async fn retire_host(&self, host_id: impl Into<HostId>) -> Result<()> {
         self.request(
             Method::POST,
-            format!("/api/v0/hosts/{}/retire", host_id),
+            format!("/api/v0/hosts/{}/retire", host_id.into()),
             query_params![],
             request_body![],
             response_body!(),
@@ -482,12 +499,20 @@ impl Client {
     /// Retires hosts.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#bulk-retire>.
-    pub async fn retire_hosts(&self, host_ids: Vec<HostId>) -> Result<()> {
+    pub async fn retire_hosts(
+        &self,
+        host_ids: impl IntoIterator<Item = impl Into<HostId>>,
+    ) -> Result<()> {
         self.request(
             Method::POST,
             "/api/v0/hosts/bulk-retire",
             query_params![],
-            request_body! { ids: Vec<HostId> = host_ids },
+            request_body! {
+                ids: Vec<HostId> = host_ids
+                    .into_iter()
+                    .map(|host_id| host_id.into())
+                    .collect::<Vec<_>>(),
+            },
             response_body!(),
         )
         .await
@@ -510,10 +535,10 @@ impl Client {
     /// Fetches host metric names.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#metric-names>.
-    pub async fn list_host_metric_names(&self, host_id: HostId) -> Result<Vec<String>> {
+    pub async fn list_host_metric_names(&self, host_id: impl Into<HostId>) -> Result<Vec<String>> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}/metric-names", host_id),
+            format!("/api/v0/hosts/{}/metric-names", host_id.into()),
             query_params![],
             request_body![],
             response_body! { names: Vec<String> },
@@ -526,11 +551,11 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/hosts#monitored-statuses>.
     pub async fn list_host_monitored_statuses(
         &self,
-        host_id: HostId,
+        host_id: impl Into<HostId>,
     ) -> Result<Vec<MonitoredStatus>> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}/monitored-statuses", host_id),
+            format!("/api/v0/hosts/{}/monitored-statuses", host_id.into()),
             query_params![],
             request_body![],
             response_body! { monitoredStatuses: Vec<MonitoredStatus> },
@@ -598,7 +623,7 @@ mod client_tests {
             response = json!({ "id": "host0" }),
         };
         assert_eq!(
-            test_client!(server).create_host(value_example()).await,
+            test_client!(server).create_host(&value_example()).await,
             Ok(HostId::from("host0")),
         );
     }
@@ -609,9 +634,14 @@ mod client_tests {
             method = GET,
             path = "/api/v0/hosts/host0",
             response = json!({ "host": entity_json_example() }),
+            count = 2,
         };
         assert_eq!(
-            test_client!(server).get_host("host0".into()).await,
+            test_client!(server).get_host("host0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server).get_host(HostId::from("host0")).await,
             Ok(entity_example()),
         );
     }
@@ -625,7 +655,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .get_host_by_custom_identifier("test/custom?identifier&".into())
+                .get_host_by_custom_identifier("test/custom?identifier&")
                 .await,
             Ok(Some(entity_example())),
         );
@@ -640,7 +670,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .get_host_by_custom_identifier("not-found".into())
+                .get_host_by_custom_identifier(String::from("not-found"))
                 .await,
             Ok(None),
         );
@@ -653,10 +683,17 @@ mod client_tests {
             path = "/api/v0/hosts/host0",
             request = value_json_example(),
             response = json!({ "id": "host0" }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_host("host0".into(), value_example())
+                .update_host("host0", &value_example())
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_host(HostId::from("host0"), &value_example())
                 .await,
             Ok(()),
         );
@@ -672,7 +709,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_host_status("host0".into(), HostStatus::Standby)
+                .update_host_status("host0", HostStatus::Standby)
                 .await,
             Ok(()),
         );
@@ -684,16 +721,27 @@ mod client_tests {
             method = POST,
             path = "/api/v0/hosts/bulk-update-statuses",
             request = json!({
-                "ids": ["host0", "abcde1", "abcde2"],
+                "ids": ["host0", "host1", "host2"],
                 "status": "standby",
             }),
             response = json!({ "success": true }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
+                .update_host_statuses(["host0", "host1", "host2"], HostStatus::Standby)
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
                 .update_host_statuses(
-                    vec!["host0".into(), "abcde1".into(), "abcde2".into()],
-                    HostStatus::Standby,
+                    vec![
+                        HostId::from("host0"),
+                        HostId::from("host1"),
+                        HostId::from("host2")
+                    ],
+                    HostStatus::Standby
                 )
                 .await,
             Ok(()),
@@ -707,10 +755,20 @@ mod client_tests {
             path = "/api/v0/hosts/host0/role-fullnames",
             request = json!({ "roleFullnames": ["service0:role0"] }),
             response = json!({ "success": true }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_host_roles("host0".into(), vec!["service0:role0".into()])
+                .update_host_roles("host0", ["service0:role0"])
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_host_roles(
+                    HostId::from("host0"),
+                    vec![RoleFullname::from("service0:role0")]
+                )
                 .await,
             Ok(()),
         );
@@ -722,10 +780,14 @@ mod client_tests {
             method = POST,
             path = "/api/v0/hosts/host0/retire",
             response = json!({ "success": true }),
+            count = 2,
         };
+        assert_eq!(test_client!(server).retire_host("host0").await, Ok(()));
         assert_eq!(
-            test_client!(server).retire_host("host0".into()).await,
-            Ok(()),
+            test_client!(server)
+                .retire_host(HostId::from("host0"))
+                .await,
+            Ok(())
         );
     }
 
@@ -734,12 +796,23 @@ mod client_tests {
         let server = test_server! {
             method = POST,
             path = "/api/v0/hosts/bulk-retire",
-            request = json!({ "ids": ["host0", "abcde1", "abcde2"] }),
+            request = json!({ "ids": ["host0", "host1", "host2"] }),
             response = json!({ "success": true }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .retire_hosts(vec!["host0".into(), "abcde1".into(), "abcde2".into()])
+                .retire_hosts(["host0", "host1", "host2"])
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .retire_hosts(vec![
+                    HostId::from("host0"),
+                    HostId::from("host1"),
+                    HostId::from("host2")
+                ])
                 .await,
             Ok(()),
         );
@@ -771,12 +844,21 @@ mod client_tests {
             method = GET,
             path = "/api/v0/hosts/host0/metric-names",
             response = json!({ "names": metric_names }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .list_host_metric_names("host0".into())
-                .await,
-            Ok(metric_names),
+                .list_host_metric_names("host0")
+                .await
+                .as_ref(),
+            Ok(&metric_names),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_host_metric_names(HostId::from("host0"))
+                .await
+                .as_ref(),
+            Ok(&metric_names),
         );
     }
 
@@ -800,7 +882,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .list_host_monitored_statuses("host0".into())
+                .list_host_monitored_statuses("host0")
                 .await,
             Ok(vec![MonitoredStatus::builder()
                 .monitor_id("monitor0")

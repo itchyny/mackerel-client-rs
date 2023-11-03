@@ -110,17 +110,17 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#get>.
     pub async fn list_graph_annotations(
         &self,
-        service: ServiceName,
-        from: DateTime<Utc>,
-        to: DateTime<Utc>,
+        service: impl Into<ServiceName>,
+        from: impl Into<DateTime<Utc>>,
+        to: impl Into<DateTime<Utc>>,
     ) -> Result<Vec<GraphAnnotation>> {
         self.request(
             Method::GET,
             "/api/v0/graph-annotations",
             query_params! {
-                service = service,
-                from = from.timestamp().to_string(),
-                to = to.timestamp().to_string(),
+                service = service.into(),
+                from = from.into().timestamp().to_string(),
+                to = to.into().timestamp().to_string(),
             },
             request_body![],
             response_body! { graphAnnotations: Vec<GraphAnnotation> },
@@ -133,7 +133,7 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#create>.
     pub async fn create_graph_annotation(
         &self,
-        graph_annotation_value: GraphAnnotationValue,
+        graph_annotation_value: &GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::POST,
@@ -150,12 +150,12 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#update>.
     pub async fn update_graph_annotation(
         &self,
-        graph_annontation_id: GraphAnnotationId,
-        graph_annotation_value: GraphAnnotationValue,
+        graph_annontation_id: impl Into<GraphAnnotationId>,
+        graph_annotation_value: &GraphAnnotationValue,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::PUT,
-            format!("/api/v0/graph-annotations/{}", graph_annontation_id),
+            format!("/api/v0/graph-annotations/{}", graph_annontation_id.into()),
             query_params![],
             request_body!(graph_annotation_value),
             response_body!(..),
@@ -168,11 +168,11 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#delete>.
     pub async fn delete_graph_annotation(
         &self,
-        graph_annotation_id: GraphAnnotationId,
+        graph_annotation_id: impl Into<GraphAnnotationId>,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/graph-annotations/{}", graph_annotation_id),
+            format!("/api/v0/graph-annotations/{}", graph_annotation_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -184,6 +184,7 @@ impl Client {
 #[cfg(test)]
 mod client_tests {
     use serde_json::json;
+    use std::time::{Duration, SystemTime};
 
     use crate::graph_annotation::*;
     use crate::tests::*;
@@ -232,11 +233,22 @@ mod client_tests {
             response = json!({
                 "graphAnnotations": [entity_json_example()],
             }),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
                 .list_graph_annotations(
-                    "service0".into(),
+                    "service0",
+                    SystemTime::UNIX_EPOCH + Duration::from_secs(1698850800),
+                    SystemTime::UNIX_EPOCH + Duration::from_secs(1698937200),
+                )
+                .await,
+            Ok(vec![entity_example()]),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_graph_annotations(
+                    ServiceName::from("service0"),
                     DateTime::from_timestamp(1698850800, 0).unwrap(),
                     DateTime::from_timestamp(1698937200, 0).unwrap(),
                 )
@@ -255,7 +267,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .create_graph_annotation(value_example())
+                .create_graph_annotation(&value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -268,10 +280,17 @@ mod client_tests {
             path = "/api/v0/graph-annotations/annotation0",
             request = value_json_example(),
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .update_graph_annotation("annotation0".into(), value_example())
+                .update_graph_annotation("annotation0", &value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_graph_annotation(GraphAnnotationId::from("annotation0"), &value_example())
                 .await,
             Ok(entity_example()),
         );
@@ -283,10 +302,17 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/graph-annotations/annotation0",
             response = entity_json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .delete_graph_annotation("annotation0".into())
+                .delete_graph_annotation("annotation0")
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_graph_annotation(GraphAnnotationId::from("annotation0"))
                 .await,
             Ok(entity_example()),
         );

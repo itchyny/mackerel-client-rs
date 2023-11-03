@@ -185,10 +185,10 @@ impl Client {
     /// Fetches the roles in the specified service.
     ///
     /// See <https://mackerel.io/api-docs/entry/services#rolelist>.
-    pub async fn list_roles(&self, service_name: ServiceName) -> Result<Vec<Role>> {
+    pub async fn list_roles(&self, service_name: impl Into<ServiceName>) -> Result<Vec<Role>> {
         self.request(
             Method::GET,
-            format!("/api/v0/services/{}/roles", service_name),
+            format!("/api/v0/services/{}/roles", service_name.into()),
             query_params![],
             request_body![],
             response_body! { roles: Vec<Role> },
@@ -199,10 +199,14 @@ impl Client {
     /// Creates a new role.
     ///
     /// See <https://mackerel.io/api-docs/entry/services#rolecreate>.
-    pub async fn create_role(&self, service_name: ServiceName, role: Role) -> Result<Role> {
+    pub async fn create_role(
+        &self,
+        service_name: impl Into<ServiceName>,
+        role: &Role,
+    ) -> Result<Role> {
         self.request(
             Method::POST,
-            format!("/api/v0/services/{}/roles", service_name),
+            format!("/api/v0/services/{}/roles", service_name.into()),
             query_params![],
             request_body!(role),
             response_body!(..),
@@ -215,12 +219,16 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/services#roledelete>.
     pub async fn delete_role(
         &self,
-        service_name: ServiceName,
-        role_name: RoleName,
+        service_name: impl Into<ServiceName>,
+        role_name: impl Into<RoleName>,
     ) -> Result<Role> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/services/{}/roles/{}", service_name, role_name),
+            format!(
+                "/api/v0/services/{}/roles/{}",
+                service_name.into(),
+                role_name.into()
+            ),
             query_params![],
             request_body![],
             response_body!(..),
@@ -260,7 +268,7 @@ mod client_tests {
             }),
         };
         assert_eq!(
-            test_client!(server).list_roles("service0".into()).await,
+            test_client!(server).list_roles("service0").await,
             Ok(vec![value_example()]),
         );
     }
@@ -272,10 +280,17 @@ mod client_tests {
             path = "/api/v0/services/service0/roles",
             request = json_example(),
             response = json_example(),
+            count = 2,
         };
         assert_eq!(
             test_client!(server)
-                .create_role("service0".into(), value_example())
+                .create_role("service0", &value_example())
+                .await,
+            Ok(value_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .create_role(ServiceName::from("service0"), &value_example())
                 .await,
             Ok(value_example()),
         );
@@ -287,10 +302,15 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/services/service0/roles/role0",
             response = json_example(),
+            count = 2,
         };
         assert_eq!(
+            test_client!(server).delete_role("service0", "role0").await,
+            Ok(value_example()),
+        );
+        assert_eq!(
             test_client!(server)
-                .delete_role("service0".into(), "role0".into())
+                .delete_role(ServiceName::from("service0"), RoleName::from("role0"))
                 .await,
             Ok(value_example()),
         );

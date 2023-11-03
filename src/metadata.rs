@@ -22,12 +22,16 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#hostget>.
     pub async fn get_host_metadata(
         &self,
-        host_id: HostId,
-        namespace: String,
+        host_id: impl Into<HostId>,
+        namespace: impl AsRef<str>,
     ) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
+            format!(
+                "/api/v0/hosts/{}/metadata/{}",
+                host_id.into(),
+                namespace.as_ref()
+            ),
             query_params![],
             request_body![],
             response_body!(..),
@@ -40,13 +44,17 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#hostput>.
     pub async fn put_host_metadata(
         &self,
-        host_id: HostId,
-        namespace: String,
-        metadata: serde_json::Value,
+        host_id: impl Into<HostId>,
+        namespace: impl AsRef<str>,
+        metadata: &serde_json::Value,
     ) -> Result<()> {
         self.request(
             Method::PUT,
-            format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
+            format!(
+                "/api/v0/hosts/{}/metadata/{}",
+                host_id.into(),
+                namespace.as_ref()
+            ),
             query_params![],
             request_body!(metadata),
             response_body!(),
@@ -57,10 +65,18 @@ impl Client {
     /// Deletes a host metadata.
     ///
     /// See <https://mackerel.io/api-docs/entry/metadata#hostdelete>.
-    pub async fn delete_host_metadata(&self, host_id: HostId, namespace: String) -> Result<()> {
+    pub async fn delete_host_metadata(
+        &self,
+        host_id: impl Into<HostId>,
+        namespace: impl AsRef<str>,
+    ) -> Result<()> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/hosts/{}/metadata/{}", host_id, namespace),
+            format!(
+                "/api/v0/hosts/{}/metadata/{}",
+                host_id.into(),
+                namespace.as_ref()
+            ),
             query_params![],
             request_body![],
             response_body!(),
@@ -71,10 +87,10 @@ impl Client {
     /// Lists host metadata.
     ///
     /// See <https://mackerel.io/api-docs/entry/metadata#hostlist>.
-    pub async fn list_host_metadata(&self, host_id: HostId) -> Result<Vec<Metadata>> {
+    pub async fn list_host_metadata(&self, host_id: impl Into<HostId>) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
-            format!("/api/v0/hosts/{}/metadata", host_id),
+            format!("/api/v0/hosts/{}/metadata", host_id.into()),
             query_params![],
             request_body![],
             response_body! { metadata: Vec<Metadata> },
@@ -87,12 +103,16 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#serviceget>.
     pub async fn get_service_metadata(
         &self,
-        service_name: ServiceName,
-        namespace: String,
+        service_name: impl Into<ServiceName>,
+        namespace: impl AsRef<str>,
     ) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
-            format!("/api/v0/services/{}/metadata/{}", service_name, namespace),
+            format!(
+                "/api/v0/services/{}/metadata/{}",
+                service_name.into(),
+                namespace.as_ref()
+            ),
             query_params![],
             request_body![],
             response_body!(..),
@@ -105,13 +125,17 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#serviceput>.
     pub async fn put_service_metadata(
         &self,
-        service_name: ServiceName,
-        namespace: String,
-        metadata: serde_json::Value,
+        service_name: impl Into<ServiceName>,
+        namespace: impl AsRef<str>,
+        metadata: &serde_json::Value,
     ) -> Result<()> {
         self.request(
             Method::PUT,
-            format!("/api/v0/services/{}/metadata/{}", service_name, namespace),
+            format!(
+                "/api/v0/services/{}/metadata/{}",
+                service_name.into(),
+                namespace.as_ref()
+            ),
             query_params![],
             request_body!(metadata),
             response_body!(),
@@ -124,12 +148,16 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#servicedelete>.
     pub async fn delete_service_metadata(
         &self,
-        service_name: ServiceName,
-        namespace: String,
+        service_name: impl Into<ServiceName>,
+        namespace: impl AsRef<str>,
     ) -> Result<()> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/services/{}/metadata/{}", service_name, namespace),
+            format!(
+                "/api/v0/services/{}/metadata/{}",
+                service_name.into(),
+                namespace.as_ref()
+            ),
             query_params![],
             request_body![],
             response_body!(),
@@ -140,10 +168,13 @@ impl Client {
     /// Lists service metadata.
     ///
     /// See <https://mackerel.io/api-docs/entry/metadata#servicelist>.
-    pub async fn list_service_metadata(&self, service_name: ServiceName) -> Result<Vec<Metadata>> {
+    pub async fn list_service_metadata(
+        &self,
+        service_name: impl Into<ServiceName>,
+    ) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
-            format!("/api/v0/services/{}/metadata", service_name),
+            format!("/api/v0/services/{}/metadata", service_name.into()),
             query_params![],
             request_body![],
             response_body! { metadata: Vec<Metadata> },
@@ -156,15 +187,17 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#roleget>.
     pub async fn get_role_metadata(
         &self,
-        service_name: ServiceName,
-        role_name: RoleName,
-        namespace: String,
+        service_name: impl Into<ServiceName>,
+        role_name: impl Into<RoleName>,
+        namespace: impl AsRef<str>,
     ) -> Result<serde_json::Value> {
         self.request(
             Method::GET,
             format!(
                 "/api/v0/services/{}/roles/{}/metadata/{}",
-                service_name, role_name, namespace
+                service_name.into(),
+                role_name.into(),
+                namespace.as_ref()
             ),
             query_params![],
             request_body![],
@@ -178,16 +211,18 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#roleput>.
     pub async fn put_role_metadata(
         &self,
-        service_name: ServiceName,
-        role_name: RoleName,
-        namespace: String,
-        metadata: serde_json::Value,
+        service_name: impl Into<ServiceName>,
+        role_name: impl Into<RoleName>,
+        namespace: impl AsRef<str>,
+        metadata: &serde_json::Value,
     ) -> Result<()> {
         self.request(
             Method::PUT,
             format!(
                 "/api/v0/services/{}/roles/{}/metadata/{}",
-                service_name, role_name, namespace
+                service_name.into(),
+                role_name.into(),
+                namespace.as_ref()
             ),
             query_params![],
             request_body!(metadata),
@@ -201,15 +236,17 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#roledelete>.
     pub async fn delete_role_metadata(
         &self,
-        service_name: ServiceName,
-        role_name: RoleName,
-        namespace: String,
+        service_name: impl Into<ServiceName>,
+        role_name: impl Into<RoleName>,
+        namespace: impl AsRef<str>,
     ) -> Result<()> {
         self.request(
             Method::DELETE,
             format!(
                 "/api/v0/services/{}/roles/{}/metadata/{}",
-                service_name, role_name, namespace
+                service_name.into(),
+                role_name.into(),
+                namespace.as_ref()
             ),
             query_params![],
             request_body![],
@@ -223,14 +260,15 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/metadata#rolelist>.
     pub async fn list_role_metadata(
         &self,
-        service_name: ServiceName,
-        role_name: RoleName,
+        service_name: impl Into<ServiceName>,
+        role_name: impl Into<RoleName>,
     ) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
             format!(
                 "/api/v0/services/{}/roles/{}/metadata",
-                service_name, role_name,
+                service_name.into(),
+                role_name.into(),
             ),
             query_params![],
             request_body![],
@@ -258,7 +296,7 @@ mod client_tests {
     }
 
     fn metadata_json_example() -> serde_json::Value {
-        json!({ "namespace": "namespace0".to_owned() })
+        json!({ "namespace": "namespace0" })
     }
 
     #[async_std::test]
@@ -270,7 +308,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .get_host_metadata("host0".into(), "namespace0".to_owned())
+                .get_host_metadata("host0", "namespace0")
                 .await,
             Ok(metadata_value_example())
         );
@@ -286,11 +324,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .put_host_metadata(
-                    "host0".into(),
-                    "namespace0".to_owned(),
-                    metadata_value_example()
-                )
+                .put_host_metadata("host0", "namespace0", &metadata_value_example())
                 .await,
             Ok(())
         );
@@ -305,7 +339,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .delete_host_metadata("host0".into(), "namespace0".to_owned())
+                .delete_host_metadata("host0", "namespace0")
                 .await,
             Ok(())
         );
@@ -321,9 +355,7 @@ mod client_tests {
             }),
         };
         assert_eq!(
-            test_client!(server)
-                .list_host_metadata("host0".into())
-                .await,
+            test_client!(server).list_host_metadata("host0").await,
             Ok(vec![metadata_example()])
         );
     }
@@ -337,7 +369,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .get_service_metadata("service0".into(), "namespace0".to_owned())
+                .get_service_metadata("service0", "namespace0")
                 .await,
             Ok(metadata_value_example())
         );
@@ -353,11 +385,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .put_service_metadata(
-                    "service0".into(),
-                    "namespace0".to_owned(),
-                    metadata_value_example()
-                )
+                .put_service_metadata("service0", "namespace0", &metadata_value_example())
                 .await,
             Ok(())
         );
@@ -372,7 +400,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .delete_service_metadata("service0".into(), "namespace0".to_owned())
+                .delete_service_metadata("service0", "namespace0")
                 .await,
             Ok(())
         );
@@ -388,9 +416,7 @@ mod client_tests {
             }),
         };
         assert_eq!(
-            test_client!(server)
-                .list_service_metadata("service0".into())
-                .await,
+            test_client!(server).list_service_metadata("service0").await,
             Ok(vec![metadata_example()])
         );
     }
@@ -404,7 +430,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .get_role_metadata("service0".into(), "role0".into(), "namespace0".to_owned())
+                .get_role_metadata("service0", "role0", "namespace0")
                 .await,
             Ok(metadata_value_example())
         );
@@ -420,12 +446,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .put_role_metadata(
-                    "service0".into(),
-                    "role0".into(),
-                    "namespace0".to_owned(),
-                    metadata_value_example()
-                )
+                .put_role_metadata("service0", "role0", "namespace0", &metadata_value_example())
                 .await,
             Ok(())
         );
@@ -440,7 +461,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .delete_role_metadata("service0".into(), "role0".into(), "namespace0".to_owned())
+                .delete_role_metadata("service0", "role0", "namespace0")
                 .await,
             Ok(())
         );
@@ -457,7 +478,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .list_role_metadata("service0".into(), "role0".into())
+                .list_role_metadata("service0", "role0")
                 .await,
             Ok(vec![metadata_example()])
         );
