@@ -73,12 +73,11 @@ mod client_tests {
             path = "/api/v0/org",
             response = json!({ "name": "ExampleOrganization" }),
         };
-        let organization = Organization {
-            name: OrganizationName::from("ExampleOrganization"),
-        };
         assert_eq!(
             test_client!(server).get_organization().await,
-            Ok(organization)
+            Ok(Organization {
+                name: OrganizationName::from("ExampleOrganization"),
+            })
         );
     }
 }
