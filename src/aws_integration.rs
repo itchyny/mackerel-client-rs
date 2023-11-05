@@ -66,16 +66,7 @@ pub struct AWSServiceConfig {
 
 /// AWS service name
 #[derive(
-    PartialEq,
-    Eq,
-    Copy,
-    Clone,
-    Hash,
-    Debug,
-    Display,
-    EnumString,
-    SerializeDisplay,
-    DeserializeFromStr,
+    PartialEq, Eq, Clone, Hash, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
 )]
 pub enum AWSServiceName {
     EC2,
@@ -105,6 +96,8 @@ pub enum AWSServiceName {
     Connect,
     DocDB,
     CodeBuild,
+    #[strum(default)]
+    Unknown(String),
 }
 
 #[cfg(test)]
@@ -566,12 +559,16 @@ mod client_tests {
                 "Route53": ["route53.dns_queries.*"],
                 "Connect": ["connect.voice_calls.breaching_concurrency_quota"],
                 "DocDB": ["docdb.cpu.used"],
-                "CodeBuild": ["codebuild.builds.count"]
+                "CodeBuild": ["codebuild.builds.count"],
+                "UnknownService": [],
             }),
         };
-        assert!(test_client!(server)
-            .list_aws_integration_excludable_metrics()
-            .await
-            .is_ok());
+        assert_eq!(
+            test_client!(server)
+                .list_aws_integration_excludable_metrics()
+                .await
+                .map(|_| ()),
+            Ok(())
+        );
     }
 }
