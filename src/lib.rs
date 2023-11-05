@@ -39,6 +39,7 @@ pub mod check_report;
 pub mod dashboard;
 pub mod downtime;
 pub mod graph_annotation;
+pub mod graph_definition;
 pub mod host;
 pub mod invitation;
 pub mod metadata;
