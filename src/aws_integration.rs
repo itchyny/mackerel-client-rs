@@ -56,7 +56,11 @@ pub struct AWSServiceConfig {
     #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub role: Option<RoleFullname>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |metrics: impl IntoIterator<Item = impl AsRef<str>>| metrics
+            .into_iter().map(|metric| metric.as_ref().to_owned()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub excluded_metrics: Vec<String>,
     #[builder(default)]
@@ -160,7 +164,7 @@ mod tests {
                             AWSServiceConfig::builder()
                                 .enable(false)
                                 .role("aws:s3")
-                                .excluded_metrics(["s3.bucket_size.*".to_owned()])
+                                .excluded_metrics(["s3.bucket_size.*"])
                                 .build(),
                         ),
                     ])

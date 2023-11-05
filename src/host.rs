@@ -105,7 +105,11 @@ pub struct HostValue {
     #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub interfaces: Vec<HostInterface>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |role_fullnames: impl IntoIterator<Item = impl Into<RoleFullname>>| role_fullnames
+            .into_iter().map(|role_fullname| role_fullname.into()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_fullnames: Vec<RoleFullname>,
     #[builder(default)]
@@ -121,10 +125,18 @@ pub struct HostInterface {
     #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub mac_address: Option<String>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |ipv4_addresses: impl IntoIterator<Item = impl Into<Ipv4Addr>>| ipv4_addresses
+            .into_iter().map(|ipv4_address| ipv4_address.into()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv4_addresses: Vec<Ipv4Addr>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |ipv6_addresses: impl IntoIterator<Item = impl Into<Ipv6Addr>>| ipv6_addresses
+            .into_iter().map(|ipv6_address| ipv6_address.into()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv6_addresses: Vec<Ipv6Addr>,
     #[builder(default, setter(strip_option))]
@@ -215,12 +227,12 @@ mod tests {
                     .interfaces([HostInterface::builder()
                         .name("lo0")
                         .mac_address("00:00:00:00:00:00")
-                        .ipv4_addresses([[127, 0, 0, 1].into()])
-                        .ipv6_addresses([[0xfe80, 0, 0, 0, 0, 0, 0, 1].into()])
+                        .ipv4_addresses([[127, 0, 0, 1]])
+                        .ipv6_addresses([[0xfe80, 0, 0, 0, 0, 0, 0, 1]])
                         .ip_address([127, 0, 0, 1])
                         .ipv6_address([0xfe80, 0, 0, 0, 0, 0, 0, 1])
                         .build()])
-                    .role_fullnames(["service0:role0".into()])
+                    .role_fullnames(["service0:role0"])
                     .checks([
                         HostCheck::builder().name("check0").memo("memo").build(),
                         HostCheck::builder().name("check1").build(),

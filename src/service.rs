@@ -14,7 +14,11 @@ pub struct Service {
     pub name: ServiceName,
     #[builder(default)]
     pub memo: String,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |role_names: impl IntoIterator<Item = impl Into<RoleName>>| role_names
+            .into_iter().map(|role_name| role_name.into()).collect::<Vec<_>>()),
+    )]
     pub roles: Vec<RoleName>,
 }
 
@@ -36,7 +40,7 @@ mod tests {
         Service::builder()
             .name("service1")
             .memo("service memo")
-            .roles(["role0".into(), "role1".into(), "role2".into()])
+            .roles(["role0", "role1", "role2"])
             .build()
     }
 
@@ -44,11 +48,7 @@ mod tests {
         json!({
             "name": "service1",
             "memo": "service memo",
-            "roles": [
-                "role0",
-                "role1",
-                "role2",
-            ],
+            "roles": ["role0", "role1", "role2"],
         })
     }
 

@@ -28,7 +28,11 @@ pub struct GraphAnnotationValue {
     #[serde(with = "chrono::serde::ts_seconds")]
     pub to: DateTime<Utc>,
     pub service: ServiceName,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |role_names: impl IntoIterator<Item = impl Into<RoleName>>| role_names
+            .into_iter().map(|role_name| role_name.into()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub roles: Vec<RoleName>,
 }
@@ -49,7 +53,7 @@ mod tests {
                     .from(DateTime::from_timestamp(1484000000, 0).unwrap())
                     .to(DateTime::from_timestamp(1484000030, 0).unwrap())
                     .service("service0")
-                    .roles(["role1".into(), "role2".into()])
+                    .roles(["role1", "role2"])
                     .build(),
             )
             .build()
@@ -195,7 +199,7 @@ mod client_tests {
             .from(DateTime::from_timestamp(1698890400, 0).unwrap())
             .to(DateTime::from_timestamp(1698894000, 0).unwrap())
             .service("service0")
-            .roles(["role1".into(), "role2".into()])
+            .roles(["role1", "role2"])
             .build()
     }
 

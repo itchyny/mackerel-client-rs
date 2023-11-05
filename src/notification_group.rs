@@ -26,8 +26,17 @@ pub struct NotificationGroupValue {
     #[builder(default)]
     pub notification_level: NotificationLevel,
     #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |notification_group_ids: impl IntoIterator<Item = impl Into<NotificationGroupId>>| notification_group_ids
+            .into_iter().map(|notification_group_id| notification_group_id.into()).collect::<Vec<_>>()),
+    )]
     pub child_notification_group_ids: Vec<NotificationGroupId>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |channel_ids: impl IntoIterator<Item = impl Into<ChannelId>>| channel_ids
+            .into_iter().map(|channel_id| channel_id.into()).collect::<Vec<_>>()),
+    )]
     pub child_channel_ids: Vec<ChannelId>,
     #[builder(default)]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -109,8 +118,8 @@ mod tests {
                 NotificationGroupValue::builder()
                     .name("Example notification group")
                     .notification_level(NotificationLevel::Critical)
-                    .child_notification_group_ids(["group3".into()])
-                    .child_channel_ids(["channel0".into()])
+                    .child_notification_group_ids(["group3"])
+                    .child_channel_ids(["channel0"])
                     .monitors([NotificationGroupMonitor::builder().id("monitor0").build()])
                     .services([NotificationGroupService::builder().name("service0").build()])
                     .build(),
@@ -221,8 +230,8 @@ mod client_tests {
         NotificationGroupValue::builder()
             .name("Example notification group")
             .notification_level(NotificationLevel::Critical)
-            .child_notification_group_ids(["group1".into()])
-            .child_channel_ids(["channel0".into()])
+            .child_notification_group_ids(["group1"])
+            .child_channel_ids(["channel0"])
             .monitors([NotificationGroupMonitor::builder()
                 .id("monitor0")
                 .skip_default(true)

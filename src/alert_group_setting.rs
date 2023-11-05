@@ -24,13 +24,25 @@ pub struct AlertGroupSettingValue {
     #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |service_names: impl IntoIterator<Item = impl Into<ServiceName>>| service_names
+            .into_iter().map(|service_name| service_name.into()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub service_scopes: Vec<ServiceName>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |role_fullnames: impl IntoIterator<Item = impl Into<RoleFullname>>| role_fullnames
+            .into_iter().map(|role_fullname| role_fullname.into()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_scopes: Vec<RoleFullname>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |monitor_ids: impl IntoIterator<Item = impl Into<MonitorId>>| monitor_ids
+            .into_iter().map(|monitor_id| monitor_id.into()).collect::<Vec<_>>()),
+    )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_scopes: Vec<MonitorId>,
     #[builder(default, setter(!into, strip_option))]
@@ -69,9 +81,9 @@ mod tests {
                 AlertGroupSettingValue::builder()
                     .name("Example alert group setting")
                     .memo("This is an alert group setting memo.")
-                    .service_scopes(["service0".into()])
-                    .role_scopes(["service1:role1".into()])
-                    .monitor_scopes(["monitor0".into()])
+                    .service_scopes(["service0"])
+                    .role_scopes(["service1:role1"])
+                    .monitor_scopes(["monitor0"])
                     .notification_interval(60)
                     .build(),
             )
@@ -198,9 +210,9 @@ mod client_tests {
         AlertGroupSettingValue::builder()
             .name("Example alert group setting")
             .memo("This is an alert group setting memo.")
-            .service_scopes(["service0".into()])
-            .role_scopes(["service1:role1".into()])
-            .monitor_scopes(["monitor0".into()])
+            .service_scopes(["service0"])
+            .role_scopes(["service1:role1"])
+            .monitor_scopes(["monitor0"])
             .notification_interval(60)
             .build()
     }
