@@ -5,10 +5,9 @@ use std::collections::HashMap;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
-use crate::macros::*;
 use crate::role::RoleFullname;
 
 /// An AWS integration entity

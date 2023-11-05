@@ -3,9 +3,8 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::error::Result;
-use crate::macros::*;
 use crate::user::UserAuthority;
 
 /// An invitation entity

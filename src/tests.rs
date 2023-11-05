@@ -29,8 +29,8 @@ macro_rules! test_server {
         use ::serde_json::json;
         let _ = pretty_env_logger::try_init();
         let config = TestServerConfig {
-            $( $field: $value.try_into().unwrap_or_else(|e| {
-                panic!("failed to convert {:?} into {}: {}", $value, stringify!($field), e);
+            $( $field: $value.try_into().unwrap_or_else(|err| {
+                panic!("failed to convert {:?} into {}: {}", $value, stringify!($field), err);
             }), )*
             ..TestServerConfig::default()
         };
@@ -74,7 +74,7 @@ pub(crate) use test_server;
 
 macro_rules! test_client {
     ($server:expr) => {
-        $crate::Client::builder()
+        $crate::client::Client::builder()
             .api_key("")
             .api_base($server.url_str("/"))
             .build()

@@ -5,11 +5,10 @@ use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::host::HostId;
-use crate::macros::*;
 use crate::monitor::{MonitorId, MonitorType};
 
 /// An alert entity

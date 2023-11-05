@@ -127,25 +127,126 @@ impl Client {
     }
 }
 
+macro_rules! query_params {
+    { $( $field:ident = $value:expr ),* $(,)? } => {{
+        &[
+            $( (stringify!($field), &$value) ),*
+        ]
+    }};
+}
+pub(crate) use query_params;
+
+macro_rules! request_body {
+    [] => {
+        None::<()>
+    };
+    ( $value:expr $(,)? ) => {
+        Some($value)
+    };
+    { $( $field:ident: $type:ty = $value:expr ),+ $(,)? } => {{
+        #[allow(non_snake_case)]
+        #[derive(::serde_derive::Serialize)]
+        struct Request { $( $field: $type ),* }
+        #[allow(clippy::redundant_field_names)]
+        Some(Request { $( $field: $value ),* })
+    }};
+}
+pub(crate) use request_body;
+
+macro_rules! response_body {
+    () => {
+        |_: ::serde_json::Value| ()
+    };
+    (..) => {
+        |response| response
+    };
+    { $( $field:ident: $type:ty ),+ $(,)? } => {{
+        #[allow(non_snake_case)]
+        #[derive(::serde_derive::Deserialize)]
+        struct Response { $( $field: $type ),* }
+        |response: Response| ($( response.$field ),*)
+    }};
+}
+pub(crate) use response_body;
+
 #[cfg(test)]
 mod client_tests {
-    use crate::error::Error::ApiError;
+    use reqwest::Method;
+
+    use crate::client::*;
+    use crate::error::Error;
     use crate::tests::*;
+
+    impl Client {
+        async fn get(&self) -> Result<bool> {
+            self.request(
+                Method::GET,
+                "/api/v0/test",
+                query_params![],
+                request_body![],
+                response_body!(..),
+            )
+            .await
+        }
+
+        async fn post(&self) -> Result<bool> {
+            self.request(
+                Method::POST,
+                "/api/v0/test",
+                query_params! {
+                    param1 = "value1",
+                    param2 = "value2",
+                    param3 = "value3",
+                },
+                request_body! {
+                    message: String = "request body".to_owned(),
+                },
+                response_body! {
+                    success: bool,
+                },
+            )
+            .await
+        }
+    }
+
+    #[async_std::test]
+    async fn success() {
+        {
+            let server = test_server! {
+                method = GET,
+                path = "/api/v0/test",
+                status_code = 200,
+                response = json!(true),
+            };
+            assert_eq!(test_client!(server).get().await, Ok(true));
+        }
+        {
+            let server = test_server! {
+                method = POST,
+                path = "/api/v0/test",
+                query_params = "param1=value1&param2=value2&param3=value3",
+                status_code = 201,
+                request = json!({ "message": "request body" }),
+                response = json!({ "success": true }),
+            };
+            assert_eq!(test_client!(server).post().await, Ok(true));
+        }
+    }
 
     #[async_std::test]
     async fn error() {
         {
             let server = test_server! {
-                method = "GET",
-                path = "/api/v0/org",
+                method = GET,
+                path = "/api/v0/test",
                 status_code = 400,
                 response = json!({
                     "error": "This is an error message.",
                 }),
             };
             assert_eq!(
-                test_client!(server).get_organization().await,
-                Err(ApiError(
+                test_client!(server).get().await,
+                Err(Error::ApiError(
                     reqwest::StatusCode::BAD_REQUEST,
                     "This is an error message.".to_owned()
                 )),
@@ -154,7 +255,7 @@ mod client_tests {
         {
             let server = test_server! {
                 method = GET,
-                path = "/api/v0/org",
+                path = "/api/v0/test",
                 status_code = 500,
                 response = json!({
                     "error": {
@@ -163,8 +264,8 @@ mod client_tests {
                 }),
             };
             assert_eq!(
-                test_client!(server).get_organization().await,
-                Err(ApiError(
+                test_client!(server).get().await,
+                Err(Error::ApiError(
                     reqwest::StatusCode::INTERNAL_SERVER_ERROR,
                     "This is an error message.".to_owned()
                 )),

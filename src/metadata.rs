@@ -2,10 +2,9 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::error::Result;
 use crate::host::HostId;
-use crate::macros::*;
 use crate::role::RoleName;
 use crate::service::ServiceName;
 

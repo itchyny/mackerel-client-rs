@@ -4,11 +4,10 @@ use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DurationSeconds};
 use typed_builder::TypedBuilder;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
 use crate::host::HostId;
-use crate::macros::*;
 use crate::monitor::MonitorOperator;
 use crate::role::RoleFullname;
 use crate::service::ServiceName;

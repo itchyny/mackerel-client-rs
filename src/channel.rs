@@ -4,10 +4,9 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::collections::HashMap;
 use strum::{Display, EnumString};
 
-use crate::client::Client;
+use crate::client::*;
 use crate::entity::{Entity, Id};
 use crate::error::Result;
-use crate::macros::*;
 use crate::user::UserId;
 
 /// A channel entity

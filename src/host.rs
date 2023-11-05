@@ -10,10 +10,9 @@ use typed_builder::TypedBuilder;
 use url::form_urlencoded;
 
 use crate::alert::AlertStatus;
-use crate::client::Client;
+use crate::client::*;
 use crate::entity::Id;
 use crate::error::Result;
-use crate::macros::*;
 use crate::monitor::{MonitorId, MonitorType};
 use crate::role::{RoleFullname, RoleName};
 use crate::service::ServiceName;

@@ -3,10 +3,9 @@ use reqwest::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::error::Result;
 use crate::host::HostId;
-use crate::macros::*;
 use crate::service::ServiceName;
 
 /// A host metric value

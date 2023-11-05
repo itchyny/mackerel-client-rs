@@ -5,10 +5,9 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::entity::Id;
 use crate::error::Result;
-use crate::macros::*;
 
 /// A user entity
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]

@@ -27,7 +27,6 @@
 pub mod client;
 pub mod entity;
 pub mod error;
-pub(crate) mod macros;
 pub(crate) mod name;
 #[cfg(test)]
 pub(crate) mod tests;
@@ -50,4 +49,4 @@ pub mod organization;
 pub mod role;
 pub mod service;
 pub mod user;
-pub use crate::client::Client;
+pub use crate::client::*;

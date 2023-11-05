@@ -4,10 +4,9 @@ use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 
 use crate::alert::AlertStatus;
-use crate::client::Client;
+use crate::client::*;
 use crate::error::Result;
 use crate::host::HostId;
-use crate::macros::*;
 
 /// A check report
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]

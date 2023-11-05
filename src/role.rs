@@ -3,9 +3,8 @@ use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use typed_builder::TypedBuilder;
 
-use crate::client::Client;
+use crate::client::*;
 use crate::error::Result;
-use crate::macros::*;
 use crate::name::Name;
 use crate::service::ServiceName;
 
