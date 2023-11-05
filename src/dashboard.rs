@@ -432,7 +432,7 @@ impl Client {
     pub async fn get_dashboard(&self, dashboard_id: impl Into<DashboardId>) -> Result<Dashboard> {
         self.request(
             Method::GET,
-            format!("/api/v0/dashboards/{}", dashboard_id.into()),
+            format_url!("/api/v0/dashboards/{}", dashboard_id),
             query_params![],
             request_body![],
             response_body!(..),
@@ -450,7 +450,7 @@ impl Client {
     ) -> Result<Dashboard> {
         self.request(
             Method::PUT,
-            format!("/api/v0/dashboards/{}", dashboard_id.into()),
+            format_url!("/api/v0/dashboards/{}", dashboard_id),
             query_params![],
             request_body!(dashboard_value),
             response_body!(..),
@@ -467,7 +467,7 @@ impl Client {
     ) -> Result<Dashboard> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/dashboards/{}", dashboard_id.into()),
+            format_url!("/api/v0/dashboards/{}", dashboard_id),
             query_params![],
             request_body![],
             response_body!(..),

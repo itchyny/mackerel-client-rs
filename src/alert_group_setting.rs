@@ -143,10 +143,7 @@ impl Client {
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::GET,
-            format!(
-                "/api/v0/alert-group-settings/{}",
-                alert_group_setting_id.into()
-            ),
+            format_url!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
             query_params![],
             request_body![],
             response_body!(..),
@@ -164,10 +161,7 @@ impl Client {
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::PUT,
-            format!(
-                "/api/v0/alert-group-settings/{}",
-                alert_group_setting_id.into()
-            ),
+            format_url!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
             query_params![],
             request_body!(alert_group_setting_value),
             response_body!(..),
@@ -184,10 +178,7 @@ impl Client {
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::DELETE,
-            format!(
-                "/api/v0/alert-group-settings/{}",
-                alert_group_setting_id.into()
-            ),
+            format_url!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
             query_params![],
             request_body![],
             response_body!(..),

@@ -108,7 +108,7 @@ impl Client {
     pub async fn delete_service(&self, service_name: impl Into<ServiceName>) -> Result<Service> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/services/{}", service_name.into()),
+            format_url!("/api/v0/services/{}", service_name),
             query_params![],
             request_body![],
             response_body!(..),
@@ -125,7 +125,7 @@ impl Client {
     ) -> Result<Vec<String>> {
         self.request(
             Method::GET,
-            format!("/api/v0/services/{}/metric-names", service_name.into()),
+            format_url!("/api/v0/services/{}/metric-names", service_name),
             query_params![],
             request_body![],
             response_body! { names: Vec<String> },

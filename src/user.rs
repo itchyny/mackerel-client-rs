@@ -216,7 +216,7 @@ impl Client {
     pub async fn delete_user(&self, user_id: impl Into<UserId>) -> Result<User> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/users/{}", user_id.into()),
+            format_url!("/api/v0/users/{}", user_id),
             query_params![],
             request_body![],
             response_body!(..),

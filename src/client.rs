@@ -127,6 +127,13 @@ impl Client {
     }
 }
 
+macro_rules! format_url {
+    ( $format:expr, $( $args:expr ),+ $(,)? ) => {
+        format!($format, $( $args.into() ),+)
+    };
+}
+pub(crate) use format_url;
+
 macro_rules! query_params {
     { $( $field:ident = $value:expr ),* $(,)? } => {{
         &[

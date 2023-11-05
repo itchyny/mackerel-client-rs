@@ -754,7 +754,7 @@ impl Client {
     ) -> Result<Monitor> {
         self.request(
             Method::PUT,
-            format!("/api/v0/monitors/{}", monitor_id.into()),
+            format_url!("/api/v0/monitors/{}", monitor_id),
             query_params![],
             request_body!(monitor_value),
             response_body!(..),
@@ -768,7 +768,7 @@ impl Client {
     pub async fn delete_monitor(&self, monitor_id: impl Into<MonitorId>) -> Result<Monitor> {
         self.request(
             Method::DELETE,
-            format!("/api/v0/monitors/{}", monitor_id.into()),
+            format_url!("/api/v0/monitors/{}", monitor_id),
             query_params![],
             request_body![],
             response_body!(..),

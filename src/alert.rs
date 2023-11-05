@@ -207,7 +207,7 @@ impl Client {
     pub async fn get_alert(&self, alert_id: impl Into<AlertId>) -> Result<Alert> {
         self.request(
             Method::GET,
-            format!("/api/v0/alerts/{}", alert_id.into()),
+            format_url!("/api/v0/alerts/{}", alert_id),
             query_params![],
             request_body![],
             response_body!(..),
@@ -225,7 +225,7 @@ impl Client {
     ) -> Result<()> {
         self.request(
             Method::PUT,
-            format!("/api/v0/alerts/{}", alert_id.into()),
+            format_url!("/api/v0/alerts/{}", alert_id),
             query_params![],
             request_body! { memo: String = memo.as_ref().to_owned() },
             response_body!(),
@@ -243,7 +243,7 @@ impl Client {
     ) -> Result<Alert> {
         self.request(
             Method::POST,
-            format!("/api/v0/alerts/{}/close", alert_id.into()),
+            format_url!("/api/v0/alerts/{}/close", alert_id),
             query_params![],
             request_body! { reason: String = reason.as_ref().to_owned() },
             response_body!(..),

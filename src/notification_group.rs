@@ -186,10 +186,7 @@ impl Client {
     ) -> Result<NotificationGroup> {
         self.request(
             Method::PUT,
-            format!(
-                "/api/v0/notification-groups/{}",
-                notification_group_id.into()
-            ),
+            format_url!("/api/v0/notification-groups/{}", notification_group_id),
             query_params![],
             request_body!(notification_group_value),
             response_body!(..),
@@ -206,10 +203,7 @@ impl Client {
     ) -> Result<NotificationGroup> {
         self.request(
             Method::DELETE,
-            format!(
-                "/api/v0/notification-groups/{}",
-                notification_group_id.into()
-            ),
+            format_url!("/api/v0/notification-groups/{}", notification_group_id),
             query_params![],
             request_body![],
             response_body!(..),
