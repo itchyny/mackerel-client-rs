@@ -179,7 +179,7 @@ mod tests {
 
     fn dashboard_example() -> Dashboard {
         Dashboard::builder()
-            .id("abcde1")
+            .id("dashboard1")
             .value(
                 DashboardValue::builder()
                     .title("This is a dashboard")
@@ -189,7 +189,7 @@ mod tests {
                         DashboardWidget::Graph {
                             title: "Graph title".to_string(),
                             graph: DashboardGraph::Host {
-                                host_id: "abcde1".into(),
+                                host_id: "host1".into(),
                                 name: "loadavg5".to_string(),
                             },
                             time_range: Some(DashboardTimeRange::Relative {
@@ -234,7 +234,7 @@ mod tests {
                         DashboardWidget::Value {
                             title: "Metric value title".to_string(),
                             metric: DashboardMetric::Host {
-                                host_id: "abcde1".into(),
+                                host_id: "host2".into(),
                                 name: "cpu.user.percentage".to_string(),
                             },
                             fraction_size: Some(4),
@@ -281,7 +281,7 @@ mod tests {
 
     fn json_example() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "dashboard1",
             "title": "This is a dashboard",
             "memo": "This is a dashboard memo.",
             "urlPath": "example",
@@ -291,7 +291,7 @@ mod tests {
                     "title": "Graph title",
                     "graph": {
                         "type": "host",
-                        "hostId": "abcde1",
+                        "hostId": "host1",
                         "name": "loadavg5",
                     },
                     "range": {
@@ -342,7 +342,7 @@ mod tests {
                     "title": "Metric value title",
                     "metric": {
                         "type": "host",
-                        "hostId": "abcde1",
+                        "hostId": "host2",
                         "name": "cpu.user.percentage",
                     },
                     "fractionSize": 4,

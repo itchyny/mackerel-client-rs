@@ -83,7 +83,7 @@ mod tests {
 
     fn notification_group_example1() -> NotificationGroup {
         NotificationGroup::builder()
-            .id("abcde1")
+            .id("group1")
             .value(
                 NotificationGroupValue::builder()
                     .name("Example notification group")
@@ -94,7 +94,7 @@ mod tests {
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "group1",
             "name": "Example notification group",
             "notificationLevel": "all",
             "childNotificationGroupIds": [],
@@ -104,17 +104,15 @@ mod tests {
 
     fn notification_group_example2() -> NotificationGroup {
         NotificationGroup::builder()
-            .id("abcde2")
+            .id("group2")
             .value(
                 NotificationGroupValue::builder()
                     .name("Example notification group")
                     .notification_level(NotificationLevel::Critical)
-                    .child_notification_group_ids(["abcde3".into()])
-                    .child_channel_ids(["abcde4".into()])
-                    .monitors([NotificationGroupMonitor::builder().id("abcde5").build()])
-                    .services([NotificationGroupService::builder()
-                        .name("ExampleService")
-                        .build()])
+                    .child_notification_group_ids(["group3".into()])
+                    .child_channel_ids(["channel0".into()])
+                    .monitors([NotificationGroupMonitor::builder().id("monitor0").build()])
+                    .services([NotificationGroupService::builder().name("service0").build()])
                     .build(),
             )
             .build()
@@ -122,13 +120,13 @@ mod tests {
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde2",
+            "id": "group2",
             "name": "Example notification group",
             "notificationLevel": "critical",
-            "childNotificationGroupIds": ["abcde3"],
-            "childChannelIds": ["abcde4"],
-            "monitors": [{"id": "abcde5", "skipDefault": false}],
-            "services": [{"name": "ExampleService"}],
+            "childNotificationGroupIds": ["group3"],
+            "childChannelIds": ["channel0"],
+            "monitors": [{"id": "monitor0", "skipDefault": false}],
+            "services": [{"name": "service0"}],
         })
     }
 

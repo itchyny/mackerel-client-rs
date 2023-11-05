@@ -176,7 +176,7 @@ mod tests {
 
     fn host_example1() -> Host {
         Host::builder()
-            .id("abcde1")
+            .id("host1")
             .created_at(DateTime::from_timestamp(1700000000, 0).unwrap())
             .status(HostStatus::Working)
             .value(HostValue::builder().name("example-host").build())
@@ -185,7 +185,7 @@ mod tests {
 
     fn host_json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "host1",
             "createdAt": 1700000000,
             "size": "standard",
             "status": "working",
@@ -198,13 +198,13 @@ mod tests {
 
     fn host_example2() -> Host {
         Host::builder()
-            .id("abcde2")
+            .id("host2")
             .created_at(DateTime::from_timestamp(1700000000, 0).unwrap())
             .size(HostSize::Micro)
             .status(HostStatus::Poweroff)
             .is_retired(true)
             .retired_at(DateTime::from_timestamp(1710000000, 0).unwrap())
-            .roles([("ExampleService".into(), vec!["ExampleRole".into()])])
+            .roles([("service0".into(), vec!["role0".into()])])
             .value(
                 HostValue::builder()
                     .name("example-host")
@@ -220,7 +220,7 @@ mod tests {
                         .ip_address([127, 0, 0, 1])
                         .ipv6_address([0xfe80, 0, 0, 0, 0, 0, 0, 1])
                         .build()])
-                    .role_fullnames(["ExampleService:ExampleRole".into()])
+                    .role_fullnames(["service0:role0".into()])
                     .checks([
                         HostCheck::builder().name("check0").memo("memo").build(),
                         HostCheck::builder().name("check1").build(),
@@ -232,13 +232,13 @@ mod tests {
 
     fn host_json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde2",
+            "id": "host2",
             "createdAt": 1700000000,
             "size": "micro",
             "status": "poweroff",
             "isRetired": true,
             "retiredAt": 1710000000,
-            "roles": {"ExampleService": ["ExampleRole"]},
+            "roles": {"service0": ["role0"]},
             "name": "example-host",
             "displayName": "Example host",
             "customIdentifier": "custom-identifier",
@@ -254,7 +254,7 @@ mod tests {
                     "ipv6Address": "fe80::1",
                 },
             ],
-            "roleFullnames": ["ExampleService:ExampleRole"],
+            "roleFullnames": ["service0:role0"],
             "checks": [{"name": "check0", "memo": "memo"}, {"name": "check1"}],
         })
     }

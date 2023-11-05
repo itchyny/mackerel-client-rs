@@ -46,7 +46,7 @@ mod tests {
 
     fn alert_group_setting_example1() -> AlertGroupSetting {
         AlertGroupSetting::builder()
-            .id("abcde1")
+            .id("setting1")
             .value(
                 AlertGroupSettingValue::builder()
                     .name("Example alert group setting")
@@ -57,20 +57,20 @@ mod tests {
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "setting1",
             "name": "Example alert group setting",
         })
     }
 
     fn alert_group_setting_example2() -> AlertGroupSetting {
         AlertGroupSetting::builder()
-            .id("abcde2")
+            .id("setting2")
             .value(
                 AlertGroupSettingValue::builder()
                     .name("Example alert group setting")
                     .memo("This is an alert group setting memo.")
-                    .service_scopes(["ExampleService".into()])
-                    .role_scopes(["ExampleService:ExampleRole".into()])
+                    .service_scopes(["service0".into()])
+                    .role_scopes(["service1:role1".into()])
                     .monitor_scopes(["monitor0".into()])
                     .notification_interval(60)
                     .build(),
@@ -80,11 +80,11 @@ mod tests {
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde2",
+            "id": "setting2",
             "name": "Example alert group setting",
             "memo": "This is an alert group setting memo.",
-            "serviceScopes": ["ExampleService"],
-            "roleScopes": ["ExampleService:ExampleRole"],
+            "serviceScopes": ["service0"],
+            "roleScopes": ["service1:role1"],
             "monitorScopes": ["monitor0"],
             "notificationInterval": 60,
         })
@@ -199,7 +199,7 @@ mod client_tests {
             .name("Example alert group setting")
             .memo("This is an alert group setting memo.")
             .service_scopes(["service0".into()])
-            .role_scopes(["service0:role0".into()])
+            .role_scopes(["service1:role1".into()])
             .monitor_scopes(["monitor0".into()])
             .notification_interval(60)
             .build()
@@ -217,7 +217,7 @@ mod client_tests {
             "name": "Example alert group setting",
             "memo": "This is an alert group setting memo.",
             "serviceScopes": ["service0"],
-            "roleScopes": ["service0:role0"],
+            "roleScopes": ["service1:role1"],
             "monitorScopes": ["monitor0"],
             "notificationInterval": 60,
         })

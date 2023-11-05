@@ -34,7 +34,7 @@ mod tests {
 
     fn service_example1() -> Service {
         Service::builder()
-            .name("ExampleService1")
+            .name("service1")
             .memo("service memo")
             .roles(["role0".into(), "role1".into(), "role2".into()])
             .build()
@@ -42,23 +42,23 @@ mod tests {
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "name": "ExampleService1",
+            "name": "service1",
             "memo": "service memo",
             "roles": [
                 "role0",
                 "role1",
-                "role2"
-            ]
+                "role2",
+            ],
         })
     }
 
     fn service_example2() -> Service {
-        Service::builder().name("ExampleService2").build()
+        Service::builder().name("service2").build()
     }
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "name": "ExampleService2",
+            "name": "service2",
             "memo": "",
             "roles": [],
         })

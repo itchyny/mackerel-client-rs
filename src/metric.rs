@@ -45,7 +45,7 @@ mod tests {
 
     fn host_metric_example1() -> HostMetricValue {
         HostMetricValue::builder()
-            .host_id("abcde1")
+            .host_id("host1")
             .name("loadavg.loadavg1")
             .value(
                 MetricValue::builder()
@@ -58,7 +58,7 @@ mod tests {
 
     fn host_metric_json_example1() -> serde_json::Value {
         json!({
-            "hostId": "abcde1",
+            "hostId": "host1",
             "name": "loadavg.loadavg1",
             "time": 1700000000,
             "value": 1.2,

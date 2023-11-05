@@ -84,7 +84,7 @@ mod tests {
 
     fn user_example1() -> User {
         User::builder()
-            .id("abcde1")
+            .id("user1")
             .joined_at(DateTime::from_timestamp(1630000000, 0).unwrap())
             .value(
                 UserValue::builder()
@@ -98,7 +98,7 @@ mod tests {
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "user1",
             "screenName": "Example User 1",
             "email": "mackerel@example.com",
             "authority": "manager",
@@ -110,7 +110,7 @@ mod tests {
 
     fn user_example2() -> User {
         User::builder()
-            .id("abcde2")
+            .id("user2")
             .is_in_registration_process(true)
             .is_mfa_enabled(true)
             .authentication_methods([AuthenticationMethod::Password, AuthenticationMethod::GitHub])
@@ -127,7 +127,7 @@ mod tests {
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde2",
+            "id": "user2",
             "screenName": "Example User 2",
             "email": "mackerel@example.com",
             "authority": "collaborator",

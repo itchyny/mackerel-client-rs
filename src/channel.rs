@@ -117,11 +117,11 @@ mod tests {
 
     fn email_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde1")
+            .id("channel1")
             .value(ChannelValue::Email {
                 name: "Example Email Channel".to_string(),
                 emails: vec!["test@example.com".to_string()],
-                user_ids: vec!["abcde2".into()],
+                user_ids: vec!["user0".into()],
                 events: vec![NotificationEvent::Alert],
             })
             .build()
@@ -129,18 +129,18 @@ mod tests {
 
     fn email_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "channel1",
             "type": "email",
             "name": "Example Email Channel",
             "emails": ["test@example.com"],
-            "userIds": ["abcde2"],
+            "userIds": ["user0"],
             "events": ["alert"],
         })
     }
 
     fn slack_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde2")
+            .id("channel2")
             .value(ChannelValue::Slack {
                 name: "Example Slack Channel".to_string(),
                 url: "slack@example.com".to_string(),
@@ -157,7 +157,7 @@ mod tests {
 
     fn slack_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde2",
+            "id": "channel2",
             "type": "slack",
             "name": "Example Slack Channel",
             "url": "slack@example.com",
@@ -169,7 +169,7 @@ mod tests {
 
     fn line_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde3")
+            .id("channel3")
             .value(ChannelValue::Line {
                 name: "Example Line Channel".to_string(),
             })
@@ -178,7 +178,7 @@ mod tests {
 
     fn line_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde3",
+            "id": "channel3",
             "type": "line",
             "name": "Example Line Channel",
         })
@@ -186,7 +186,7 @@ mod tests {
 
     fn chatwork_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde4")
+            .id("channel4")
             .value(ChannelValue::Chatwork {
                 name: "Example Chatwork Channel".to_string(),
             })
@@ -195,7 +195,7 @@ mod tests {
 
     fn chatwork_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde4",
+            "id": "channel4",
             "type": "chatwork",
             "name": "Example Chatwork Channel",
         })
@@ -203,7 +203,7 @@ mod tests {
 
     fn typetalk_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde5")
+            .id("channel5")
             .value(ChannelValue::Typetalk {
                 name: "Example Typetalk Channel".to_string(),
             })
@@ -212,7 +212,7 @@ mod tests {
 
     fn typetalk_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde5",
+            "id": "channel5",
             "type": "typetalk",
             "name": "Example Typetalk Channel",
         })
@@ -220,7 +220,7 @@ mod tests {
 
     fn twilio_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde6")
+            .id("channel6")
             .value(ChannelValue::Twilio {
                 name: "Example Twilio Channel".to_string(),
             })
@@ -229,7 +229,7 @@ mod tests {
 
     fn twilio_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde6",
+            "id": "channel6",
             "type": "twilio",
             "name": "Example Twilio Channel",
         })
@@ -237,7 +237,7 @@ mod tests {
 
     fn pagerduty_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde7")
+            .id("channel7")
             .value(ChannelValue::Pagerduty {
                 name: "Example Pagerduty Channel".to_string(),
             })
@@ -246,7 +246,7 @@ mod tests {
 
     fn pagerduty_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde7",
+            "id": "channel7",
             "type": "pagerduty",
             "name": "Example Pagerduty Channel",
         })
@@ -254,7 +254,7 @@ mod tests {
 
     fn opsgenie_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde8")
+            .id("channel8")
             .value(ChannelValue::Opsgenie {
                 name: "Example Opsgenie Channel".to_string(),
             })
@@ -263,7 +263,7 @@ mod tests {
 
     fn opsgenie_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde8",
+            "id": "channel8",
             "type": "opsgenie",
             "name": "Example Opsgenie Channel",
         })
@@ -271,7 +271,7 @@ mod tests {
 
     fn yammer_channel_example() -> Channel {
         Channel::builder()
-            .id("abcde9")
+            .id("channel9")
             .value(ChannelValue::Yammer {
                 name: "Example Yammer Channel".to_string(),
             })
@@ -280,7 +280,7 @@ mod tests {
 
     fn yammer_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcde9",
+            "id": "channel9",
             "type": "yammer",
             "name": "Example Yammer Channel",
         })
@@ -288,7 +288,7 @@ mod tests {
 
     fn microsoft_teams_channel_example() -> Channel {
         Channel::builder()
-            .id("abcdea")
+            .id("channel10")
             .value(ChannelValue::MicrosoftTeams {
                 name: "Example MicrosoftTeams Channel".to_string(),
             })
@@ -297,7 +297,7 @@ mod tests {
 
     fn microsoft_teams_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcdea",
+            "id": "channel10",
             "type": "microsoft-teams",
             "name": "Example MicrosoftTeams Channel",
         })
@@ -305,7 +305,7 @@ mod tests {
 
     fn webhook_channel_example() -> Channel {
         Channel::builder()
-            .id("abcdeb")
+            .id("channel11")
             .value(ChannelValue::Webhook {
                 name: "Example Webhook Channel".to_string(),
                 url: "webhook@example.com".to_string(),
@@ -321,7 +321,7 @@ mod tests {
 
     fn webhook_channel_json_example() -> serde_json::Value {
         json!({
-            "id": "abcdeb",
+            "id": "channel11",
             "type": "webhook",
             "name": "Example Webhook Channel",
             "url": "webhook@example.com",
@@ -332,7 +332,7 @@ mod tests {
 
     fn amazon_event_bridge_channel_example() -> Channel {
         Channel::builder()
-            .id("abcdec")
+            .id("channel12")
             .value(ChannelValue::AmazonEventBridge {
                 name: "Example AmazonEventBridge Channel".to_string(),
             })
@@ -341,7 +341,7 @@ mod tests {
 
     fn amazon_event_bridge_json_example() -> serde_json::Value {
         json!({
-            "id": "abcdec",
+            "id": "channel12",
             "type": "amazon-event-bridge",
             "name": "Example AmazonEventBridge Channel",
         })

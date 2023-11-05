@@ -73,13 +73,13 @@ mod tests {
 
     fn alert_example1() -> Alert {
         Alert::builder()
-            .id("abcde1")
+            .id("alert1")
             .value(
                 AlertValue::builder()
                     .status(AlertStatus::Critical)
-                    .monitor_id("abcde2")
+                    .monitor_id("monitor1")
                     .monitor_type(MonitorType::Connectivity)
-                    .host_id("abcde3")
+                    .host_id("host1")
                     .message("alert message")
                     .reason("alert close reason")
                     .opened_at(DateTime::from_timestamp(1690000000, 0).unwrap())
@@ -91,11 +91,11 @@ mod tests {
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "alert1",
             "status": "CRITICAL",
-            "monitorId": "abcde2",
+            "monitorId": "monitor1",
             "type": "connectivity",
-            "hostId": "abcde3",
+            "hostId": "host1",
             "message": "alert message",
             "reason": "alert close reason",
             "openedAt": 1690000000,
@@ -105,13 +105,13 @@ mod tests {
 
     fn alert_example2() -> Alert {
         Alert::builder()
-            .id("abcde1")
+            .id("alert2")
             .value(
                 AlertValue::builder()
                     .status(AlertStatus::Warning)
-                    .monitor_id("abcde2")
+                    .monitor_id("monitor2")
                     .monitor_type(MonitorType::Host)
-                    .host_id("abcde3")
+                    .host_id("host2")
                     .value(25.0)
                     .opened_at(DateTime::from_timestamp(1690000000, 0).unwrap())
                     .build(),
@@ -121,11 +121,11 @@ mod tests {
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "alert2",
             "status": "WARNING",
-            "monitorId": "abcde2",
+            "monitorId": "monitor2",
             "type": "host",
-            "hostId": "abcde3",
+            "hostId": "host2",
             "value": 25.0,
             "openedAt": 1690000000,
         })

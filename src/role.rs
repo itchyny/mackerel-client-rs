@@ -111,27 +111,24 @@ mod tests {
     use serde_json::json;
 
     fn role_example1() -> Role {
-        Role::builder()
-            .name("ExampleRole1")
-            .memo("role memo")
-            .build()
+        Role::builder().name("role1").memo("role memo").build()
     }
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "name": "ExampleRole1",
-            "memo": "role memo"
+            "name": "role1",
+            "memo": "role memo",
         })
     }
 
     fn role_example2() -> Role {
-        Role::builder().name("ExampleRole2").build()
+        Role::builder().name("role2").build()
     }
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "name": "ExampleRole2",
-            "memo": ""
+            "name": "role2",
+            "memo": "",
         })
     }
 

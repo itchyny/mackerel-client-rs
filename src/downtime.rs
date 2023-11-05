@@ -105,7 +105,7 @@ mod tests {
 
     fn downtime_example1() -> Downtime {
         Downtime::builder()
-            .id("abcde1")
+            .id("downtime1")
             .value(
                 DowntimeValue::builder()
                     .name("Example downtime")
@@ -119,7 +119,7 @@ mod tests {
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "downtime1",
             "name": "Example downtime",
             "memo": "This is a downtime memo.",
             "start": 1700000000,
@@ -129,7 +129,7 @@ mod tests {
 
     fn downtime_example2() -> Downtime {
         Downtime::builder()
-            .id("abcde2")
+            .id("downtime2")
             .value(
                 DowntimeValue::builder()
                     .name("Example downtime")
@@ -160,7 +160,7 @@ mod tests {
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde2",
+            "id": "downtime2",
             "name": "Example downtime",
             "start": 1700000000,
             "duration": 60,

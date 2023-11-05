@@ -331,7 +331,7 @@ mod tests {
 
     fn host_monitor_example() -> Monitor {
         Monitor::builder()
-            .id("abcde1")
+            .id("monitor1")
             .value(MonitorValue::Host {
                 name: "Example host monitor".to_string(),
                 memo: "Monitor memo".to_string(),
@@ -352,7 +352,7 @@ mod tests {
     fn host_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "host",
-            "id": "abcde1",
+            "id": "monitor1",
             "name": "Example host monitor",
             "memo": "Monitor memo",
             "duration": 5,
@@ -369,7 +369,7 @@ mod tests {
 
     fn connectivity_monitor_example() -> Monitor {
         Monitor::builder()
-            .id("abcde2")
+            .id("monitor2")
             .value(MonitorValue::Connectivity {
                 name: "Example connectivity monitor".to_string(),
                 memo: "Monitor memo".to_string(),
@@ -385,7 +385,7 @@ mod tests {
     fn connectivity_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "connectivity",
-            "id": "abcde2",
+            "id": "monitor2",
             "name": "Example connectivity monitor",
             "memo": "Monitor memo",
             "alertStatusOnGone": "WARNING",
@@ -394,7 +394,7 @@ mod tests {
 
     fn service_monitor_example() -> Monitor {
         Monitor::builder()
-            .id("abcde3")
+            .id("monitor3")
             .value(MonitorValue::Service {
                 name: "Example service monitor".to_string(),
                 memo: "Monitor memo".to_string(),
@@ -416,7 +416,7 @@ mod tests {
     fn service_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "service",
-            "id": "abcde3",
+            "id": "monitor3",
             "name": "Example service monitor",
             "memo": "Monitor memo",
             "service": "service1",
@@ -434,7 +434,7 @@ mod tests {
 
     fn external_monitor_example() -> Monitor {
         Monitor::builder()
-            .id("abcde4")
+            .id("monitor4")
             .value(MonitorValue::External {
                 name: "Example external monitor".to_string(),
                 memo: "Monitor memo".to_string(),
@@ -464,7 +464,7 @@ mod tests {
     fn external_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "external",
-            "id": "abcde4",
+            "id": "monitor4",
             "name": "Example external monitor",
             "memo": "Monitor memo",
             "url": "https://example.com",
@@ -488,7 +488,7 @@ mod tests {
 
     fn expression_monitor_example() -> Monitor {
         Monitor::builder()
-            .id("abcde5")
+            .id("monitor5")
             .value(MonitorValue::Expression {
                 name: "Example expression monitor".to_string(),
                 memo: "Monitor memo".to_string(),
@@ -505,7 +505,7 @@ mod tests {
     fn expression_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "expression",
-            "id": "abcde5",
+            "id": "monitor5",
             "name": "Example expression monitor",
             "memo": "Monitor memo",
             "expression": "min(role(\"foo:bar\", \"custom.foo.bar\"))",
@@ -517,7 +517,7 @@ mod tests {
 
     fn anomaly_detection_monitor_example() -> Monitor {
         Monitor::builder()
-            .id("abcde6")
+            .id("monitor6")
             .value(MonitorValue::AnomalyDetection {
                 name: "Example anomaly detection monitor".to_string(),
                 memo: "Monitor memo".to_string(),
@@ -535,7 +535,7 @@ mod tests {
     fn anomaly_detection_monitor_json_example() -> serde_json::Value {
         json!({
             "type": "anomalyDetection",
-            "id": "abcde6",
+            "id": "monitor6",
             "name": "Example anomaly detection monitor",
             "memo": "Monitor memo",
             "scopes": ["service0:role0"],

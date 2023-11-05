@@ -41,15 +41,15 @@ mod tests {
 
     fn graph_annotation_example1() -> GraphAnnotation {
         GraphAnnotation::builder()
-            .id("abcde1")
+            .id("annotation1")
             .value(
                 GraphAnnotationValue::builder()
                     .title("Deploy application")
                     .description("Graph Annotation Example\nhttps://example.com")
                     .from(DateTime::from_timestamp(1484000000, 0).unwrap())
                     .to(DateTime::from_timestamp(1484000030, 0).unwrap())
-                    .service("ExampleService")
-                    .roles(["ExampleRole1".into(), "ExampleRole2".into()])
+                    .service("service0")
+                    .roles(["role1".into(), "role2".into()])
                     .build(),
             )
             .build()
@@ -57,25 +57,25 @@ mod tests {
 
     fn json_example1() -> serde_json::Value {
         json!({
-            "id": "abcde1",
+            "id": "annotation1",
             "title": "Deploy application",
             "description": "Graph Annotation Example\nhttps://example.com",
             "from": 1484000000,
             "to": 1484000030,
-            "service": "ExampleService",
-            "roles": ["ExampleRole1", "ExampleRole2"]
+            "service": "service0",
+            "roles": ["role1", "role2"],
         })
     }
 
     fn graph_annotation_example2() -> GraphAnnotation {
         GraphAnnotation::builder()
-            .id("abcde2")
+            .id("annotation2")
             .value(
                 GraphAnnotationValue::builder()
                     .title("Deploy application")
                     .from(DateTime::from_timestamp(1484000000, 0).unwrap())
                     .to(DateTime::from_timestamp(1484000030, 0).unwrap())
-                    .service("ExampleService")
+                    .service("service0")
                     .build(),
             )
             .build()
@@ -83,11 +83,11 @@ mod tests {
 
     fn json_example2() -> serde_json::Value {
         json!({
-            "id": "abcde2",
+            "id": "annotation2",
             "title": "Deploy application",
             "from": 1484000000,
             "to": 1484000030,
-            "service": "ExampleService",
+            "service": "service0",
         })
     }
 
