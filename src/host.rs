@@ -517,14 +517,46 @@ impl Client {
         .await
     }
 
-    /// Fetches hosts.
+    /// Fetches hosts in the organization.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#list>.
     pub async fn list_hosts(&self) -> Result<Vec<Host>> {
+        self.list_hosts_internal(query_params![]).await
+    }
+
+    /// Fetches hosts in a service.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/hosts#list>.
+    pub async fn list_service_hosts(
+        &self,
+        service_name: impl Into<ServiceName>,
+    ) -> Result<Vec<Host>> {
+        self.list_hosts_internal(query_params! {
+            service = service_name.into(),
+        })
+        .await
+    }
+
+    /// Fetches hosts in a role.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/hosts#list>.
+    pub async fn list_role_hosts(
+        &self,
+        service_name: impl Into<ServiceName>,
+        role_name: impl Into<RoleName>,
+    ) -> Result<Vec<Host>> {
+        self.list_hosts_internal(query_params! {
+            service = service_name.into(),
+            role = role_name.into(),
+        })
+        .await
+    }
+
+    async fn list_hosts_internal(&self, query_params: &[(&str, &str)]) -> Result<Vec<Host>> {
         self.request(
             Method::GET,
             "/api/v0/hosts",
-            query_params![],
+            query_params,
             request_body![],
             response_body! { hosts: Vec<Host> },
         )
@@ -822,6 +854,52 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server).list_hosts().await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_service_hosts() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts",
+            query_params = "service=service0",
+            response = json!({
+                "hosts": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server).list_service_hosts("service0").await,
+            Ok(vec![entity_example()]),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_service_hosts(ServiceName::from("service0"))
+                .await,
+            Ok(vec![entity_example()]),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_role_hosts() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/hosts",
+            query_params = "service=service0&role=role0",
+            response = json!({
+                "hosts": [entity_json_example()],
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_role_hosts("service0", "role0")
+                .await,
+            Ok(vec![entity_example()]),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_role_hosts(ServiceName::from("service0"), RoleName::from("role0"))
+                .await,
             Ok(vec![entity_example()]),
         );
     }
