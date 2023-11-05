@@ -206,29 +206,36 @@ mod client_tests {
 
     #[async_std::test]
     async fn list_service_metric_names() {
-        let metric_names = vec![
-            "custom.metric0".to_owned(),
-            "custom.metric1".to_owned(),
-            "custom.metric2".to_owned(),
-        ];
         let server = test_server! {
             method = GET,
             path = "/api/v0/services/service0/metric-names",
-            response = json!({ "names": metric_names }),
+            response = json!({
+                "names": [
+                    "custom.service.metric0",
+                    "custom.service.metric1",
+                    "custom.service.metric2",
+                ],
+            }),
         };
         assert_eq!(
             test_client!(server)
                 .list_service_metric_names("service0")
-                .await
-                .as_ref(),
-            Ok(&metric_names),
+                .await,
+            Ok(vec![
+                "custom.service.metric0".to_owned(),
+                "custom.service.metric1".to_owned(),
+                "custom.service.metric2".to_owned(),
+            ]),
         );
         assert_eq!(
             test_client!(server)
                 .list_service_metric_names(ServiceName::from("service0"))
-                .await
-                .as_ref(),
-            Ok(&metric_names),
+                .await,
+            Ok(vec![
+                "custom.service.metric0".to_owned(),
+                "custom.service.metric1".to_owned(),
+                "custom.service.metric2".to_owned(),
+            ]),
         );
     }
 }
