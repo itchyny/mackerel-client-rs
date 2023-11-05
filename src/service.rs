@@ -191,7 +191,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/services/service0",
             response = json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).delete_service("service0").await,
@@ -216,7 +215,6 @@ mod client_tests {
             method = GET,
             path = "/api/v0/services/service0/metric-names",
             response = json!({ "names": metric_names }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)

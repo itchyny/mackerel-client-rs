@@ -853,7 +853,6 @@ mod client_tests {
             path = "/api/v0/monitors/monitor0",
             request = value_json_example(),
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -875,7 +874,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/monitors/monitor0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).delete_monitor("monitor0").await,

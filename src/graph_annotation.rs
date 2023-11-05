@@ -232,7 +232,6 @@ mod client_tests {
             response = json!({
                 "graphAnnotations": [entity_json_example()],
             }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -279,7 +278,6 @@ mod client_tests {
             path = "/api/v0/graph-annotations/annotation0",
             request = value_json_example(),
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -301,7 +299,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/graph-annotations/annotation0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)

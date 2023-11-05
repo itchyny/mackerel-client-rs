@@ -533,7 +533,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/channels/channel0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).delete_channel("channel0").await,

@@ -287,7 +287,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/users/user0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).delete_user("user0").await,

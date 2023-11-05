@@ -315,7 +315,6 @@ mod client_tests {
                 "alerts": [entity_json_example()],
                 "nextId": "alert2",
             }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -337,7 +336,6 @@ mod client_tests {
             method = GET,
             path = "/api/v0/alerts/alert1",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).get_alert("alert1").await,
@@ -358,7 +356,6 @@ mod client_tests {
             path = "/api/v0/alerts/alert1",
             request = json!({ "memo": "alert memo" }),
             response = json!({ "id": "alert1", "memo": "alert memo" }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -381,7 +378,6 @@ mod client_tests {
             path = "/api/v0/alerts/alert1/close",
             request = json!({ "reason": "alert close reason" }),
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)

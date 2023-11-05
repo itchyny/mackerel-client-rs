@@ -209,7 +209,6 @@ mod client_tests {
             path = "/api/v0/invitations/revoke",
             request = json!({ "email": "mackerel@example.com" }),
             response = json!({ "success": true }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)

@@ -606,7 +606,6 @@ mod client_tests {
             method = GET,
             path = "/api/v0/dashboards/dashboard0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).get_dashboard("dashboard0").await,
@@ -627,7 +626,6 @@ mod client_tests {
             path = "/api/v0/dashboards/dashboard0",
             request = value_json_example(),
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -649,7 +647,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/dashboards/dashboard0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).delete_dashboard("dashboard0").await,

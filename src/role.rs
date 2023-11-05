@@ -279,7 +279,6 @@ mod client_tests {
             path = "/api/v0/services/service0/roles",
             request = json_example(),
             response = json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -301,7 +300,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/services/service0/roles/role0",
             response = json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).delete_role("service0", "role0").await,

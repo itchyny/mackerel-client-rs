@@ -633,7 +633,6 @@ mod client_tests {
             method = GET,
             path = "/api/v0/hosts/host0",
             response = json!({ "host": entity_json_example() }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server).get_host("host0").await,
@@ -682,7 +681,6 @@ mod client_tests {
             path = "/api/v0/hosts/host0",
             request = value_json_example(),
             response = json!({ "id": "host0" }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -724,7 +722,6 @@ mod client_tests {
                 "status": "standby",
             }),
             response = json!({ "success": true }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -754,7 +751,6 @@ mod client_tests {
             path = "/api/v0/hosts/host0/role-fullnames",
             request = json!({ "roleFullnames": ["service0:role0"] }),
             response = json!({ "success": true }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -779,7 +775,6 @@ mod client_tests {
             method = POST,
             path = "/api/v0/hosts/host0/retire",
             response = json!({ "success": true }),
-            count = 2,
         };
         assert_eq!(test_client!(server).retire_host("host0").await, Ok(()));
         assert_eq!(
@@ -797,7 +792,6 @@ mod client_tests {
             path = "/api/v0/hosts/bulk-retire",
             request = json!({ "ids": ["host0", "host1", "host2"] }),
             response = json!({ "success": true }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -843,7 +837,6 @@ mod client_tests {
             method = GET,
             path = "/api/v0/hosts/host0/metric-names",
             response = json!({ "names": metric_names }),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)

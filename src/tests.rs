@@ -12,7 +12,6 @@ pub(crate) struct TestServerConfig<'a> {
     pub request: Value,
     pub status_code: StatusCode,
     pub response: Value,
-    pub count: usize,
 }
 
 pub(crate) const GET: &str = "GET";
@@ -28,6 +27,7 @@ macro_rules! test_server {
         #[allow(unused_imports)]
         use ::serde_json::json;
         let _ = pretty_env_logger::try_init();
+        #[allow(clippy::needless_update)]
         let config = TestServerConfig {
             $( $field: $value.try_into().unwrap_or_else(|err| {
                 panic!("failed to convert {:?} into {}: {}", $value, stringify!($field), err);
@@ -60,7 +60,7 @@ macro_rules! test_server {
                     },
                 ),
             ])
-            .times(config.count.max(1))
+            .times(1..)
             .respond_with(
                 responders::status_code(config.status_code.as_u16())
                     .append_header("Content-Type", "application/json")

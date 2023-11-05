@@ -275,7 +275,6 @@ mod client_tests {
             method = GET,
             path = "/api/v0/alert-group-settings/setting0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -298,7 +297,6 @@ mod client_tests {
             path = "/api/v0/alert-group-settings/setting0",
             request = value_json_example(),
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
@@ -320,7 +318,6 @@ mod client_tests {
             method = DELETE,
             path = "/api/v0/alert-group-settings/setting0",
             response = entity_json_example(),
-            count = 2,
         };
         assert_eq!(
             test_client!(server)
