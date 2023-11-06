@@ -544,27 +544,35 @@ impl Client {
         service_name: impl Into<ServiceName>,
     ) -> Result<Vec<Host>> {
         self.list_hosts_internal(query_params! {
-            service = service_name.into(),
+            service = service_name.into().to_string(),
         })
         .await
     }
 
-    /// Fetches hosts in a role.
+    /// Fetches hosts in roles.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#list>.
     pub async fn list_role_hosts(
         &self,
         service_name: impl Into<ServiceName>,
-        role_name: impl Into<RoleName>,
+        role_names: impl IntoIterator<Item = impl Into<RoleName>>,
     ) -> Result<Vec<Host>> {
-        self.list_hosts_internal(query_params! {
-            service = service_name.into(),
-            role = role_name.into(),
-        })
+        self.list_hosts_internal(
+            &std::iter::once(("service", service_name.into().to_string()))
+                .chain(
+                    role_names
+                        .into_iter()
+                        .map(|role_name| ("role", role_name.into().to_string())),
+                )
+                .collect::<Vec<_>>(),
+        )
         .await
     }
 
-    async fn list_hosts_internal(&self, query_params: &[(&str, &str)]) -> Result<Vec<Host>> {
+    async fn list_hosts_internal(
+        &self,
+        query_params: &[(&str, impl AsRef<str>)],
+    ) -> Result<Vec<Host>> {
         self.request(
             Method::GET,
             "/api/v0/hosts",
@@ -897,20 +905,27 @@ mod client_tests {
         let server = test_server! {
             method = GET,
             path = "/api/v0/hosts",
-            query_params = "service=service0&role=role0",
+            query_params = "service=service0&role=role0&role=role1&role=role2",
             response = json!({
                 "hosts": [entity_json_example()],
             }),
         };
         assert_eq!(
             test_client!(server)
-                .list_role_hosts("service0", "role0")
+                .list_role_hosts("service0", ["role0", "role1", "role2"])
                 .await,
             Ok(vec![entity_example()]),
         );
         assert_eq!(
             test_client!(server)
-                .list_role_hosts(ServiceName::from("service0"), RoleName::from("role0"))
+                .list_role_hosts(
+                    ServiceName::from("service0"),
+                    vec![
+                        RoleName::from("role0"),
+                        RoleName::from("role1"),
+                        RoleName::from("role2"),
+                    ]
+                )
                 .await,
             Ok(vec![entity_example()]),
         );
