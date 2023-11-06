@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::collections::HashMap;
 use typed_builder::TypedBuilder;
 
 use crate::client::*;
@@ -137,6 +138,32 @@ impl Client {
             },
             request_body![],
             response_body! { metrics: Vec<MetricValue> },
+        )
+        .await
+    }
+
+    /// Fetches latest host metric values of hosts.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/host-metrics#get-latest>.
+    pub async fn list_latest_host_metric_values(
+        &self,
+        host_ids: impl IntoIterator<Item = impl Into<HostId>>,
+        metric_names: impl IntoIterator<Item = impl AsRef<str>>,
+    ) -> Result<HashMap<HostId, HashMap<String, Option<MetricValue>>>> {
+        self.request(
+            Method::GET,
+            "/api/v0/tsdb/latest",
+            &host_ids
+                .into_iter()
+                .map(|host_id| ("hostId", host_id.into().to_string()))
+                .chain(
+                    metric_names
+                        .into_iter()
+                        .map(|metric_name| ("name", metric_name.as_ref().to_owned())),
+                )
+                .collect::<Vec<_>>(),
+            request_body![],
+            response_body! { tsdbLatest: HashMap<HostId, HashMap<String, Option<MetricValue>>> },
         )
         .await
     }
@@ -286,6 +313,63 @@ mod client_tests {
                     value: 1.2,
                 },
             ]),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_latest_host_metric_values() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/tsdb/latest",
+            query_params = "hostId=host0&hostId=host1&name=custom.host.metric0&name=custom.host.metric1",
+            response = json!({
+                "tsdbLatest": {
+                    "host0": {
+                        "custom.host.metric0": { "time": 1700000040, "value": 1.0 },
+                        "custom.host.metric1": { "time": 1700000040, "value": 1.1 },
+                    },
+                    "host1": {
+                        "custom.host.metric0": null,
+                        "custom.host.metric1": null,
+                    },
+                },
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_latest_host_metric_values(
+                    ["host0", "host1"],
+                    ["custom.host.metric0", "custom.host.metric1"],
+                )
+                .await,
+            Ok(HashMap::from([
+                (
+                    HostId::from("host0"),
+                    HashMap::from([
+                        (
+                            "custom.host.metric0".to_owned(),
+                            Some(MetricValue {
+                                time: DateTime::from_timestamp(1700000040, 0).unwrap(),
+                                value: 1.0,
+                            }),
+                        ),
+                        (
+                            "custom.host.metric1".to_owned(),
+                            Some(MetricValue {
+                                time: DateTime::from_timestamp(1700000040, 0).unwrap(),
+                                value: 1.1,
+                            })
+                        ),
+                    ])
+                ),
+                (
+                    HostId::from("host1"),
+                    HashMap::from([
+                        ("custom.host.metric0".to_owned(), None),
+                        ("custom.host.metric1".to_owned(), None),
+                    ])
+                ),
+            ])),
         );
     }
 
