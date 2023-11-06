@@ -50,6 +50,9 @@ macro_rules! test_server {
                         .map(|param| {
                             Box::new(contains(param.split_once('=').unwrap_or((param, "")))) as _
                         })
+                        .chain(::std::iter::once(
+                            Box::new(len(eq(config.query_params.split_terminator('&').count()))) as _
+                        ))
                         .collect::<Vec<_>>(),
                 ))),
                 request::body(
