@@ -121,7 +121,7 @@ impl Client {
             Method::GET,
             "/api/v0/graph-annotations",
             query_params! {
-                service = service.into(),
+                service = service.into().to_string(),
                 from = from.into().timestamp().to_string(),
                 to = to.into().timestamp().to_string(),
             },

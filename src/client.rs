@@ -57,11 +57,14 @@ impl Client {
         Self::builder().api_key(api_key.as_ref()).build()
     }
 
-    fn build_url(&self, path: &str, query_params: &[(&str, &str)]) -> Url {
+    fn build_url(&self, path: &str, query_params: &[(&str, impl AsRef<str>)]) -> Url {
         let mut url = self.api_base.join(path).unwrap();
         if !query_params.is_empty() {
-            url.query_pairs_mut()
-                .extend_pairs(query_params.iter().filter(|(_, value)| !value.is_empty()));
+            url.query_pairs_mut().extend_pairs(
+                query_params
+                    .iter()
+                    .filter(|(_, value)| !value.as_ref().is_empty()),
+            );
         }
         url
     }
@@ -70,7 +73,7 @@ impl Client {
         &self,
         method: Method,
         path: impl AsRef<str>,
-        query_params: &[(&str, &str)],
+        query_params: &[(&str, impl AsRef<str>)],
         request_body_opt: Option<impl serde::ser::Serialize>,
         converter: impl FnOnce(R) -> S,
     ) -> Result<S>
@@ -136,6 +139,9 @@ macro_rules! format_url {
 pub(crate) use format_url;
 
 macro_rules! query_params {
+    [] => {
+        &[] as &[(&str, &str); 0]
+    };
     { $( $field:ident = $value:expr ),* $(,)? } => {{
         &[
             $( (stringify!($field), &$value) ),*

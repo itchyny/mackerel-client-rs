@@ -191,7 +191,7 @@ impl Client {
             Method::GET,
             "/api/v0/alerts",
             query_params! {
-                withClosed = with_closed,
+                withClosed = *with_closed,
                 nextId = cursor_opt.map(|cursor| cursor.into()).as_deref().unwrap_or_default(),
                 limit = limit.to_string(),
             },

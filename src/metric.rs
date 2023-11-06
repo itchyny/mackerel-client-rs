@@ -131,7 +131,7 @@ impl Client {
             Method::GET,
             format_url!("/api/v0/hosts/{}/metrics", host_id),
             query_params! {
-                name = metric_name.as_ref(),
+                name = metric_name.as_ref().to_owned(),
                 from = from.into().timestamp().to_string(),
                 to = to.into().timestamp().to_string(),
             },
@@ -173,7 +173,7 @@ impl Client {
             Method::GET,
             format_url!("/api/v0/services/{}/metrics", service_name),
             query_params! {
-                name = metric_name.as_ref(),
+                name = metric_name.as_ref().to_owned(),
                 from = from.into().timestamp().to_string(),
                 to = to.into().timestamp().to_string(),
             },
