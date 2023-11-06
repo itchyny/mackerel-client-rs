@@ -5,10 +5,10 @@ use serde_json::Value;
 pub(crate) static TEST_SERVER_POOL: ServerPool = ServerPool::new(3);
 
 #[derive(Default)]
-pub(crate) struct TestServerConfig<'a> {
+pub(crate) struct TestServerConfig {
     pub method: &'static str,
     pub path: &'static str,
-    pub query_params: &'a str,
+    pub query_params: &'static str,
     pub request: Value,
     pub status_code: StatusCode,
     pub response: Value,
