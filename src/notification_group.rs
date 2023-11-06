@@ -1,5 +1,5 @@
 use crate::channel::ChannelId;
-use reqwest::Method;
+use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use strum::{Display, EnumString};

@@ -1,9 +1,10 @@
 //! Mackerel API client
+use http::{header::*, Method};
+use reqwest;
 use serde;
 use serde_json;
 use typed_builder::TypedBuilder;
 use url::Url;
-use {reqwest, reqwest::header::*};
 
 use crate::error::*;
 
@@ -67,7 +68,7 @@ impl Client {
 
     pub(crate) async fn request<R, S>(
         &self,
-        method: reqwest::Method,
+        method: Method,
         path: impl AsRef<str>,
         query_params: &[(&str, &str)],
         request_body_opt: Option<impl serde::ser::Serialize>,
@@ -178,7 +179,7 @@ pub(crate) use response_body;
 
 #[cfg(test)]
 mod client_tests {
-    use reqwest::Method;
+    use http::{Method, StatusCode};
 
     use crate::client::*;
     use crate::error::Error;
@@ -254,7 +255,7 @@ mod client_tests {
             assert_eq!(
                 test_client!(server).get().await,
                 Err(Error::ApiError(
-                    reqwest::StatusCode::BAD_REQUEST,
+                    StatusCode::BAD_REQUEST,
                     "This is an error message.".to_owned()
                 )),
             );
@@ -273,7 +274,7 @@ mod client_tests {
             assert_eq!(
                 test_client!(server).get().await,
                 Err(Error::ApiError(
-                    reqwest::StatusCode::INTERNAL_SERVER_ERROR,
+                    StatusCode::INTERNAL_SERVER_ERROR,
                     "This is an error message.".to_owned()
                 )),
             );

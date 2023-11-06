@@ -1,4 +1,4 @@
-use reqwest::Method;
+use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use typed_builder::TypedBuilder;
 

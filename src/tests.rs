@@ -1,5 +1,5 @@
+use http::StatusCode;
 use httptest::ServerPool;
-use reqwest::StatusCode;
 use serde_json::Value;
 
 pub(crate) static TEST_SERVER_POOL: ServerPool = ServerPool::new(3);

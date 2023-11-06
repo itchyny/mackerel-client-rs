@@ -1,7 +1,9 @@
+use http::StatusCode;
+
 /// Error type
 #[derive(PartialEq, Debug)]
 pub enum Error {
-    ApiError(reqwest::StatusCode, String),
+    ApiError(StatusCode, String),
     MsgError(String),
 }
 

@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use reqwest::Method;
+use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_with::{DeserializeFromStr, SerializeDisplay};

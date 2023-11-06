@@ -13,6 +13,7 @@ edition = "2021"
 [dependencies]
 chrono = { version = "0.4.31", features = ["serde"] }
 fixedstr = { version = "0.5.2", features = ["serde"] }
+http = "0.2.9"
 reqwest = { version = "0.11.22", features = ["json"] }
 serde = "1.0.190"
 serde_derive = "1.0.190"
