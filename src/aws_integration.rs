@@ -360,7 +360,7 @@ impl Client {
             "/api/v0/aws-integrations-excludable-metrics",
             query_params![],
             request_body![],
-            |response: HashMap<AWSServiceName, Vec<String>>| response,
+            response_body!(..),
         )
         .await
     }
