@@ -744,6 +744,20 @@ impl Client {
         .await
     }
 
+    /// Gets a monitor.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/monitors#get>.
+    pub async fn get_monitor(&self, monitor_id: impl Into<MonitorId>) -> Result<Monitor> {
+        self.request(
+            Method::GET,
+            format_url!("/api/v0/monitors/{}", monitor_id),
+            query_params![],
+            request_body![],
+            response_body! { monitor: Monitor },
+        )
+        .await
+    }
+
     /// Updates a monitor.
     ///
     /// See <https://mackerel.io/api-docs/entry/monitors#update>.
@@ -842,6 +856,25 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server).create_monitor(&value_example()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_monitor() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/monitors/monitor0",
+            response = json!({ "monitor": entity_json_example() }),
+        };
+        assert_eq!(
+            test_client!(server).get_monitor("monitor0").await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .get_monitor(MonitorId::from("monitor0"))
+                .await,
             Ok(entity_example()),
         );
     }
