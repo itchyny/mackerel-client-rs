@@ -170,10 +170,10 @@ impl Client {
         self.list_alerts("", cursor_opt, limit).await
     }
 
-    /// Fetches closed alerts.
+    /// Fetches all (open or closed) alerts.
     ///
     /// See <https://mackerel.io/api-docs/entry/alerts#get>.
-    pub async fn list_closed_alerts(
+    pub async fn list_all_alerts(
         &self,
         cursor_opt: Option<impl Into<AlertId>>,
         limit: usize,
@@ -306,7 +306,7 @@ mod client_tests {
     }
 
     #[async_std::test]
-    async fn list_closed_alerts() {
+    async fn list_all_alerts() {
         let server = test_server! {
             method = GET,
             path = "/api/v0/alerts",
@@ -318,13 +318,13 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .list_closed_alerts(Some("alert1"), 1)
+                .list_all_alerts(Some("alert1"), 1)
                 .await,
             Ok((vec![entity_example()], Some("alert2".into()))),
         );
         assert_eq!(
             test_client!(server)
-                .list_closed_alerts(Some(AlertId::from("alert1")), 1)
+                .list_all_alerts(Some(AlertId::from("alert1")), 1)
                 .await,
             Ok((vec![entity_example()], Some(AlertId::from("alert2")))),
         );
