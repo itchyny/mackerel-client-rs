@@ -1,6 +1,5 @@
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_json;
 
 use crate::client::*;
 use crate::error::Result;

@@ -1,8 +1,5 @@
 //! Mackerel API client
 use http::{header::*, Method};
-use reqwest;
-use serde;
-use serde_json;
 use typed_builder::TypedBuilder;
 use url::Url;
 
