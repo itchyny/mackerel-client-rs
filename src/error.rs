@@ -1,23 +1,30 @@
 use http::StatusCode;
+use thiserror::Error;
 
-/// Error type
-#[derive(PartialEq, Debug)]
+/// Error represents the error type of the library.
+#[derive(Debug, Error)]
 pub enum Error {
+    #[error("status:{0}, message:{1}")]
     ApiError(StatusCode, String),
-    MsgError(String),
+
+    #[error(transparent)]
+    RequestError(#[from] reqwest::Error),
 }
 
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Error::ApiError(status, message) => {
-                write!(f, "status:{}, message:{}", status, message)
+impl PartialEq for Error {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (
+                Self::ApiError(status_code1, error_message1),
+                Self::ApiError(status_code2, error_message2),
+            ) => status_code1 == status_code2 && error_message1 == error_message2,
+            (Self::RequestError(err1), Self::RequestError(err2)) => {
+                err1.to_string() == err2.to_string()
             }
-            Error::MsgError(message) => write!(f, "message:{}", message),
+            _ => false,
         }
     }
 }
 
-impl std::error::Error for Error {}
-
+/// Result alias where the error type is [`crate::Error`].
 pub type Result<T> = std::result::Result<T, Error>;

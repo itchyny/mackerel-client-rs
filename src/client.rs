@@ -98,21 +98,19 @@ impl Client {
             }
         }
         .send()
-        .await
-        .map_err(|err| Error::MsgError(format!("failed to send request: {}", err)))?;
+        .await?;
         if !response.status().is_success() {
             return Err(self.api_error(response).await);
         }
-        response
-            .json::<R>()
-            .await
-            .map(converter)
-            .map_err(|err| Error::MsgError(format!("JSON deserialization failed: {}", err)))
+        Ok(converter(response.json::<R>().await?))
     }
 
     async fn api_error(&self, response: reqwest::Response) -> Error {
         let status = response.status();
-        let body = response.text().await.unwrap_or_default();
+        let body = match response.text().await {
+            Ok(text) => text,
+            Err(err) => return err.into(),
+        };
         Error::ApiError(
             status,
             serde_json::from_str::<serde_json::Value>(&body)

@@ -51,3 +51,4 @@ pub mod role;
 pub mod service;
 pub mod user;
 pub use crate::client::*;
+pub use crate::error::Error;
