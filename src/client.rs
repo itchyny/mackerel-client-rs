@@ -10,7 +10,6 @@ use crate::error::*;
 
 /// An API client for Mackerel.
 #[derive(Debug, TypedBuilder)]
-#[builder(field_defaults(setter(into)))]
 pub struct Client {
     #[builder(
         setter(transform = |s: impl AsRef<str>| HeaderValue::from_str(s.as_ref())
@@ -54,19 +53,7 @@ impl Client {
     ///     .build();
     /// ```
     pub fn new(api_key: impl AsRef<str>) -> Client {
-        Self::builder().api_key(api_key.as_ref()).build()
-    }
-
-    fn build_url(&self, path: &str, query_params: &[(&str, impl AsRef<str>)]) -> Url {
-        let mut url = self.api_base.join(path).unwrap();
-        if !query_params.is_empty() {
-            url.query_pairs_mut().extend_pairs(
-                query_params
-                    .iter()
-                    .filter(|(_, value)| !value.as_ref().is_empty()),
-            );
-        }
-        url
+        Self::builder().api_key(api_key).build()
     }
 
     pub(crate) async fn request<R, S>(
@@ -80,7 +67,17 @@ impl Client {
     where
         for<'de> R: serde::de::Deserialize<'de>,
     {
-        let url = self.build_url(path.as_ref(), query_params);
+        let url = {
+            let mut url = self.api_base.join(path.as_ref()).unwrap();
+            if !query_params.is_empty() {
+                url.query_pairs_mut().extend_pairs(
+                    query_params
+                        .iter()
+                        .filter(|(_, value)| !value.as_ref().is_empty()),
+                );
+            }
+            url
+        };
         let request_body_bytes = request_body_opt
             .map(|b| serde_json::to_vec(&b).unwrap())
             .unwrap_or_default();
@@ -115,10 +112,10 @@ impl Client {
 
     async fn api_error(&self, response: reqwest::Response) -> Error {
         let status = response.status();
-        let message_opt =
-            response
-                .json::<serde_json::Value>()
-                .await
+        let body = response.text().await.unwrap_or_default();
+        Error::ApiError(
+            status,
+            serde_json::from_str::<serde_json::Value>(&body)
                 .ok()
                 .and_then(|value: serde_json::Value| {
                     value
@@ -126,8 +123,9 @@ impl Client {
                         .map(|err| err.get("message").unwrap_or(err))
                         .and_then(serde_json::Value::as_str)
                         .map(str::to_owned)
-                });
-        Error::ApiError(status, message_opt.unwrap_or_default())
+                })
+                .unwrap_or(body),
+        )
     }
 }
 
@@ -268,7 +266,7 @@ mod client_tests {
             let server = test_server! {
                 method = GET,
                 path = "/api/v0/test",
-                status_code = 500,
+                status_code = 404,
                 response = json!({
                     "error": {
                         "message": "This is an error message.",
@@ -278,8 +276,23 @@ mod client_tests {
             assert_eq!(
                 test_client!(server).get().await,
                 Err(Error::ApiError(
-                    StatusCode::INTERNAL_SERVER_ERROR,
+                    StatusCode::NOT_FOUND,
                     "This is an error message.".to_owned()
+                )),
+            );
+        }
+        {
+            let server = test_server! {
+                method = GET,
+                path = "/api/v0/test",
+                status_code = 500,
+                response = "This is an error message.",
+            };
+            assert_eq!(
+                test_client!(server).get().await,
+                Err(Error::ApiError(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    r#""This is an error message.""#.to_owned()
                 )),
             );
         }
