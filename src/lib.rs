@@ -9,7 +9,11 @@
 //!
 //! # Example
 //!
-//! ```rust,no_run,ignore
+//! ```rust,no_run
+//! use mackerel_client::*;
+//!
+//! # #[async_std::main]
+//! # async fn main() {
 //! let client = Client::new("<Mackerel-API-KEY>");
 //!
 //! println!("{:?}", client.get_organization().await);
@@ -21,6 +25,7 @@
 //!
 //! println!("{:?}", client.list_monitors().await);
 //! println!("{:?}", client.delete_monitor("<Monitor-ID>").await);
+//! # }
 //! ```
 //!
 
@@ -50,5 +55,8 @@ pub mod organization;
 pub mod role;
 pub mod service;
 pub mod user;
-pub use crate::client::*;
+
+#[doc(inline)]
+pub use crate::client::Client;
+#[doc(inline)]
 pub use crate::error::Error;
