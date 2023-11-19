@@ -1,5 +1,6 @@
 //! Mackerel API client
 use http::{header::*, Method};
+use std::time::Duration;
 use typed_builder::TypedBuilder;
 use url::Url;
 
@@ -9,19 +10,21 @@ use crate::error::*;
 #[derive(Debug, TypedBuilder)]
 pub struct Client {
     #[builder(
-        setter(transform = |s: impl AsRef<str>| HeaderValue::from_str(s.as_ref())
-            .map(|mut header_value| { header_value.set_sensitive(true); header_value })
-            .unwrap_or_else(|err| panic!("invalid api_key: {}", err))),
-    )]
-    api_key: HeaderValue,
-
-    #[builder(
         default = "https://api.mackerelio.com".try_into().unwrap(),
         setter(transform = |s: impl AsRef<str>| Url::parse(s.as_ref())
             .unwrap_or_else(|err| panic!("invalid api_base ({:?}): {}", s.as_ref(), err))),
     )]
     api_base: Url,
 
+    #[allow(dead_code)]
+    #[builder(
+        setter(transform = |s: impl AsRef<str>| HeaderValue::from_str(s.as_ref())
+            .map(|mut header_value| { header_value.set_sensitive(true); header_value })
+            .unwrap_or_else(|err| panic!("invalid api_key: {}", err))),
+    )]
+    api_key: HeaderValue,
+
+    #[allow(dead_code)]
     #[builder(
         default = format!("mackerel-client-rs/{}", env!("CARGO_PKG_VERSION")).try_into().unwrap(),
         setter(transform = |s: impl AsRef<str>| HeaderValue::from_str(s.as_ref())
@@ -29,7 +32,27 @@ pub struct Client {
     )]
     user_agent: HeaderValue,
 
-    #[builder(default = reqwest::Client::new(), setter(skip))]
+    #[allow(dead_code)]
+    #[builder(
+        default = ::std::time::Duration::from_secs(30),
+        setter(transform = |d: impl Into<::std::time::Duration>| d.into()),
+    )]
+    timeout: Duration,
+
+    #[builder(
+        default = ::reqwest::Client::builder()
+            .default_headers(HeaderMap::from_iter([
+                (HeaderName::from_static("x-api-key"), api_key.clone()),
+                (USER_AGENT, user_agent.clone()),
+                (CONTENT_TYPE, HeaderValue::from_static("application/json")),
+                (ACCEPT, HeaderValue::from_static("application/json")),
+            ]))
+            .redirect(::reqwest::redirect::Policy::none())
+            .timeout(timeout)
+            .build()
+            .unwrap_or_else(|err| panic!("{}", err)),
+        setter(skip),
+    )]
     client: reqwest::Client,
 }
 
@@ -40,6 +63,7 @@ impl Client {
     ///
     /// let client = Client::new("<Mackerel-API-KEY>");
     /// ```
+    ///
     /// If you want to configure the API base, use [`Client::builder()`].
     /// ```rust
     /// use mackerel_client::Client;
@@ -47,6 +71,18 @@ impl Client {
     /// let client = Client::builder()
     ///     .api_key("<Mackerel-API-KEY>")
     ///     .api_base("https://api.mackerelio.com")
+    ///     .build();
+    /// ```
+    ///
+    /// You can configure user agent and timeout (default: 30s).
+    /// ```rust
+    /// use mackerel_client::Client;
+    /// use std::time::Duration;
+    ///
+    /// let client = Client::builder()
+    ///     .api_key("<Mackerel-API-KEY>")
+    ///     .user_agent("custom-user-agent/0.0")
+    ///     .timeout(Duration::from_secs(60))
     ///     .build();
     /// ```
     pub fn new(api_key: impl AsRef<str>) -> Client {
@@ -82,11 +118,6 @@ impl Client {
             let request = self
                 .client
                 .request(method, url.clone())
-                .headers(HeaderMap::from_iter([
-                    (HeaderName::from_static("x-api-key"), self.api_key.clone()),
-                    (USER_AGENT, self.user_agent.clone()),
-                    (CONTENT_TYPE, HeaderValue::from_static("application/json")),
-                ]))
                 .body(request_body_bytes);
             if url.username() != "" {
                 request.basic_auth(url.username(), url.password())
