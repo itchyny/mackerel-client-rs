@@ -62,6 +62,13 @@ pub struct AWSServiceConfig {
             .into_iter().map(|metric| metric.as_ref().to_owned()).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub included_metrics: Vec<String>,
+    #[builder(
+        default,
+        setter(transform = |metrics: impl IntoIterator<Item = impl AsRef<str>>| metrics
+            .into_iter().map(|metric| metric.as_ref().to_owned()).collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub excluded_metrics: Vec<String>,
     #[builder(default)]
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
@@ -157,7 +164,13 @@ mod tests {
                         ),
                         (
                             AWSServiceName::NLB,
-                            AWSServiceConfig::builder().role("aws:nlb").build(),
+                            AWSServiceConfig::builder()
+                                .role("aws:nlb")
+                                .included_metrics([
+                                    "nlb.host_count.#.healthy",
+                                    "nlb.host_count.#.unhealthy",
+                                ])
+                                .build(),
                         ),
                         (
                             AWSServiceName::S3,
@@ -191,6 +204,10 @@ mod tests {
                 "NLB": {
                     "enable": true,
                     "role": "aws:nlb",
+                    "includedMetrics": [
+                        "nlb.host_count.#.healthy",
+                        "nlb.host_count.#.unhealthy",
+                    ],
                 },
                 "S3": {
                     "enable": false,
