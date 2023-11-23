@@ -366,10 +366,10 @@ impl Client {
         .await
     }
 
-    /// Lists excludable metrics.
+    /// Lists includable/excludable metrics for AWS integration.
     ///
     /// See <https://mackerel.io/api-docs/entry/aws-integration#excludable-metrics>.
-    pub async fn list_aws_integration_excludable_metrics(
+    pub async fn list_aws_integration_metrics(
         &self,
     ) -> Result<HashMap<AWSServiceName, Vec<String>>> {
         self.request(
@@ -546,7 +546,7 @@ mod client_tests {
     }
 
     #[async_std::test]
-    async fn list_aws_integration_excludable_metrics() {
+    async fn list_aws_integration_metrics() {
         let server = test_server! {
             method = GET,
             path = "/api/v0/aws-integrations-excludable-metrics",
@@ -583,7 +583,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .list_aws_integration_excludable_metrics()
+                .list_aws_integration_metrics()
                 .await
                 .map(|_| ()),
             Ok(())
