@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::borrow::Borrow;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
@@ -288,12 +289,15 @@ impl Client {
     /// Creates a new downtime.
     ///
     /// See <https://mackerel.io/api-docs/entry/downtimes#create>.
-    pub async fn create_downtime(&self, downtime_value: &DowntimeValue) -> Result<Downtime> {
+    pub async fn create_downtime(
+        &self,
+        downtime_value: impl Borrow<DowntimeValue>,
+    ) -> Result<Downtime> {
         self.request(
             Method::POST,
             "/api/v0/downtimes",
             query_params![],
-            request_body!(downtime_value),
+            request_body!(downtime_value.borrow()),
             response_body!(..),
         )
         .await
@@ -305,13 +309,13 @@ impl Client {
     pub async fn update_downtime(
         &self,
         downtime_id: impl Into<DowntimeId>,
-        downtime_value: &DowntimeValue,
+        downtime_value: impl Borrow<DowntimeValue>,
     ) -> Result<Downtime> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/downtimes/{}", downtime_id),
             query_params![],
-            request_body!(downtime_value),
+            request_body!(downtime_value.borrow()),
             response_body!(..),
         )
         .await
@@ -400,6 +404,10 @@ mod client_tests {
             response = entity_json_example(),
         };
         assert_eq!(
+            test_client!(server).create_downtime(value_example()).await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
             test_client!(server).create_downtime(&value_example()).await,
             Ok(entity_example()),
         );
@@ -415,7 +423,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_downtime("downtime0", &value_example())
+                .update_downtime("downtime0", value_example())
                 .await,
             Ok(entity_example()),
         );

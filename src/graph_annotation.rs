@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::borrow::Borrow;
 use typed_builder::TypedBuilder;
 
 use crate::client::*;
@@ -136,13 +137,13 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#create>.
     pub async fn create_graph_annotation(
         &self,
-        graph_annotation_value: &GraphAnnotationValue,
+        graph_annotation_value: impl Borrow<GraphAnnotationValue>,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::POST,
             "/api/v0/graph-annotations",
             query_params![],
-            request_body!(graph_annotation_value),
+            request_body!(graph_annotation_value.borrow()),
             response_body!(..),
         )
         .await
@@ -154,13 +155,13 @@ impl Client {
     pub async fn update_graph_annotation(
         &self,
         graph_annontation_id: impl Into<GraphAnnotationId>,
-        graph_annotation_value: &GraphAnnotationValue,
+        graph_annotation_value: impl Borrow<GraphAnnotationValue>,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/graph-annotations/{}", graph_annontation_id),
             query_params![],
-            request_body!(graph_annotation_value),
+            request_body!(graph_annotation_value.borrow()),
             response_body!(..),
         )
         .await
@@ -269,6 +270,12 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
+                .create_graph_annotation(value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
                 .create_graph_annotation(&value_example())
                 .await,
             Ok(entity_example()),
@@ -285,7 +292,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_graph_annotation("annotation0", &value_example())
+                .update_graph_annotation("annotation0", value_example())
                 .await,
             Ok(entity_example()),
         );

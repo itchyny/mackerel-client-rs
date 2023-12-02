@@ -2,6 +2,7 @@ use crate::channel::ChannelId;
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::borrow::Borrow;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
@@ -171,13 +172,13 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/notification-groups#create>.
     pub async fn create_notification_group(
         &self,
-        notification_group_value: &NotificationGroupValue,
+        notification_group_value: impl Borrow<NotificationGroupValue>,
     ) -> Result<NotificationGroup> {
         self.request(
             Method::POST,
             "/api/v0/notification-groups",
             query_params![],
-            request_body!(notification_group_value),
+            request_body!(notification_group_value.borrow()),
             response_body!(..),
         )
         .await
@@ -189,13 +190,13 @@ impl Client {
     pub async fn update_notification_group(
         &self,
         notification_group_id: impl Into<NotificationGroupId>,
-        notification_group_value: &NotificationGroupValue,
+        notification_group_value: impl Borrow<NotificationGroupValue>,
     ) -> Result<NotificationGroup> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/notification-groups/{}", notification_group_id),
             query_params![],
-            request_body!(notification_group_value),
+            request_body!(notification_group_value.borrow()),
             response_body!(..),
         )
         .await
@@ -289,6 +290,12 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
+                .create_notification_group(value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
                 .create_notification_group(&value_example())
                 .await,
             Ok(entity_example()),
@@ -305,7 +312,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_notification_group("group0", &value_example())
+                .update_notification_group("group0", value_example())
                 .await,
             Ok(entity_example()),
         );

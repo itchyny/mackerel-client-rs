@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::borrow::Borrow;
 use typed_builder::TypedBuilder;
 
 use crate::client::*;
@@ -109,13 +110,13 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/invitations#create>.
     pub async fn create_invitation(
         &self,
-        invitation_value: &InvitationValue,
+        invitation_value: impl Borrow<InvitationValue>,
     ) -> Result<Invitation> {
         self.request(
             Method::POST,
             "/api/v0/invitations",
             query_params![],
-            request_body!(invitation_value),
+            request_body!(invitation_value.borrow()),
             response_body!(..),
         )
         .await
@@ -194,6 +195,12 @@ mod client_tests {
             request = value_json_example(),
             response = entity_json_example(),
         };
+        assert_eq!(
+            test_client!(server)
+                .create_invitation(value_example())
+                .await,
+            Ok(entity_example())
+        );
         assert_eq!(
             test_client!(server)
                 .create_invitation(&value_example())

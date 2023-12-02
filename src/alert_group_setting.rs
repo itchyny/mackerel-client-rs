@@ -1,5 +1,6 @@
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::borrow::Borrow;
 use typed_builder::TypedBuilder;
 
 use crate::client::*;
@@ -134,13 +135,13 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/alert-group-settings#create>.
     pub async fn create_alert_group_setting(
         &self,
-        alert_group_setting_value: &AlertGroupSettingValue,
+        alert_group_setting_value: impl Borrow<AlertGroupSettingValue>,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::POST,
             "/api/v0/alert-group-settings",
             query_params![],
-            request_body!(alert_group_setting_value),
+            request_body!(alert_group_setting_value.borrow()),
             response_body!(..),
         )
         .await
@@ -169,13 +170,13 @@ impl Client {
     pub async fn update_alert_group_setting(
         &self,
         alert_group_setting_id: impl Into<AlertGroupSettingId>,
-        alert_group_setting_value: &AlertGroupSettingValue,
+        alert_group_setting_value: impl Borrow<AlertGroupSettingValue>,
     ) -> Result<AlertGroupSetting> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/alert-group-settings/{}", alert_group_setting_id),
             query_params![],
-            request_body!(alert_group_setting_value),
+            request_body!(alert_group_setting_value.borrow()),
             response_body!(..),
         )
         .await
@@ -266,6 +267,12 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
+                .create_alert_group_setting(value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
                 .create_alert_group_setting(&value_example())
                 .await,
             Ok(entity_example()),
@@ -303,7 +310,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_alert_group_setting("setting0", &value_example())
+                .update_alert_group_setting("setting0", value_example())
                 .await,
             Ok(entity_example()),
         );

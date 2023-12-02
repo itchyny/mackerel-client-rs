@@ -2,6 +2,7 @@ use chrono::{DateTime, Duration, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DurationSeconds};
+use std::borrow::Borrow;
 use typed_builder::TypedBuilder;
 
 use crate::client::*;
@@ -415,12 +416,15 @@ impl Client {
     /// Creates a new dashboard.
     ///
     /// See <https://mackerel.io/api-docs/entry/dashboards#create>.
-    pub async fn create_dashboard(&self, dashboard_value: &DashboardValue) -> Result<Dashboard> {
+    pub async fn create_dashboard(
+        &self,
+        dashboard_value: impl Borrow<DashboardValue>,
+    ) -> Result<Dashboard> {
         self.request(
             Method::POST,
             "/api/v0/dashboards",
             query_params![],
-            request_body!(dashboard_value),
+            request_body!(dashboard_value.borrow()),
             response_body!(..),
         )
         .await
@@ -446,13 +450,13 @@ impl Client {
     pub async fn update_dashboard(
         &self,
         dashboard_id: impl Into<DashboardId>,
-        dashboard_value: &DashboardValue,
+        dashboard_value: impl Borrow<DashboardValue>,
     ) -> Result<Dashboard> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/dashboards/{}", dashboard_id),
             query_params![],
-            request_body!(dashboard_value),
+            request_body!(dashboard_value.borrow()),
             response_body!(..),
         )
         .await
@@ -593,6 +597,10 @@ mod client_tests {
             response = entity_json_example(),
         };
         assert_eq!(
+            test_client!(server).create_dashboard(value_example()).await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
             test_client!(server)
                 .create_dashboard(&value_example())
                 .await,
@@ -629,7 +637,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_dashboard("dashboard0", &value_example())
+                .update_dashboard("dashboard0", value_example())
                 .await,
             Ok(entity_example()),
         );

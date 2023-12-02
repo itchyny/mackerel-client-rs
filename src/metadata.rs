@@ -1,5 +1,6 @@
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::borrow::Borrow;
 
 use crate::client::*;
 use crate::error::Result;
@@ -44,7 +45,7 @@ impl Client {
         &self,
         host_id: impl Into<HostId>,
         namespace: impl AsRef<str>,
-        metadata: &serde_json::Value,
+        metadata: impl Borrow<serde_json::Value>,
     ) -> Result<()> {
         self.request(
             Method::PUT,
@@ -54,7 +55,7 @@ impl Client {
                 namespace.as_ref()
             ),
             query_params![],
-            request_body!(metadata),
+            request_body!(metadata.borrow()),
             response_body!(),
         )
         .await
@@ -125,7 +126,7 @@ impl Client {
         &self,
         service_name: impl Into<ServiceName>,
         namespace: impl AsRef<str>,
-        metadata: &serde_json::Value,
+        metadata: impl Borrow<serde_json::Value>,
     ) -> Result<()> {
         self.request(
             Method::PUT,
@@ -135,7 +136,7 @@ impl Client {
                 namespace.as_ref()
             ),
             query_params![],
-            request_body!(metadata),
+            request_body!(metadata.borrow()),
             response_body!(),
         )
         .await
@@ -212,7 +213,7 @@ impl Client {
         service_name: impl Into<ServiceName>,
         role_name: impl Into<RoleName>,
         namespace: impl AsRef<str>,
-        metadata: &serde_json::Value,
+        metadata: impl Borrow<serde_json::Value>,
     ) -> Result<()> {
         self.request(
             Method::PUT,
@@ -223,7 +224,7 @@ impl Client {
                 namespace.as_ref()
             ),
             query_params![],
-            request_body!(metadata),
+            request_body!(metadata.borrow()),
             response_body!(),
         )
         .await
@@ -310,6 +311,12 @@ mod client_tests {
                 .await,
             Ok(metadata_value_example())
         );
+        assert_eq!(
+            test_client!(server)
+                .get_host_metadata(HostId::from("host0"), String::from("namespace0"))
+                .await,
+            Ok(metadata_value_example())
+        );
     }
 
     #[async_std::test]
@@ -322,7 +329,17 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .put_host_metadata("host0", "namespace0", &metadata_value_example())
+                .put_host_metadata("host0", "namespace0", metadata_value_example())
+                .await,
+            Ok(())
+        );
+        assert_eq!(
+            test_client!(server)
+                .put_host_metadata(
+                    HostId::from("host0"),
+                    String::from("namespace0"),
+                    &metadata_value_example()
+                )
                 .await,
             Ok(())
         );
@@ -341,6 +358,12 @@ mod client_tests {
                 .await,
             Ok(())
         );
+        assert_eq!(
+            test_client!(server)
+                .delete_host_metadata(HostId::from("host0"), String::from("namespace0"))
+                .await,
+            Ok(())
+        );
     }
 
     #[async_std::test]
@@ -354,6 +377,12 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server).list_host_metadata("host0").await,
+            Ok(vec![metadata_example()])
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_host_metadata(HostId::from("host0"))
+                .await,
             Ok(vec![metadata_example()])
         );
     }
@@ -371,6 +400,12 @@ mod client_tests {
                 .await,
             Ok(metadata_value_example())
         );
+        assert_eq!(
+            test_client!(server)
+                .get_service_metadata(ServiceName::from("service0"), String::from("namespace0"))
+                .await,
+            Ok(metadata_value_example())
+        );
     }
 
     #[async_std::test]
@@ -383,7 +418,17 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .put_service_metadata("service0", "namespace0", &metadata_value_example())
+                .put_service_metadata("service0", "namespace0", metadata_value_example())
+                .await,
+            Ok(())
+        );
+        assert_eq!(
+            test_client!(server)
+                .put_service_metadata(
+                    ServiceName::from("service0"),
+                    String::from("namespace0"),
+                    &metadata_value_example()
+                )
                 .await,
             Ok(())
         );
@@ -402,6 +447,12 @@ mod client_tests {
                 .await,
             Ok(())
         );
+        assert_eq!(
+            test_client!(server)
+                .delete_service_metadata(ServiceName::from("service0"), String::from("namespace0"))
+                .await,
+            Ok(())
+        );
     }
 
     #[async_std::test]
@@ -415,6 +466,12 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server).list_service_metadata("service0").await,
+            Ok(vec![metadata_example()])
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_service_metadata(ServiceName::from("service0"))
+                .await,
             Ok(vec![metadata_example()])
         );
     }
@@ -432,6 +489,16 @@ mod client_tests {
                 .await,
             Ok(metadata_value_example())
         );
+        assert_eq!(
+            test_client!(server)
+                .get_role_metadata(
+                    ServiceName::from("service0"),
+                    RoleName::from("role0"),
+                    String::from("namespace0")
+                )
+                .await,
+            Ok(metadata_value_example())
+        );
     }
 
     #[async_std::test]
@@ -444,7 +511,18 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .put_role_metadata("service0", "role0", "namespace0", &metadata_value_example())
+                .put_role_metadata("service0", "role0", "namespace0", metadata_value_example())
+                .await,
+            Ok(())
+        );
+        assert_eq!(
+            test_client!(server)
+                .put_role_metadata(
+                    ServiceName::from("service0"),
+                    RoleName::from("role0"),
+                    String::from("namespace0"),
+                    &metadata_value_example()
+                )
                 .await,
             Ok(())
         );
@@ -463,6 +541,16 @@ mod client_tests {
                 .await,
             Ok(())
         );
+        assert_eq!(
+            test_client!(server)
+                .delete_role_metadata(
+                    ServiceName::from("service0"),
+                    RoleName::from("role0"),
+                    String::from("namespace0")
+                )
+                .await,
+            Ok(())
+        );
     }
 
     #[async_std::test]
@@ -477,6 +565,12 @@ mod client_tests {
         assert_eq!(
             test_client!(server)
                 .list_role_metadata("service0", "role0")
+                .await,
+            Ok(vec![metadata_example()])
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_role_metadata(ServiceName::from("service0"), RoleName::from("role0"))
                 .await,
             Ok(vec![metadata_example()])
         );

@@ -1,6 +1,7 @@
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::borrow::Borrow;
 use std::collections::HashMap;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
@@ -288,13 +289,13 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/aws-integration#create>.
     pub async fn create_aws_integration(
         &self,
-        aws_integration_value: &AWSIntegrationValue,
+        aws_integration_value: impl Borrow<AWSIntegrationValue>,
     ) -> Result<AWSIntegration> {
         self.request(
             Method::POST,
             "/api/v0/aws-integrations",
             query_params![],
-            request_body!(aws_integration_value),
+            request_body!(aws_integration_value.borrow()),
             response_body!(..),
         )
         .await
@@ -323,13 +324,13 @@ impl Client {
     pub async fn update_aws_integration(
         &self,
         aws_integration_id: impl Into<AWSIntegrationId>,
-        aws_integration_value: &AWSIntegrationValue,
+        aws_integration_value: impl Borrow<AWSIntegrationValue>,
     ) -> Result<AWSIntegration> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/aws-integrations/{}", aws_integration_id),
             query_params![],
-            request_body!(aws_integration_value),
+            request_body!(aws_integration_value.borrow()),
             response_body!(..),
         )
         .await
@@ -464,6 +465,12 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
+                .create_aws_integration(value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
                 .create_aws_integration(&value_example())
                 .await,
             Ok(entity_example()),
@@ -499,7 +506,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_aws_integration("aws0", &value_example())
+                .update_aws_integration("aws0", value_example())
                 .await,
             Ok(entity_example()),
         );

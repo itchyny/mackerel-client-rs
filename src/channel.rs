@@ -1,6 +1,7 @@
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::borrow::Borrow;
 use std::collections::HashMap;
 use strum::{Display, EnumString};
 
@@ -433,12 +434,15 @@ impl Client {
     /// Creates a new channel.
     ///
     /// See <https://mackerel.io/api-docs/entry/channels#create>.
-    pub async fn create_channel(&self, channel_value: &ChannelValue) -> Result<Channel> {
+    pub async fn create_channel(
+        &self,
+        channel_value: impl Borrow<ChannelValue>,
+    ) -> Result<Channel> {
         self.request(
             Method::POST,
             "/api/v0/channels",
             query_params![],
-            request_body!(channel_value),
+            request_body!(channel_value.borrow()),
             response_body!(..),
         )
         .await
@@ -521,6 +525,10 @@ mod client_tests {
             request = value_json_example(),
             response = entity_json_example(),
         };
+        assert_eq!(
+            test_client!(server).create_channel(value_example()).await,
+            Ok(entity_example()),
+        );
         assert_eq!(
             test_client!(server).create_channel(&value_example()).await,
             Ok(entity_example()),

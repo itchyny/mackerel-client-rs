@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
+use std::borrow::Borrow;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
 
@@ -733,12 +734,15 @@ impl Client {
     /// Creates a new monitor.
     ///
     /// See <https://mackerel.io/api-docs/entry/monitors#create>.
-    pub async fn create_monitor(&self, monitor_value: &MonitorValue) -> Result<Monitor> {
+    pub async fn create_monitor(
+        &self,
+        monitor_value: impl Borrow<MonitorValue>,
+    ) -> Result<Monitor> {
         self.request(
             Method::POST,
             "/api/v0/monitors",
             query_params![],
-            request_body!(monitor_value),
+            request_body!(monitor_value.borrow()),
             response_body!(..),
         )
         .await
@@ -764,13 +768,13 @@ impl Client {
     pub async fn update_monitor(
         &self,
         monitor_id: impl Into<MonitorId>,
-        monitor_value: &MonitorValue,
+        monitor_value: impl Borrow<MonitorValue>,
     ) -> Result<Monitor> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/monitors/{}", monitor_id),
             query_params![],
-            request_body!(monitor_value),
+            request_body!(monitor_value.borrow()),
             response_body!(..),
         )
         .await
@@ -855,6 +859,10 @@ mod client_tests {
             response = entity_json_example(),
         };
         assert_eq!(
+            test_client!(server).create_monitor(value_example()).await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
             test_client!(server).create_monitor(&value_example()).await,
             Ok(entity_example()),
         );
@@ -889,7 +897,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_monitor("monitor0", &value_example())
+                .update_monitor("monitor0", value_example())
                 .await,
             Ok(entity_example()),
         );

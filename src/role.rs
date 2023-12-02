@@ -1,6 +1,7 @@
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::borrow::Borrow;
 use typed_builder::TypedBuilder;
 
 use crate::client::*;
@@ -198,13 +199,13 @@ impl Client {
     pub async fn create_role(
         &self,
         service_name: impl Into<ServiceName>,
-        role: &Role,
+        role: impl Borrow<Role>,
     ) -> Result<Role> {
         self.request(
             Method::POST,
             format_url!("/api/v0/services/{}/roles", service_name),
             query_params![],
-            request_body!(role),
+            request_body!(role.borrow()),
             response_body!(..),
         )
         .await
@@ -275,7 +276,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .create_role("service0", &value_example())
+                .create_role("service0", value_example())
                 .await,
             Ok(value_example()),
         );

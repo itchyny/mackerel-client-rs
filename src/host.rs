@@ -3,6 +3,7 @@ use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
+use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use strum::{Display, EnumString};
@@ -364,12 +365,12 @@ impl Client {
     /// Creates a new host.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#create>.
-    pub async fn create_host(&self, host_value: &HostValue) -> Result<HostId> {
+    pub async fn create_host(&self, host_value: impl Borrow<HostValue>) -> Result<HostId> {
         self.request(
             Method::POST,
             "/api/v0/hosts",
             query_params![],
-            request_body!(host_value),
+            request_body!(host_value.borrow()),
             response_body! { id: HostId },
         )
         .await
@@ -416,13 +417,13 @@ impl Client {
     pub async fn update_host(
         &self,
         host_id: impl Into<HostId>,
-        host_value: &HostValue,
+        host_value: impl Borrow<HostValue>,
     ) -> Result<()> {
         self.request(
             Method::PUT,
             format_url!("/api/v0/hosts/{}", host_id),
             query_params![],
-            request_body!(host_value),
+            request_body!(host_value.borrow()),
             response_body!(),
         )
         .await
@@ -674,6 +675,10 @@ mod client_tests {
             response = json!({ "id": "host0" }),
         };
         assert_eq!(
+            test_client!(server).create_host(value_example()).await,
+            Ok(HostId::from("host0")),
+        );
+        assert_eq!(
             test_client!(server).create_host(&value_example()).await,
             Ok(HostId::from("host0")),
         );
@@ -736,7 +741,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server)
-                .update_host("host0", &value_example())
+                .update_host("host0", value_example())
                 .await,
             Ok(()),
         );

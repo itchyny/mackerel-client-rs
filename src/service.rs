@@ -1,5 +1,6 @@
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
+use std::borrow::Borrow;
 use typed_builder::TypedBuilder;
 
 use crate::client::*;
@@ -91,12 +92,12 @@ impl Client {
     /// Creates a new service.
     ///
     /// See <https://mackerel.io/api-docs/entry/services#create>.
-    pub async fn create_service(&self, service: &Service) -> Result<Service> {
+    pub async fn create_service(&self, service: impl Borrow<Service>) -> Result<Service> {
         self.request(
             Method::POST,
             "/api/v0/services",
             query_params![],
-            request_body!(service),
+            request_body!(service.borrow()),
             response_body!(..),
         )
         .await
@@ -179,6 +180,10 @@ mod client_tests {
             request = json_example(),
             response = json_example(),
         };
+        assert_eq!(
+            test_client!(server).create_service(value_example()).await,
+            Ok(value_example()),
+        );
         assert_eq!(
             test_client!(server).create_service(&value_example()).await,
             Ok(value_example()),
