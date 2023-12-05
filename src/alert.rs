@@ -161,22 +161,22 @@ mod tests {
 impl Client {
     /// Fetches open alerts.
     ///
-    /// See <https://mackerel.io/api-docs/entry/alerts#get>.
+    /// See <https://mackerel.io/api-docs/entry/alerts#list>.
     pub async fn list_open_alerts(
         &self,
         cursor_opt: Option<impl Into<AlertId>>,
-        limit: usize,
+        limit: u8,
     ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.list_alerts("", cursor_opt, limit).await
     }
 
     /// Fetches all (open or closed) alerts.
     ///
-    /// See <https://mackerel.io/api-docs/entry/alerts#get>.
+    /// See <https://mackerel.io/api-docs/entry/alerts#list>.
     pub async fn list_all_alerts(
         &self,
         cursor_opt: Option<impl Into<AlertId>>,
-        limit: usize,
+        limit: u8,
     ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.list_alerts("true", cursor_opt, limit).await
     }
@@ -185,7 +185,7 @@ impl Client {
         &self,
         with_closed: &str,
         cursor_opt: Option<impl Into<AlertId>>,
-        limit: usize,
+        limit: u8,
     ) -> Result<(Vec<Alert>, Option<AlertId>)> {
         self.request(
             Method::GET,
