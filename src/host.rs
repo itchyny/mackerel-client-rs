@@ -361,6 +361,113 @@ mod tests {
     }
 }
 
+#[derive(PartialEq, Clone, Debug, Default)]
+pub struct ListHostsParams {
+    service_name: Option<ServiceName>,
+    role_names: Vec<RoleName>,
+    host_name: Option<String>,
+    statuses: Vec<HostStatus>,
+}
+
+impl ListHostsParams {
+    pub fn service_name(service_name: impl Into<ServiceName>) -> Self {
+        Self {
+            service_name: Some(service_name.into()),
+            ..Self::default()
+        }
+    }
+
+    pub fn role_fullname(role_fullname: impl Into<RoleFullname>) -> Self {
+        let role_fullname = role_fullname.into();
+        Self::service_role_name(role_fullname.service_name, role_fullname.role_name)
+    }
+
+    pub fn service_role_name(
+        service_name: impl Into<ServiceName>,
+        role_name: impl Into<RoleName>,
+    ) -> Self {
+        Self::service_role_names(service_name, [role_name])
+    }
+
+    pub fn service_role_names(
+        service_name: impl Into<ServiceName>,
+        role_names: impl IntoIterator<Item = impl Into<RoleName>>,
+    ) -> Self {
+        Self {
+            service_name: Some(service_name.into()),
+            role_names: role_names
+                .into_iter()
+                .map(|role_name| role_name.into())
+                .collect::<Vec<_>>(),
+            ..Self::default()
+        }
+    }
+
+    pub fn host_name(host_name: impl AsRef<str>) -> Self {
+        Self {
+            host_name: Some(host_name.as_ref().to_string()),
+            ..Self::default()
+        }
+    }
+
+    pub fn status(self, status: HostStatus) -> Self {
+        self.statuses([status])
+    }
+
+    pub fn statuses(self, statuses: impl IntoIterator<Item = HostStatus>) -> Self {
+        Self {
+            statuses: statuses.into_iter().collect::<Vec<_>>(),
+            ..self
+        }
+    }
+
+    fn query_params(&self) -> Vec<(&str, String)> {
+        self.service_name
+            .iter()
+            .map(|service_name| ("service", service_name.to_string()))
+            .chain(
+                self.role_names
+                    .iter()
+                    .map(|role_name| ("role", role_name.to_string())),
+            )
+            .chain(
+                self.host_name
+                    .iter()
+                    .map(|host_name| ("name", host_name.to_string())),
+            )
+            .chain(
+                self.statuses
+                    .iter()
+                    .map(|status| ("status", status.to_string())),
+            )
+            .collect::<Vec<_>>()
+    }
+}
+
+impl From<()> for ListHostsParams {
+    fn from(_: ()) -> Self {
+        Self::default()
+    }
+}
+
+impl From<ServiceName> for ListHostsParams {
+    fn from(service_name: ServiceName) -> Self {
+        Self::service_name(service_name)
+    }
+}
+
+impl From<RoleFullname> for ListHostsParams {
+    fn from(role_fullname: RoleFullname) -> Self {
+        Self::role_fullname(role_fullname)
+    }
+}
+
+impl From<(ServiceName, RoleName)> for ListHostsParams {
+    fn from((service_name, role_name): (ServiceName, RoleName)) -> Self {
+        Self::service_role_name(service_name, role_name)
+    }
+}
+
 impl Client {
     /// Creates a new host.
     ///
@@ -530,54 +637,59 @@ impl Client {
         .await
     }
 
-    /// Fetches hosts in the organization.
+    /// Fetches hosts.
     ///
     /// See <https://mackerel.io/api-docs/entry/hosts#list>.
-    pub async fn list_hosts(&self) -> Result<Vec<Host>> {
-        self.list_hosts_internal(query_params![]).await
-    }
-
-    /// Fetches hosts in a service.
     ///
-    /// See <https://mackerel.io/api-docs/entry/hosts#list>.
-    pub async fn list_service_hosts(
-        &self,
-        service_name: impl Into<ServiceName>,
-    ) -> Result<Vec<Host>> {
-        self.list_hosts_internal(query_params! {
-            service = service_name.into().to_string(),
-        })
-        .await
-    }
-
-    /// Fetches hosts in roles.
+    /// ```rust,no_run
+    /// # use mackerel_client::Client;
+    /// # use mackerel_client::host::{ListHostsParams, HostStatus};
+    /// # use mackerel_client::role::{RoleFullname, RoleName};
+    /// # use mackerel_client::service::ServiceName;
+    /// #
+    /// # #[async_std::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let client = Client::new("<Mackerel-API-KEY>");
+    /// // Fetches all the hosts (with working or standby status).
+    /// let hosts = client.list_hosts(()).await?;
+    /// // Fetches the hosts in the specified service and role.
+    /// let hosts = client.list_hosts(ServiceName::from("service0")).await?;
+    /// let hosts = client.list_hosts(RoleFullname::from("service0:role0")).await?;
+    /// let hosts = client.list_hosts((ServiceName::from("service0"), RoleName::from("role0"))).await?;
+    /// // Fetches the hosts with the specified name.
+    /// let hosts = client.list_hosts(ListHostsParams::host_name("example-host")).await?;
     ///
-    /// See <https://mackerel.io/api-docs/entry/hosts#list>.
-    pub async fn list_role_hosts(
+    /// // Fetches the hosts with the specified statuses.
+    /// let hosts = client.list_hosts(
+    ///     ListHostsParams::default().status(HostStatus::Working),
+    /// ).await?;
+    /// let hosts = client.list_hosts(
+    ///     ListHostsParams::service_name("service0").status(HostStatus::Working),
+    /// ).await?;
+    /// let hosts = client.list_hosts(
+    ///     ListHostsParams::service_name("service0")
+    ///         .statuses([HostStatus::Working, HostStatus::Standby, HostStatus::Maintenance]),
+    /// ).await?;
+    /// let hosts = client.list_hosts(
+    ///     ListHostsParams::role_fullname("service0:role0").status(HostStatus::Working),
+    /// ).await?;
+    /// let hosts = client.list_hosts(
+    ///     ListHostsParams::service_role_name("service0", "role0").status(HostStatus::Working),
+    /// ).await?;
+    /// let hosts = client.list_hosts(
+    ///     ListHostsParams::service_role_names("service0", ["role0", "role1", "role2"])
+    ///         .statuses([HostStatus::Working, HostStatus::Standby, HostStatus::Maintenance]),
+    /// ).await?;
+    /// # Ok(())
+    /// # }
+    pub async fn list_hosts(
         &self,
-        service_name: impl Into<ServiceName>,
-        role_names: impl IntoIterator<Item = impl Into<RoleName>>,
-    ) -> Result<Vec<Host>> {
-        self.list_hosts_internal(
-            &std::iter::once(("service", service_name.into().to_string()))
-                .chain(
-                    role_names
-                        .into_iter()
-                        .map(|role_name| ("role", role_name.into().to_string())),
-                )
-                .collect::<Vec<_>>(),
-        )
-        .await
-    }
-
-    async fn list_hosts_internal(
-        &self,
-        query_params: &[(&str, impl AsRef<str>)],
+        list_hosts_params: impl Into<ListHostsParams>,
     ) -> Result<Vec<Host>> {
         self.request(
             Method::GET,
             "/api/v0/hosts",
-            query_params,
+            &list_hosts_params.into().query_params(),
             request_body![],
             response_body! { hosts: Vec<Host> },
         )
@@ -619,6 +731,7 @@ impl Client {
 #[cfg(test)]
 mod client_tests {
     use chrono::DateTime;
+    use rstest::rstest;
     use serde_json::json;
 
     use crate::alert::*;
@@ -868,70 +981,50 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
-    async fn list_hosts() {
+    #[rstest]
+    #[case((), "")]
+    #[case(ServiceName::from("service0"), "service=service0")]
+    #[case(RoleFullname::from("service0:role0"), "service=service0&role=role0")]
+    #[case((ServiceName::from("service0"), RoleName::from("role0")), "service=service0&role=role0")]
+    #[case(ListHostsParams::host_name("example-host"), "name=example-host")]
+    #[case(ListHostsParams::default().status(HostStatus::Working), "status=working")]
+    #[case(ListHostsParams::service_name("service0"), "service=service0")]
+    #[case(
+        ListHostsParams::service_name("service0").status(HostStatus::Working),
+        "service=service0&status=working",
+    )]
+    #[case(
+        ListHostsParams::service_name("service0")
+            .statuses([HostStatus::Working, HostStatus::Standby, HostStatus::Maintenance]),
+        "service=service0&status=working&status=standby&status=maintenance",
+    )]
+    #[case(
+        ListHostsParams::role_fullname("service0:role0").status(HostStatus::Working),
+        "service=service0&role=role0&status=working",
+    )]
+    #[case(
+        ListHostsParams::service_role_name("service0", "role0").status(HostStatus::Working),
+        "service=service0&role=role0&status=working",
+    )]
+    #[case(
+        ListHostsParams::service_role_names("service0", ["role0", "role1", "role2"])
+            .statuses([HostStatus::Working, HostStatus::Standby, HostStatus::Maintenance]),
+        "service=service0&role=role0&role=role1&role=role2&status=working&status=standby&status=maintenance",
+    )]
+    async fn list_hosts(
+        #[case] list_hosts_params: impl Into<ListHostsParams>,
+        #[case] query_params: &'static str,
+    ) {
         let server = test_server! {
             method = GET,
             path = "/api/v0/hosts",
+            query_params = query_params,
             response = json!({
                 "hosts": [entity_json_example()],
             }),
         };
         assert_eq!(
-            test_client!(server).list_hosts().await,
-            Ok(vec![entity_example()]),
-        );
-    }
-
-    #[async_std::test]
-    async fn list_service_hosts() {
-        let server = test_server! {
-            method = GET,
-            path = "/api/v0/hosts",
-            query_params = "service=service0",
-            response = json!({
-                "hosts": [entity_json_example()],
-            }),
-        };
-        assert_eq!(
-            test_client!(server).list_service_hosts("service0").await,
-            Ok(vec![entity_example()]),
-        );
-        assert_eq!(
-            test_client!(server)
-                .list_service_hosts(ServiceName::from("service0"))
-                .await,
-            Ok(vec![entity_example()]),
-        );
-    }
-
-    #[async_std::test]
-    async fn list_role_hosts() {
-        let server = test_server! {
-            method = GET,
-            path = "/api/v0/hosts",
-            query_params = "service=service0&role=role0&role=role1&role=role2",
-            response = json!({
-                "hosts": [entity_json_example()],
-            }),
-        };
-        assert_eq!(
-            test_client!(server)
-                .list_role_hosts("service0", ["role0", "role1", "role2"])
-                .await,
-            Ok(vec![entity_example()]),
-        );
-        assert_eq!(
-            test_client!(server)
-                .list_role_hosts(
-                    ServiceName::from("service0"),
-                    vec![
-                        RoleName::from("role0"),
-                        RoleName::from("role1"),
-                        RoleName::from("role2"),
-                    ]
-                )
-                .await,
+            test_client!(server).list_hosts(list_hosts_params).await,
             Ok(vec![entity_example()]),
         );
     }
