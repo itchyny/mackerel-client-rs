@@ -192,7 +192,7 @@ impl Client {
             "/api/v0/alerts",
             query_params! {
                 withClosed = *with_closed,
-                nextId = cursor_opt.map(|cursor| cursor.into()).as_deref().unwrap_or_default(),
+                nextId = cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
                 limit = limit.to_string(),
             },
             request_body![],

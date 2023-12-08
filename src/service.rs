@@ -18,7 +18,7 @@ pub struct Service {
     #[builder(
         default,
         setter(transform = |role_names: impl IntoIterator<Item = impl Into<RoleName>>| role_names
-            .into_iter().map(|role_name| role_name.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     pub roles: Vec<RoleName>,
 }

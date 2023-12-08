@@ -30,13 +30,13 @@ pub struct NotificationGroupValue {
     #[builder(
         default,
         setter(transform = |notification_group_ids: impl IntoIterator<Item = impl Into<NotificationGroupId>>| notification_group_ids
-            .into_iter().map(|notification_group_id| notification_group_id.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     pub child_notification_group_ids: Vec<NotificationGroupId>,
     #[builder(
         default,
         setter(transform = |channel_ids: impl IntoIterator<Item = impl Into<ChannelId>>| channel_ids
-            .into_iter().map(|channel_id| channel_id.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     pub child_channel_ids: Vec<ChannelId>,
     #[builder(default)]

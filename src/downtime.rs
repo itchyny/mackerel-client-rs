@@ -38,42 +38,42 @@ pub struct DowntimeValue {
     #[builder(
         default,
         setter(transform = |service_names: impl IntoIterator<Item = impl Into<ServiceName>>| service_names
-            .into_iter().map(|service_name| service_name.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub service_scopes: Vec<ServiceName>,
     #[builder(
         default,
         setter(transform = |service_names: impl IntoIterator<Item = impl Into<ServiceName>>| service_names
-            .into_iter().map(|service_name| service_name.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub service_exclude_scopes: Vec<ServiceName>,
     #[builder(
         default,
         setter(transform = |role_fullnames: impl IntoIterator<Item = impl Into<RoleFullname>>| role_fullnames
-            .into_iter().map(|role_fullname| role_fullname.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_scopes: Vec<RoleFullname>,
     #[builder(
         default,
         setter(transform = |role_fullnames: impl IntoIterator<Item = impl Into<RoleFullname>>| role_fullnames
-            .into_iter().map(|role_fullname| role_fullname.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_exclude_scopes: Vec<RoleFullname>,
     #[builder(
         default,
         setter(transform = |monitor_ids: impl IntoIterator<Item = impl Into<MonitorId>>| monitor_ids
-            .into_iter().map(|monitor_id| monitor_id.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_scopes: Vec<MonitorId>,
     #[builder(
         default,
         setter(transform = |monitor_ids: impl IntoIterator<Item = impl Into<MonitorId>>| monitor_ids
-            .into_iter().map(|monitor_id| monitor_id.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub monitor_exclude_scopes: Vec<MonitorId>,

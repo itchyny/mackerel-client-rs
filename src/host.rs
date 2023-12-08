@@ -109,7 +109,7 @@ pub struct HostValue {
     #[builder(
         default,
         setter(transform = |role_fullnames: impl IntoIterator<Item = impl Into<RoleFullname>>| role_fullnames
-            .into_iter().map(|role_fullname| role_fullname.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub role_fullnames: Vec<RoleFullname>,
@@ -129,14 +129,14 @@ pub struct HostInterface {
     #[builder(
         default,
         setter(transform = |ipv4_addresses: impl IntoIterator<Item = impl Into<Ipv4Addr>>| ipv4_addresses
-            .into_iter().map(|ipv4_address| ipv4_address.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv4_addresses: Vec<Ipv4Addr>,
     #[builder(
         default,
         setter(transform = |ipv6_addresses: impl IntoIterator<Item = impl Into<Ipv6Addr>>| ipv6_addresses
-            .into_iter().map(|ipv6_address| ipv6_address.into()).collect::<Vec<_>>()),
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
     )]
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub ipv6_addresses: Vec<Ipv6Addr>,
@@ -395,10 +395,7 @@ impl ListHostsParams {
     ) -> Self {
         Self {
             service_name: Some(service_name.into()),
-            role_names: role_names
-                .into_iter()
-                .map(|role_name| role_name.into())
-                .collect::<Vec<_>>(),
+            role_names: role_names.into_iter().map(Into::into).collect::<Vec<_>>(),
             ..Self::default()
         }
     }
@@ -569,7 +566,7 @@ impl Client {
             request_body! {
                 ids: Vec<HostId> = host_ids
                     .into_iter()
-                    .map(|host_id| host_id.into())
+                    .map(Into::into)
                     .collect::<Vec<_>>(),
                 status: HostStatus = host_status,
             },
@@ -593,7 +590,7 @@ impl Client {
             request_body! {
                 roleFullnames: Vec<RoleFullname> = role_fullnames
                     .into_iter()
-                    .map(|role_fullname| role_fullname.into())
+                    .map(Into::into)
                     .collect::<Vec<_>>(),
             },
             response_body!(),
@@ -629,7 +626,7 @@ impl Client {
             request_body! {
                 ids: Vec<HostId> = host_ids
                     .into_iter()
-                    .map(|host_id| host_id.into())
+                    .map(Into::into)
                     .collect::<Vec<_>>(),
             },
             response_body!(),
