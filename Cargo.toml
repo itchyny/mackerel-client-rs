@@ -13,17 +13,17 @@ edition = "2021"
 [dependencies]
 chrono = { version = "0.4.31", features = ["serde"] }
 derivative = "2.2.0"
-fixedstr = { version = "0.5.2", features = ["serde"] }
-http = "0.2.9"
+fixedstr = { version = "0.5.4", features = ["serde"] }
+http = "0.2.11"
 reqwest = { version = "0.11.22", features = ["json"] }
-serde = "1.0.190"
-serde_derive = "1.0.190"
+serde = "1.0.193"
+serde_derive = "1.0.193"
 serde_json = "1.0.108"
 serde_with = { version = "1.14.0", features = ["chrono"] }
 strum = { version = "0.25.0", features = ["derive"] }
 thiserror = "1.0.50"
 typed-builder = "0.18.0"
-url = "2.4.1"
+url = "2.5.0"
 
 [dev-dependencies]
 async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }
