@@ -9,8 +9,12 @@ use crate::name::Name;
 /// An organization value
 #[derive(PartialEq, Eq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
 pub struct Organization {
     pub name: OrganizationName,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<String>,
 }
 
 /// An organization name
@@ -27,18 +31,33 @@ mod tests {
     use rstest::rstest;
     use serde_json::json;
 
-    fn organization_example() -> Organization {
+    fn organization_example1() -> Organization {
         Organization::builder().name("ExampleOrganization").build()
     }
 
-    fn json_example() -> serde_json::Value {
+    fn json_example1() -> serde_json::Value {
         json!({
             "name": "ExampleOrganization"
         })
     }
 
+    fn organization_example2() -> Organization {
+        Organization::builder()
+            .name("ExampleOrganization")
+            .display_name("Example Organization")
+            .build()
+    }
+
+    fn json_example2() -> serde_json::Value {
+        json!({
+            "name": "ExampleOrganization",
+            "displayName": "Example Organization"
+        })
+    }
+
     #[rstest]
-    #[case(organization_example(), json_example())]
+    #[case(organization_example1(), json_example1())]
+    #[case(organization_example2(), json_example2())]
     fn test_organization_json(#[case] organization: Organization, #[case] json: serde_json::Value) {
         assert_eq!(serde_json::to_value(&organization).unwrap(), json);
         assert_eq!(organization, serde_json::from_value(json).unwrap());
@@ -75,9 +94,7 @@ mod client_tests {
         };
         assert_eq!(
             test_client!(server).get_organization().await,
-            Ok(Organization {
-                name: OrganizationName::from("ExampleOrganization"),
-            })
+            Ok(Organization::builder().name("ExampleOrganization").build())
         );
     }
 }
