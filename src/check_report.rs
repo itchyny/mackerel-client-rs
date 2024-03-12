@@ -127,8 +127,6 @@ impl Client {
 
 #[cfg(test)]
 mod client_tests {
-    use chrono::DateTime;
-
     use crate::check_report::*;
     use crate::tests::*;
 

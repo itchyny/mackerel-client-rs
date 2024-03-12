@@ -727,7 +727,6 @@ impl Client {
 
 #[cfg(test)]
 mod client_tests {
-    use chrono::DateTime;
     use rstest::rstest;
     use serde_json::json;
 

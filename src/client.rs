@@ -207,10 +207,9 @@ pub(crate) use response_body;
 
 #[cfg(test)]
 mod client_tests {
-    use http::{Method, StatusCode};
+    use http::StatusCode;
 
     use crate::client::*;
-    use crate::error::Error;
     use crate::tests::*;
 
     impl Client {
