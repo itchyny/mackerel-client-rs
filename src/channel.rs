@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -23,6 +24,12 @@ pub enum ChannelValue {
     #[serde(rename_all = "camelCase")]
     Email {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
         #[serde(default)]
         emails: Vec<String>,
         #[serde(default)]
@@ -33,6 +40,12 @@ pub enum ChannelValue {
     #[serde(rename_all = "camelCase")]
     Slack {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
         url: String,
         enabled_graph_image: bool,
         mentions: HashMap<String, String>,
@@ -41,31 +54,85 @@ pub enum ChannelValue {
     },
     Line {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     Chatwork {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     Typetalk {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     Twilio {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     Pagerduty {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     Opsgenie {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     Yammer {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     MicrosoftTeams {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
     #[serde(rename_all = "camelCase")]
     Webhook {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
         url: String,
         enabled_graph_image: bool,
         #[serde(default)]
@@ -73,6 +140,12 @@ pub enum ChannelValue {
     },
     AmazonEventBridge {
         name: String,
+        #[serde(
+            default,
+            with = "chrono::serde::ts_seconds_option",
+            skip_serializing_if = "Option::is_none"
+        )]
+        suspended_at: Option<DateTime<Utc>>,
     },
 }
 
@@ -92,6 +165,24 @@ impl ChannelValue {
             Self::MicrosoftTeams { ref name, .. } => name.clone(),
             Self::Webhook { ref name, .. } => name.clone(),
             Self::AmazonEventBridge { ref name, .. } => name.clone(),
+        }
+    }
+
+    /// Returns the suspended_at of the channel.
+    pub fn suspended_at(&self) -> Option<DateTime<Utc>> {
+        match *self {
+            Self::Email { suspended_at, .. } => suspended_at,
+            Self::Slack { suspended_at, .. } => suspended_at,
+            Self::Line { suspended_at, .. } => suspended_at,
+            Self::Chatwork { suspended_at, .. } => suspended_at,
+            Self::Typetalk { suspended_at, .. } => suspended_at,
+            Self::Twilio { suspended_at, .. } => suspended_at,
+            Self::Pagerduty { suspended_at, .. } => suspended_at,
+            Self::Opsgenie { suspended_at, .. } => suspended_at,
+            Self::Yammer { suspended_at, .. } => suspended_at,
+            Self::MicrosoftTeams { suspended_at, .. } => suspended_at,
+            Self::Webhook { suspended_at, .. } => suspended_at,
+            Self::AmazonEventBridge { suspended_at, .. } => suspended_at,
         }
     }
 }
@@ -121,6 +212,7 @@ mod tests {
             .id("channel1")
             .value(ChannelValue::Email {
                 name: "Example Email Channel".to_string(),
+                suspended_at: Some(DateTime::from_timestamp(1711360000, 0).unwrap()),
                 emails: vec!["test@example.com".to_string()],
                 user_ids: vec!["user0".into()],
                 events: vec![NotificationEvent::Alert],
@@ -133,6 +225,7 @@ mod tests {
             "id": "channel1",
             "type": "email",
             "name": "Example Email Channel",
+            "suspendedAt": 1711360000,
             "emails": ["test@example.com"],
             "userIds": ["user0"],
             "events": ["alert"],
@@ -144,6 +237,7 @@ mod tests {
             .id("channel2")
             .value(ChannelValue::Slack {
                 name: "Example Slack Channel".to_string(),
+                suspended_at: Some(DateTime::from_timestamp(1711360000, 0).unwrap()),
                 url: "slack@example.com".to_string(),
                 enabled_graph_image: true,
                 mentions: HashMap::from([("critical".to_string(), "@channel".to_string())]),
@@ -161,6 +255,7 @@ mod tests {
             "id": "channel2",
             "type": "slack",
             "name": "Example Slack Channel",
+            "suspendedAt": 1711360000,
             "url": "slack@example.com",
             "enabledGraphImage": true,
             "mentions": {"critical": "@channel"},
@@ -173,6 +268,7 @@ mod tests {
             .id("channel3")
             .value(ChannelValue::Line {
                 name: "Example Line Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -190,6 +286,7 @@ mod tests {
             .id("channel4")
             .value(ChannelValue::Chatwork {
                 name: "Example Chatwork Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -207,6 +304,7 @@ mod tests {
             .id("channel5")
             .value(ChannelValue::Typetalk {
                 name: "Example Typetalk Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -224,6 +322,7 @@ mod tests {
             .id("channel6")
             .value(ChannelValue::Twilio {
                 name: "Example Twilio Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -241,6 +340,7 @@ mod tests {
             .id("channel7")
             .value(ChannelValue::Pagerduty {
                 name: "Example Pagerduty Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -258,6 +358,7 @@ mod tests {
             .id("channel8")
             .value(ChannelValue::Opsgenie {
                 name: "Example Opsgenie Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -275,6 +376,7 @@ mod tests {
             .id("channel9")
             .value(ChannelValue::Yammer {
                 name: "Example Yammer Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -292,6 +394,7 @@ mod tests {
             .id("channel10")
             .value(ChannelValue::MicrosoftTeams {
                 name: "Example MicrosoftTeams Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -309,6 +412,7 @@ mod tests {
             .id("channel11")
             .value(ChannelValue::Webhook {
                 name: "Example Webhook Channel".to_string(),
+                suspended_at: None,
                 url: "webhook@example.com".to_string(),
                 enabled_graph_image: true,
                 events: vec![
@@ -336,6 +440,7 @@ mod tests {
             .id("channel12")
             .value(ChannelValue::AmazonEventBridge {
                 name: "Example AmazonEventBridge Channel".to_string(),
+                suspended_at: None,
             })
             .build()
     }
@@ -473,6 +578,7 @@ mod client_tests {
     fn value_example() -> ChannelValue {
         ChannelValue::Email {
             name: "Example Email Channel".to_string(),
+            suspended_at: None,
             emails: vec!["mackerel@example.com".to_string()],
             user_ids: vec!["user0".into()],
             events: vec![NotificationEvent::Alert],
