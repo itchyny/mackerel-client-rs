@@ -194,8 +194,8 @@ mod tests {
                                 name: "loadavg5".to_string(),
                             },
                             time_range: Some(DashboardTimeRange::Relative {
-                                period: Duration::try_seconds(86400).unwrap(),
-                                offset: Duration::try_seconds(-3600).unwrap(),
+                                period: Duration::seconds(86400),
+                                offset: Duration::seconds(-3600),
                             }),
                             value_range: Some(DashboardValueRange {
                                 min: Some(0.0),
@@ -499,8 +499,8 @@ mod client_tests {
                     name: "loadavg5".to_string(),
                 },
                 time_range: Some(DashboardTimeRange::Relative {
-                    period: Duration::try_seconds(86400).unwrap(),
-                    offset: Duration::try_seconds(-3600).unwrap(),
+                    period: Duration::seconds(86400),
+                    offset: Duration::seconds(-3600),
                 }),
                 value_range: Some(DashboardValueRange {
                     min: Some(0.0),
