@@ -163,6 +163,23 @@ pub enum MonitorValue {
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         is_mute: bool,
     },
+    #[serde(rename_all = "camelCase")]
+    Query {
+        name: String,
+        #[serde(default, skip_serializing_if = "String::is_empty")]
+        memo: String,
+        query: String,
+        legend: String,
+        operator: MonitorOperator,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        warning: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        critical: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        notification_interval: Option<u64>,
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        is_mute: bool,
+    },
 }
 
 impl MonitorValue {
@@ -175,6 +192,7 @@ impl MonitorValue {
             Self::External { ref name, .. } => name.clone(),
             Self::Expression { ref name, .. } => name.clone(),
             Self::AnomalyDetection { ref name, .. } => name.clone(),
+            Self::Query { ref name, .. } => name.clone(),
         }
     }
 
@@ -187,6 +205,7 @@ impl MonitorValue {
             Self::External { ref memo, .. } => memo.clone(),
             Self::Expression { ref memo, .. } => memo.clone(),
             Self::AnomalyDetection { ref memo, .. } => memo.clone(),
+            Self::Query { ref memo, .. } => memo.clone(),
         }
     }
 
@@ -199,6 +218,7 @@ impl MonitorValue {
             Self::External { is_mute, .. } => is_mute,
             Self::Expression { is_mute, .. } => is_mute,
             Self::AnomalyDetection { is_mute, .. } => is_mute,
+            Self::Query { is_mute, .. } => is_mute,
         }
     }
 }
@@ -216,6 +236,7 @@ pub enum MonitorType {
     Check,
     Expression,
     AnomalyDetection,
+    Query,
 }
 
 /// Monitor operator
@@ -548,6 +569,37 @@ mod tests {
         })
     }
 
+    fn query_monitor_example() -> Monitor {
+        Monitor::builder()
+            .id("monitor7")
+            .value(MonitorValue::Query {
+                name: "Example query monitor".to_string(),
+                memo: "Monitor memo".to_string(),
+                query: "container.cpu.utilization{label=\"value\"}".to_string(),
+                legend: "cpu.utilization {{k8s.node.name}}".to_string(),
+                operator: MonitorOperator::GreaterThan,
+                warning: Some(75.0),
+                critical: Some(90.0),
+                notification_interval: None,
+                is_mute: false,
+            })
+            .build()
+    }
+
+    fn query_monitor_json_example() -> serde_json::Value {
+        json!({
+            "type": "query",
+            "id": "monitor7",
+            "name": "Example query monitor",
+            "memo": "Monitor memo",
+            "query": "container.cpu.utilization{label=\"value\"}",
+            "legend": "cpu.utilization {{k8s.node.name}}",
+            "operator": ">",
+            "warning": 75.0,
+            "critical": 90.0,
+        })
+    }
+
     #[rstest]
     #[case(host_monitor_example(), host_monitor_json_example())]
     #[case(connectivity_monitor_example(), connectivity_monitor_json_example())]
@@ -558,6 +610,7 @@ mod tests {
         anomaly_detection_monitor_example(),
         anomaly_detection_monitor_json_example()
     )]
+    #[case(query_monitor_example(), query_monitor_json_example())]
     fn test_monitor_json(#[case] monitor: Monitor, #[case] json: serde_json::Value) {
         assert_eq!(serde_json::to_value(&monitor).unwrap(), json);
         assert_eq!(monitor, serde_json::from_value(json).unwrap());
@@ -573,6 +626,7 @@ mod tests {
         anomaly_detection_monitor_example(),
         "Example anomaly detection monitor"
     )]
+    #[case(query_monitor_example(), "Example query monitor")]
     fn test_monitor_name(#[case] monitor: Monitor, #[case] name_str: &str) {
         assert_eq!(monitor.name(), name_str);
     }
@@ -584,6 +638,7 @@ mod tests {
     #[case(external_monitor_example())]
     #[case(expression_monitor_example())]
     #[case(anomaly_detection_monitor_example())]
+    #[case(query_monitor_example())]
     fn test_monitor_memo(#[case] monitor: Monitor) {
         assert_eq!(monitor.memo(), "Monitor memo");
     }
@@ -595,6 +650,7 @@ mod tests {
     #[case(external_monitor_example(), true)]
     #[case(expression_monitor_example(), true)]
     #[case(anomaly_detection_monitor_example(), true)]
+    #[case(query_monitor_example(), false)]
     fn test_monitor_is_mute(#[case] monitor: Monitor, #[case] is_mute: bool) {
         assert_eq!(monitor.is_mute(), is_mute);
     }
@@ -607,6 +663,7 @@ mod tests {
     #[case(MonitorType::Check, "check")]
     #[case(MonitorType::Expression, "expression")]
     #[case(MonitorType::AnomalyDetection, "anomalyDetection")]
+    #[case(MonitorType::Query, "query")]
     fn test_monitor_type(#[case] monitor_type: MonitorType, #[case] monitor_type_str: &str) {
         assert_eq!(monitor_type.to_string(), monitor_type_str);
         assert_eq!(monitor_type, monitor_type_str.parse().unwrap());
