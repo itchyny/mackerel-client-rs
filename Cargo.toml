@@ -1,6 +1,6 @@
 [package]
 name = "mackerel_client"
-version = "0.6.1"
+version = "0.6.2"
 authors = ["itchyny <itchyny@cybozu.co.jp>"]
 description = "An API client library for Mackerel"
 repository = "https://github.com/itchyny/mackerel-client-rs"
