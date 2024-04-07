@@ -85,7 +85,10 @@ pub enum DashboardWidget {
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardGraph {
     #[serde(rename_all = "camelCase")]
-    Host { host_id: HostId, name: String },
+    Host {
+        host_id: HostId,
+        name: String,
+    },
     #[serde(rename_all = "camelCase")]
     Role {
         role_fullname: RoleFullname,
@@ -97,9 +100,13 @@ pub enum DashboardGraph {
         service_name: ServiceName,
         name: String,
     },
-    #[serde(rename_all = "camelCase")]
-    Expression { expression: String },
-    #[serde(rename_all = "camelCase")]
+    Expression {
+        expression: String,
+    },
+    Query {
+        query: String,
+        legend: String,
+    },
     Unknown {},
 }
 
@@ -119,6 +126,10 @@ pub enum DashboardMetric {
     },
     Expression {
         expression: String,
+    },
+    Query {
+        query: String,
+        legend: String,
     },
     Unknown {},
 }
@@ -395,6 +406,163 @@ mod tests {
     fn test_dashboard_json(#[case] dashboard: Dashboard, #[case] json: serde_json::Value) {
         assert_eq!(serde_json::to_value(&dashboard).unwrap(), json);
         assert_eq!(dashboard, serde_json::from_value(json).unwrap());
+    }
+
+    fn dashboard_graph_example1() -> DashboardGraph {
+        DashboardGraph::Host {
+            host_id: "host1".into(),
+            name: "loadavg5".to_string(),
+        }
+    }
+
+    fn json_dashboard_graph_example1() -> serde_json::Value {
+        json!({
+            "type": "host",
+            "hostId": "host1",
+            "name": "loadavg5",
+        })
+    }
+
+    fn dashboard_graph_example2() -> DashboardGraph {
+        DashboardGraph::Role {
+            role_fullname: "service:role".into(),
+            name: "cpu.{user,iowait,system}".to_string(),
+            is_stacked: true,
+        }
+    }
+
+    fn json_dashboard_graph_example2() -> serde_json::Value {
+        json!({
+            "type": "role",
+            "roleFullname": "service:role",
+            "name": "cpu.{user,iowait,system}",
+            "isStacked": true,
+        })
+    }
+
+    fn dashboard_graph_example3() -> DashboardGraph {
+        DashboardGraph::Service {
+            service_name: "service".into(),
+            name: "cpu.{user,iowait,system}".to_string(),
+        }
+    }
+
+    fn json_dashboard_graph_example3() -> serde_json::Value {
+        json!({
+            "type": "service",
+            "serviceName": "service",
+            "name": "cpu.{user,iowait,system}",
+        })
+    }
+
+    fn dashboard_graph_example4() -> DashboardGraph {
+        DashboardGraph::Expression {
+            expression: "min(role(\"service:role\", \"custom.foo.bar\"))".to_string(),
+        }
+    }
+
+    fn json_dashboard_graph_example4() -> serde_json::Value {
+        json!({
+            "type": "expression",
+            "expression": "min(role(\"service:role\", \"custom.foo.bar\"))",
+        })
+    }
+
+    fn dashboard_graph_example5() -> DashboardGraph {
+        DashboardGraph::Query {
+            query: "container.cpu.utilization{label=\"value\"}".to_string(),
+            legend: "cpu.utilization {{k8s.node.name}}".to_string(),
+        }
+    }
+
+    fn json_dashboard_graph_example5() -> serde_json::Value {
+        json!({
+            "type": "query",
+            "query": "container.cpu.utilization{label=\"value\"}",
+            "legend": "cpu.utilization {{k8s.node.name}}",
+        })
+    }
+
+    #[rstest]
+    #[case(dashboard_graph_example1(), json_dashboard_graph_example1())]
+    #[case(dashboard_graph_example2(), json_dashboard_graph_example2())]
+    #[case(dashboard_graph_example3(), json_dashboard_graph_example3())]
+    #[case(dashboard_graph_example4(), json_dashboard_graph_example4())]
+    #[case(dashboard_graph_example5(), json_dashboard_graph_example5())]
+    fn test_dashboard_graph_json(#[case] graph: DashboardGraph, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&graph).unwrap(), json);
+        assert_eq!(graph, serde_json::from_value(json).unwrap());
+    }
+
+    fn dashboard_metric_example1() -> DashboardMetric {
+        DashboardMetric::Host {
+            host_id: "host1".into(),
+            name: "loadavg5".to_string(),
+        }
+    }
+
+    fn json_dashboard_metric_example1() -> serde_json::Value {
+        json!({
+            "type": "host",
+            "hostId": "host1",
+            "name": "loadavg5",
+        })
+    }
+
+    fn dashboard_metric_example2() -> DashboardMetric {
+        DashboardMetric::Service {
+            service_name: "service".into(),
+            name: "cpu.{user,iowait,system}".to_string(),
+        }
+    }
+
+    fn json_dashboard_metric_example2() -> serde_json::Value {
+        json!({
+            "type": "service",
+            "serviceName": "service",
+            "name": "cpu.{user,iowait,system}",
+        })
+    }
+
+    fn dashboard_metric_example3() -> DashboardMetric {
+        DashboardMetric::Expression {
+            expression: "min(role(\"service:role\", \"custom.foo.bar\"))".to_string(),
+        }
+    }
+
+    fn json_dashboard_metric_example3() -> serde_json::Value {
+        json!({
+            "type": "expression",
+            "expression": "min(role(\"service:role\", \"custom.foo.bar\"))",
+        })
+    }
+
+    fn dashboard_metric_example4() -> DashboardMetric {
+        DashboardMetric::Query {
+            query: "container.cpu.utilization{label=\"value\"}".to_string(),
+            legend: "cpu.utilization {{k8s.node.name}}".to_string(),
+        }
+    }
+
+    fn json_dashboard_metric_example4() -> serde_json::Value {
+        json!({
+            "type": "query",
+            "query": "container.cpu.utilization{label=\"value\"}",
+            "legend": "cpu.utilization {{k8s.node.name}}",
+        })
+    }
+
+    #[rstest]
+    #[case(dashboard_metric_example1(), json_dashboard_metric_example1())]
+    #[case(dashboard_metric_example2(), json_dashboard_metric_example2())]
+    #[case(dashboard_metric_example3(), json_dashboard_metric_example3())]
+    #[case(dashboard_metric_example4(), json_dashboard_metric_example4())]
+    fn test_dashboard_metric_json(
+        #[case] metric: DashboardMetric,
+        #[case] json: serde_json::Value,
+    ) {
+        assert_eq!(serde_json::to_value(&metric).unwrap(), json);
+        assert_eq!(metric, serde_json::from_value(json).unwrap());
     }
 }
 
