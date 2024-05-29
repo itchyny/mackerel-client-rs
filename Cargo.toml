@@ -11,22 +11,22 @@ categories = ["api-bindings"]
 edition = "2021"
 
 [dependencies]
-chrono = { version = "0.4.37", features = ["serde"] }
+chrono = { version = "0.4.38", features = ["serde"] }
 derivative = "2.2.0"
-fixedstr = { version = "0.5.5", features = ["serde"] }
+fixedstr = { version = "0.5.6", features = ["serde"] }
 http = "1.1.0"
-reqwest = { version = "0.12.3", features = ["json"] }
-serde = "1.0.197"
-serde_derive = "1.0.197"
-serde_json = "1.0.115"
-serde_with = { version = "3.7.0", features = ["chrono"] }
+reqwest = { version = "0.12.4", features = ["json"] }
+serde = { version = "1.0.203", features = ["derive"] }
+serde_derive = "1.0.203"
+serde_json = "1.0.117"
+serde_with = { version = "3.8.1", features = ["chrono"] }
 strum = { version = "0.26.2", features = ["derive"] }
-thiserror = "1.0.58"
-typed-builder = "0.18.1"
+thiserror = "1.0.61"
+typed-builder = "0.18.2"
 url = "2.5.0"
 
 [dev-dependencies]
 async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }
-httptest = "0.15.5"
+httptest = "0.16.1"
 pretty_env_logger = "0.5.0"
-rstest = "0.18.2"
+rstest = "0.19.0"
