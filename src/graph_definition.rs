@@ -158,6 +158,20 @@ impl Client {
         )
         .await
     }
+
+    /// Deletes a graph definition.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/host-metrics#delete-graphdef>.
+    pub async fn delete_graph_definition(&self, name: impl AsRef<str>) -> Result<()> {
+        self.request(
+            Method::DELETE,
+            "/api/v0/graph-defs/delete",
+            query_params![],
+            request_body! { name: String = name.as_ref().to_owned() },
+            response_body!(),
+        )
+        .await
+    }
 }
 
 #[cfg(test)]
@@ -203,6 +217,28 @@ mod client_tests {
                             .build(),
                     ])
                     .build()])
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_graph_definition() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/graph-defs/delete",
+            request = json!({ "name": "custom.metric" }),
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_graph_definition("custom.metric")
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_graph_definition(String::from("custom.metric"))
                 .await,
             Ok(()),
         );
