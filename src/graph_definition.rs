@@ -165,7 +165,7 @@ impl Client {
     pub async fn delete_graph_definition(&self, name: impl AsRef<str>) -> Result<()> {
         self.request(
             Method::DELETE,
-            "/api/v0/graph-defs/delete",
+            "/api/v0/graph-defs",
             query_params![],
             request_body! { name: String = name.as_ref().to_owned() },
             response_body!(),
@@ -226,7 +226,7 @@ mod client_tests {
     async fn delete_graph_definition() {
         let server = test_server! {
             method = DELETE,
-            path = "/api/v0/graph-defs/delete",
+            path = "/api/v0/graph-defs",
             request = json!({ "name": "custom.metric" }),
             response = json!({ "success": true }),
         };
