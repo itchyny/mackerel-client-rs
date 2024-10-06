@@ -108,6 +108,7 @@ pub enum AWSServiceName {
     Connect,
     DocDB,
     CodeBuild,
+    Athena,
     #[strum(default)]
     Unknown(String),
 }
@@ -258,6 +259,7 @@ mod tests {
     #[case(AWSServiceName::Connect, "Connect")]
     #[case(AWSServiceName::DocDB, "DocDB")]
     #[case(AWSServiceName::CodeBuild, "CodeBuild")]
+    #[case(AWSServiceName::Athena, "Athena")]
     fn test_aws_service(#[case] aws_service: AWSServiceName, #[case] aws_service_str: &str) {
         assert_eq!(aws_service.to_string(), aws_service_str);
         assert_eq!(aws_service, aws_service_str.parse().unwrap());
@@ -585,6 +587,7 @@ mod client_tests {
                 "Connect": ["connect.voice_calls.breaching_concurrency_quota"],
                 "DocDB": ["docdb.cpu.used"],
                 "CodeBuild": ["codebuild.builds.count"],
+                "Athena": ["athena.processed_bytes.#.average"],
                 "UnknownService": [],
             }),
         };
