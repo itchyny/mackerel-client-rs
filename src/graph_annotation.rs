@@ -154,12 +154,12 @@ impl Client {
     /// See <https://mackerel.io/api-docs/entry/graph-annotations#update>.
     pub async fn update_graph_annotation(
         &self,
-        graph_annontation_id: impl Into<GraphAnnotationId>,
+        graph_annotation_id: impl Into<GraphAnnotationId>,
         graph_annotation_value: impl Borrow<GraphAnnotationValue>,
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/graph-annotations/{}", graph_annontation_id),
+            format_url!("/api/v0/graph-annotations/{}", graph_annotation_id),
             query_params![],
             request_body!(graph_annotation_value.borrow()),
             response_body!(..),
