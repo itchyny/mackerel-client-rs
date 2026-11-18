@@ -47,6 +47,7 @@ pub mod graph_annotation;
 pub mod graph_definition;
 pub mod host;
 pub mod invitation;
+pub mod log;
 pub mod metadata;
 pub mod metric;
 pub mod monitor;
