@@ -3,12 +3,16 @@ use thiserror::Error;
 
 /// Error represents the error type of the library.
 #[derive(Debug, Error)]
+#[non_exhaustive]
 pub enum Error {
     #[error("status_code:{0}, message:{1}")]
     ApiError(StatusCode, String),
 
     #[error(transparent)]
     RequestError(#[from] reqwest::Error),
+
+    #[error("failed to decode response: {0}")]
+    DecodeError(#[from] serde_json::Error),
 }
 
 impl PartialEq for Error {

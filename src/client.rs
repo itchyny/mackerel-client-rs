@@ -130,7 +130,7 @@ impl Client {
         if !response.status().is_success() {
             return Err(self.api_error(response).await);
         }
-        Ok(converter(response.json::<R>().await?))
+        Ok(converter(serde_json::from_slice(&response.bytes().await?)?))
     }
 
     async fn api_error(&self, response: reqwest::Response) -> Error {
@@ -314,5 +314,21 @@ mod client_tests {
                 )),
             );
         }
+    }
+
+    #[async_std::test]
+    async fn decode_error() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/test",
+            status_code = 200,
+            response = json!({ "unexpected": "response" }),
+        };
+        let result = test_client!(server).get().await;
+        assert!(
+            matches!(result, Err(Error::DecodeError(_))),
+            "expected decode error but got {:?}",
+            result,
+        );
     }
 }
