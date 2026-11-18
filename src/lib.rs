@@ -55,6 +55,7 @@ pub mod notification_group;
 pub mod organization;
 pub mod role;
 pub mod service;
+pub mod trace;
 pub mod user;
 
 #[doc(inline)]
