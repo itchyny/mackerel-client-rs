@@ -105,6 +105,8 @@ pub enum MonitorValue {
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         follow_redirect: bool,
         #[serde(default, skip_serializing_if = "Option::is_none")]
+        expected_status_code: Option<u16>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         service: Option<ServiceName>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         response_time_duration: Option<u64>,
@@ -123,6 +125,8 @@ pub enum MonitorValue {
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         skip_certificate_verification: bool,
         #[serde(default, skip_serializing_if = "Option::is_none")]
+        dualstack: Option<ExternalDualstack>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
         is_mute: bool,
@@ -138,6 +142,8 @@ pub enum MonitorValue {
         warning: Option<f64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        evaluate_backward_minutes: Option<u64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
@@ -175,6 +181,8 @@ pub enum MonitorValue {
         warning: Option<f64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         critical: Option<f64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        evaluate_backward_minutes: Option<u64>,
         #[serde(default, skip_serializing_if = "Option::is_none")]
         notification_interval: Option<u64>,
         #[serde(default, skip_serializing_if = "std::ops::Not::not")]
@@ -334,6 +342,17 @@ pub struct ExternalHeader {
     value: String,
 }
 
+/// IP version for external http monitor
+#[derive(
+    PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
+)]
+#[strum(serialize_all = "lowercase")]
+pub enum ExternalDualstack {
+    Ipv4,
+    Ipv6,
+    Auto,
+}
+
 /// Anomaly detection sensitivity
 #[derive(
     PartialEq, Eq, Copy, Clone, Debug, Display, EnumString, SerializeDisplay, DeserializeFromStr,
@@ -468,6 +487,7 @@ mod tests {
                     .build()]),
                 request_body: "Request Body".to_owned(),
                 follow_redirect: true,
+                expected_status_code: Some(200),
                 service: Some("service1".into()),
                 response_time_duration: Some(5),
                 response_time_warning: Some(3000.0),
@@ -477,6 +497,7 @@ mod tests {
                 certification_expiration_warning: Some(1200),
                 certification_expiration_critical: Some(60),
                 skip_certificate_verification: true,
+                dualstack: Some(ExternalDualstack::Auto),
                 notification_interval: Some(60),
                 is_mute: true,
             })
@@ -494,6 +515,7 @@ mod tests {
             "headers": [{ "name": "Cache-Control", "value": "no-cache" }],
             "requestBody": "Request Body",
             "followRedirect": true,
+            "expectedStatusCode": 200,
             "service": "service1",
             "responseTimeDuration": 5,
             "responseTimeWarning": 3000.0,
@@ -503,6 +525,7 @@ mod tests {
             "certificationExpirationWarning": 1200,
             "certificationExpirationCritical": 60,
             "skipCertificateVerification": true,
+            "dualstack": "auto",
             "notificationInterval": 60,
             "isMute": true,
         })
@@ -518,6 +541,7 @@ mod tests {
                 operator: MonitorOperator::LessThan,
                 warning: Some(10.0),
                 critical: None,
+                evaluate_backward_minutes: Some(5),
                 notification_interval: None,
                 is_mute: true,
             })
@@ -533,6 +557,7 @@ mod tests {
             "expression": "min(role(\"foo:bar\", \"custom.foo.bar\"))",
             "operator": "<",
             "warning": 10.0,
+            "evaluateBackwardMinutes": 5,
             "isMute": true
         })
     }
@@ -580,6 +605,7 @@ mod tests {
                 operator: MonitorOperator::GreaterThan,
                 warning: Some(75.0),
                 critical: Some(90.0),
+                evaluate_backward_minutes: None,
                 notification_interval: None,
                 is_mute: false,
             })
