@@ -7,6 +7,7 @@ use crate::alert::AlertStatus;
 use crate::client::*;
 use crate::error::Result;
 use crate::host::HostId;
+use crate::monitor::MonitorId;
 
 /// A check report
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -33,6 +34,14 @@ pub struct CheckReport {
 pub enum CheckSource {
     #[serde(rename_all = "camelCase")]
     Host { host_id: HostId },
+}
+
+/// A check monitor
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+pub struct CheckMonitor {
+    pub id: MonitorId,
+    pub name: String,
 }
 
 #[cfg(test)]
@@ -101,6 +110,17 @@ mod tests {
         assert_eq!(serde_json::to_value(&check_report).unwrap(), json);
         assert_eq!(check_report, serde_json::from_value(json).unwrap());
     }
+
+    #[test]
+    fn test_check_monitor_json() {
+        let check_monitor = CheckMonitor::builder()
+            .id("monitor0")
+            .name("ExampleCheckMonitor")
+            .build();
+        let json = json!({ "id": "monitor0", "name": "ExampleCheckMonitor" });
+        assert_eq!(serde_json::to_value(&check_monitor).unwrap(), json);
+        assert_eq!(check_monitor, serde_json::from_value(json).unwrap());
+    }
 }
 
 impl Client {
@@ -123,10 +143,50 @@ impl Client {
         )
         .await
     }
+
+    /// Fetches check monitors.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/check-monitoring#list>.
+    pub async fn list_check_monitors(
+        &self,
+        cursor_opt: Option<impl Into<MonitorId>>,
+        limit: u8,
+    ) -> Result<(Vec<CheckMonitor>, Option<MonitorId>)> {
+        self.request(
+            Method::GET,
+            "/api/v0/monitoring/checks",
+            query_params! {
+                nextId = *cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
+                limit = limit.to_string(),
+            },
+            request_body![],
+            response_body! { checks: Vec<CheckMonitor>, nextId: Option<MonitorId> },
+        )
+        .await
+    }
+
+    /// Gets a check monitor.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/check-monitoring#retrieve>.
+    pub async fn get_check_monitor(
+        &self,
+        monitor_id: impl Into<MonitorId>,
+    ) -> Result<CheckMonitor> {
+        self.request(
+            Method::GET,
+            format_url!("/api/v0/monitoring/checks/{}", monitor_id),
+            query_params![],
+            request_body![],
+            response_body! { check: CheckMonitor },
+        )
+        .await
+    }
 }
 
 #[cfg(test)]
 mod client_tests {
+    use serde_json::json;
+
     use crate::check_report::*;
     use crate::tests::*;
 
@@ -168,6 +228,80 @@ mod client_tests {
                     .build()])
                 .await,
             Ok(())
+        );
+    }
+
+    fn check_monitor_example() -> CheckMonitor {
+        CheckMonitor::builder()
+            .id("monitor1")
+            .name("ExampleCheckMonitor")
+            .build()
+    }
+
+    fn check_monitor_json_example() -> serde_json::Value {
+        json!({ "id": "monitor1", "name": "ExampleCheckMonitor" })
+    }
+
+    #[async_std::test]
+    async fn list_check_monitors() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/monitoring/checks",
+            query_params = "limit=100",
+            response = json!({ "checks": [check_monitor_json_example()] }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_check_monitors(None::<MonitorId>, 100)
+                .await,
+            Ok((vec![check_monitor_example()], None)),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_check_monitors_with_cursor() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/monitoring/checks",
+            query_params = "limit=1&nextId=monitor0",
+            response = json!({
+                "checks": [check_monitor_json_example()],
+                "nextId": "monitor2",
+            }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_check_monitors(Some("monitor0"), 1)
+                .await,
+            Ok((vec![check_monitor_example()], Some("monitor2".into()))),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_check_monitors(Some(MonitorId::from("monitor0")), 1)
+                .await,
+            Ok((
+                vec![check_monitor_example()],
+                Some(MonitorId::from("monitor2"))
+            )),
+        );
+    }
+
+    #[async_std::test]
+    async fn get_check_monitor() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/monitoring/checks/monitor1",
+            response = json!({ "check": check_monitor_json_example() }),
+        };
+        assert_eq!(
+            test_client!(server).get_check_monitor("monitor1").await,
+            Ok(check_monitor_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .get_check_monitor(MonitorId::from("monitor1"))
+                .await,
+            Ok(check_monitor_example()),
         );
     }
 }
