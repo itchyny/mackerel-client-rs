@@ -65,6 +65,49 @@ impl AlertStatus {
     }
 }
 
+/// An alert log entity
+pub type AlertLog = Entity<AlertLogValue>;
+
+/// An alert log id
+pub type AlertLogId = Id<AlertLogValue>;
+
+/// An alert log value
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+pub struct AlertLogValue {
+    #[serde(with = "chrono::serde::ts_seconds")]
+    pub created_at: DateTime<Utc>,
+    pub status: AlertStatus,
+    pub trigger: String,
+    #[builder(default, setter(strip_option))]
+    pub monitor_id: Option<MonitorId>,
+    #[builder(default, setter(strip_option))]
+    pub target_value: Option<f64>,
+    #[builder(default, setter(strip_option))]
+    pub status_detail: Option<AlertLogStatusDetail>,
+}
+
+/// An alert log status detail
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+pub struct AlertLogStatusDetail {
+    #[serde(rename = "type")]
+    pub detail_type: String,
+    pub detail: AlertLogDetail,
+}
+
+/// An alert log detail
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+pub struct AlertLogDetail {
+    pub message: String,
+    #[builder(default)]
+    #[serde(default)]
+    pub memo: String,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -137,6 +180,91 @@ mod tests {
     fn test_alert_json(#[case] alert: Alert, #[case] json: serde_json::Value) {
         assert_eq!(serde_json::to_value(&alert).unwrap(), json);
         assert_eq!(alert, serde_json::from_value(json).unwrap());
+    }
+
+    fn alert_log_example1() -> AlertLog {
+        AlertLog::builder()
+            .id("log1")
+            .value(
+                AlertLogValue::builder()
+                    .created_at(DateTime::from_timestamp(1735290407, 0).unwrap())
+                    .status(AlertStatus::Warning)
+                    .trigger("monitoring")
+                    .monitor_id("monitor1")
+                    .status_detail(
+                        AlertLogStatusDetail::builder()
+                            .detail_type("check")
+                            .detail(
+                                AlertLogDetail::builder()
+                                    .message("Uptime WARNING: 0 day(s) 0 hour(s) 6 minute(s)")
+                                    .build(),
+                            )
+                            .build(),
+                    )
+                    .build(),
+            )
+            .build()
+    }
+
+    fn alert_log_json_example1() -> serde_json::Value {
+        json!({
+            "id": "log1",
+            "createdAt": 1735290407,
+            "status": "WARNING",
+            "trigger": "monitoring",
+            "monitorId": "monitor1",
+            "statusDetail": {
+                "type": "check",
+                "detail": {
+                    "message": "Uptime WARNING: 0 day(s) 0 hour(s) 6 minute(s)",
+                    "memo": "",
+                },
+            },
+        })
+    }
+
+    fn alert_log_example2() -> AlertLog {
+        AlertLog::builder()
+            .id("log2")
+            .value(
+                AlertLogValue::builder()
+                    .created_at(DateTime::from_timestamp(1735290407, 0).unwrap())
+                    .status(AlertStatus::Critical)
+                    .trigger("monitoring")
+                    .monitor_id("monitor2")
+                    .target_value(95.0)
+                    .build(),
+            )
+            .build()
+    }
+
+    fn alert_log_json_example2() -> serde_json::Value {
+        json!({
+            "id": "log2",
+            "createdAt": 1735290407,
+            "status": "CRITICAL",
+            "trigger": "monitoring",
+            "monitorId": "monitor2",
+            "targetValue": 95.0,
+        })
+    }
+
+    #[rstest]
+    #[case(alert_log_example1(), alert_log_json_example1())]
+    #[case(alert_log_example2(), alert_log_json_example2())]
+    fn test_alert_log_json(#[case] alert_log: AlertLog, #[case] json: serde_json::Value) {
+        assert_eq!(serde_json::to_value(&alert_log).unwrap(), json);
+        assert_eq!(alert_log, serde_json::from_value(json).unwrap());
+    }
+
+    #[test]
+    fn test_alert_log_json_null_status_detail() {
+        let mut json = alert_log_json_example2();
+        json["statusDetail"] = json!(null);
+        assert_eq!(
+            alert_log_example2(),
+            serde_json::from_value::<AlertLog>(json).unwrap()
+        );
     }
 
     #[rstest]
@@ -247,6 +375,28 @@ impl Client {
             query_params![],
             request_body! { reason: String = reason.as_ref().to_owned() },
             response_body!(..),
+        )
+        .await
+    }
+
+    /// Fetches logs of the specified alert.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/alerts#logs>.
+    pub async fn list_alert_logs(
+        &self,
+        alert_id: impl Into<AlertId>,
+        cursor_opt: Option<impl Into<AlertLogId>>,
+        limit: u8,
+    ) -> Result<(Vec<AlertLog>, Option<AlertLogId>)> {
+        self.request(
+            Method::GET,
+            format_url!("/api/v0/alerts/{}/logs", alert_id),
+            query_params! {
+                nextId = *cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
+                limit = limit.to_string(),
+            },
+            request_body![],
+            response_body! { logs: Vec<AlertLog>, nextId: Option<AlertLogId> },
         )
         .await
     }
@@ -388,6 +538,44 @@ mod client_tests {
                 .close_alert(AlertId::from("alert1"), String::from("alert close reason"))
                 .await,
             Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn list_alert_logs() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/alerts/alert1/logs",
+            query_params = "limit=1&nextId=log1",
+            response = json!({
+                "logs": [{
+                    "id": "log2",
+                    "createdAt": 1698890400,
+                    "status": "OK",
+                    "trigger": "manual",
+                }],
+                "nextId": "log3",
+            }),
+        };
+        let alert_log = AlertLog {
+            id: AlertLogId::from("log2"),
+            value: AlertLogValue::builder()
+                .created_at(DateTime::from_timestamp(1698890400, 0).unwrap())
+                .status(AlertStatus::Ok)
+                .trigger("manual")
+                .build(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .list_alert_logs("alert1", Some("log1"), 1)
+                .await,
+            Ok((vec![alert_log.clone()], Some("log3".into()))),
+        );
+        assert_eq!(
+            test_client!(server)
+                .list_alert_logs(AlertId::from("alert1"), Some(AlertLogId::from("log1")), 1)
+                .await,
+            Ok((vec![alert_log], Some(AlertLogId::from("log3")))),
         );
     }
 }
