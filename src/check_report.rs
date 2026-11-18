@@ -190,7 +190,7 @@ mod client_tests {
     use crate::check_report::*;
     use crate::tests::*;
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_check_report() {
         let server = test_server! {
             method = POST,
@@ -242,7 +242,7 @@ mod client_tests {
         json!({ "id": "monitor1", "name": "ExampleCheckMonitor" })
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_check_monitors() {
         let server = test_server! {
             method = GET,
@@ -258,7 +258,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_check_monitors_with_cursor() {
         let server = test_server! {
             method = GET,
@@ -286,7 +286,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_check_monitor() {
         let server = test_server! {
             method = GET,

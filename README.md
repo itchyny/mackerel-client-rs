@@ -15,10 +15,12 @@ The official Go client library: [mackerel-client-go](https://github.com/mackerel
 
 ## Example
 
+This library is built on [reqwest](https://crates.io/crates/reqwest), which requires the [Tokio](https://tokio.rs) runtime.
+
 ```rust
 use mackerel_client::*;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() {
     let client = Client::new("<Mackerel-API-KEY>");
 

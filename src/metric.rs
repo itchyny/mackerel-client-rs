@@ -216,7 +216,7 @@ mod client_tests {
     use crate::metric::*;
     use crate::tests::*;
 
-    #[async_std::test]
+    #[tokio::test]
     async fn post_host_metric_values() {
         let server = test_server! {
             method = POST,
@@ -276,7 +276,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_host_metric_values() {
         let server = test_server! {
             method = GET,
@@ -316,7 +316,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_latest_host_metric_values() {
         let server = test_server! {
             method = GET,
@@ -373,7 +373,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn post_service_metric_values() {
         let server = test_server! {
             method = POST,
@@ -418,7 +418,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_service_metric_values() {
         let server = test_server! {
             method = GET,

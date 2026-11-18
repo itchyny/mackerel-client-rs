@@ -298,7 +298,7 @@ mod client_tests {
         json!({ "namespace": "namespace0" })
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_host_metadata() {
         let server = test_server! {
             method = GET,
@@ -319,7 +319,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn put_host_metadata() {
         let server = test_server! {
             method = PUT,
@@ -345,7 +345,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_host_metadata() {
         let server = test_server! {
             method = DELETE,
@@ -366,7 +366,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_host_metadata() {
         let server = test_server! {
             method = GET,
@@ -387,7 +387,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_service_metadata() {
         let server = test_server! {
             method = GET,
@@ -408,7 +408,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn put_service_metadata() {
         let server = test_server! {
             method = PUT,
@@ -434,7 +434,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_service_metadata() {
         let server = test_server! {
             method = DELETE,
@@ -455,7 +455,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_service_metadata() {
         let server = test_server! {
             method = GET,
@@ -476,7 +476,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_role_metadata() {
         let server = test_server! {
             method = GET,
@@ -501,7 +501,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn put_role_metadata() {
         let server = test_server! {
             method = PUT,
@@ -528,7 +528,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_role_metadata() {
         let server = test_server! {
             method = DELETE,
@@ -553,7 +553,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_role_metadata() {
         let server = test_server! {
             method = GET,

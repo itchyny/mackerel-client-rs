@@ -437,7 +437,7 @@ mod client_tests {
         })
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_open_alerts() {
         let server = test_server! {
             method = GET,
@@ -453,7 +453,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_all_alerts() {
         let server = test_server! {
             method = GET,
@@ -478,7 +478,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_alert() {
         let server = test_server! {
             method = GET,
@@ -497,7 +497,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_alert() {
         let server = test_server! {
             method = PUT,
@@ -519,7 +519,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn close_alert() {
         let server = test_server! {
             method = POST,
@@ -541,7 +541,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_alert_logs() {
         let server = test_server! {
             method = GET,

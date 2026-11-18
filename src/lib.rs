@@ -12,7 +12,7 @@
 //! ```rust,no_run
 //! use mackerel_client::*;
 //!
-//! # #[async_std::main]
+//! # #[tokio::main]
 //! # async fn main() {
 //! let client = Client::new("<Mackerel-API-KEY>");
 //!

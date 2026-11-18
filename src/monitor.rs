@@ -1122,7 +1122,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_monitors() {
         let server = test_server! {
             method = GET,
@@ -1137,7 +1137,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_monitor() {
         let server = test_server! {
             method = POST,
@@ -1155,7 +1155,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_monitor() {
         let server = test_server! {
             method = GET,
@@ -1174,7 +1174,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_monitor() {
         let server = test_server! {
             method = PUT,
@@ -1196,7 +1196,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_monitor() {
         let server = test_server! {
             method = DELETE,

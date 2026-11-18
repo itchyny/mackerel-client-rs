@@ -157,7 +157,7 @@ mod client_tests {
         })
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_services() {
         let server = test_server! {
             method = GET,
@@ -172,7 +172,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_service() {
         let server = test_server! {
             method = POST,
@@ -190,7 +190,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_service() {
         let server = test_server! {
             method = DELETE,
@@ -209,7 +209,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_service_metric_names() {
         let server = test_server! {
             method = GET,

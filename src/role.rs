@@ -255,7 +255,7 @@ mod client_tests {
         })
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_roles() {
         let server = test_server! {
             method = GET,
@@ -270,7 +270,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_role() {
         let server = test_server! {
             method = POST,
@@ -292,7 +292,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_role() {
         let server = test_server! {
             method = DELETE,

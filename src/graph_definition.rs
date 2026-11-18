@@ -202,7 +202,7 @@ mod client_tests {
     use crate::graph_definition::*;
     use crate::tests::*;
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_graph_definitions() {
         let server = test_server! {
             method = POST,
@@ -245,7 +245,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_graph_definition() {
         let server = test_server! {
             method = DELETE,
@@ -267,7 +267,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_service_graph_definition() {
         let server = test_server! {
             method = DELETE,

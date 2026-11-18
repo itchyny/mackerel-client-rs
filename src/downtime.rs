@@ -380,7 +380,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_downtimes() {
         let server = test_server! {
             method = GET,
@@ -395,7 +395,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_downtime() {
         let server = test_server! {
             method = POST,
@@ -413,7 +413,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_downtime() {
         let server = test_server! {
             method = PUT,
@@ -435,7 +435,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_downtime() {
         let server = test_server! {
             method = DELETE,

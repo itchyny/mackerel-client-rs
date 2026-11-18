@@ -843,7 +843,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_dashboards() {
         let server = test_server! {
             method = GET,
@@ -858,7 +858,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_dashboard() {
         let server = test_server! {
             method = POST,
@@ -878,7 +878,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_dashboard() {
         let server = test_server! {
             method = GET,
@@ -897,7 +897,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_dashboard() {
         let server = test_server! {
             method = PUT,
@@ -919,7 +919,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_dashboard() {
         let server = test_server! {
             method = DELETE,

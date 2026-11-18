@@ -447,7 +447,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_aws_integrations() {
         let server = test_server! {
             method = GET,
@@ -462,7 +462,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_aws_integration() {
         let server = test_server! {
             method = POST,
@@ -484,7 +484,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_aws_integration() {
         let server = test_server! {
             method = GET,
@@ -503,7 +503,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_aws_integration() {
         let server = test_server! {
             method = PUT,
@@ -525,7 +525,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_aws_integration() {
         let server = test_server! {
             method = DELETE,
@@ -544,7 +544,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_aws_integration_external_id() {
         let server = test_server! {
             method = POST,
@@ -559,7 +559,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_aws_integration_metrics() {
         let server = test_server! {
             method = GET,

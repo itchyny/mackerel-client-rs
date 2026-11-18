@@ -265,7 +265,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_users() {
         let server = test_server! {
             method = GET,
@@ -280,7 +280,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_user() {
         let server = test_server! {
             method = DELETE,

@@ -85,7 +85,7 @@ mod client_tests {
     use crate::organization::*;
     use crate::tests::*;
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_organization() {
         let server = test_server! {
             method = GET,

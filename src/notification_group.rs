@@ -271,7 +271,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_notification_groups() {
         let server = test_server! {
             method = GET,
@@ -286,7 +286,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_notification_group() {
         let server = test_server! {
             method = POST,
@@ -308,7 +308,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_notification_group() {
         let server = test_server! {
             method = PUT,
@@ -330,7 +330,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn delete_notification_group() {
         let server = test_server! {
             method = DELETE,

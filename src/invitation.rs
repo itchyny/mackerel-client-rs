@@ -171,7 +171,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_invitations() {
         let server = test_server! {
             method = GET,
@@ -186,7 +186,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_invitation() {
         let server = test_server! {
             method = POST,
@@ -208,7 +208,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn revoke_invitation() {
         let server = test_server! {
             method = POST,

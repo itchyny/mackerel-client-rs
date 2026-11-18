@@ -26,7 +26,7 @@ typed-builder = "0.23.2"
 url = "2.5.8"
 
 [dev-dependencies]
-async-std = { version = "1.13.2", features = ["attributes", "tokio1"] }
+tokio = { version = "1.54.1", features = ["macros", "rt-multi-thread"] }
 httptest = "0.16.4"
 pretty_env_logger = "0.5.0"
 rstest = "0.28.0"

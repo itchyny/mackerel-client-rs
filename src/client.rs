@@ -237,7 +237,7 @@ mod client_tests {
         }
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn success() {
         {
             let server = test_server! {
@@ -261,7 +261,7 @@ mod client_tests {
         }
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn error() {
         {
             let server = test_server! {
@@ -316,7 +316,7 @@ mod client_tests {
         }
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn decode_error() {
         let server = test_server! {
             method = GET,

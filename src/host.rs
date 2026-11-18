@@ -649,7 +649,7 @@ impl Client {
     /// # use mackerel_client::role::{RoleFullname, RoleName};
     /// # use mackerel_client::service::ServiceName;
     /// #
-    /// # #[async_std::main]
+    /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let client = Client::new("<Mackerel-API-KEY>");
     /// // Fetches all the hosts (with working or standby status).
@@ -780,7 +780,7 @@ mod client_tests {
         json
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn create_host() {
         let server = test_server! {
             method = POST,
@@ -798,7 +798,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_host() {
         let server = test_server! {
             method = GET,
@@ -815,7 +815,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_host_by_custom_identifier() {
         let server = test_server! {
             method = GET,
@@ -830,7 +830,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn get_host_by_custom_identifier_not_found() {
         let server = test_server! {
             method = GET,
@@ -845,7 +845,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_host() {
         let server = test_server! {
             method = PUT,
@@ -867,7 +867,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_host_status() {
         let server = test_server! {
             method = POST,
@@ -883,7 +883,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_host_statuses() {
         let server = test_server! {
             method = POST,
@@ -915,7 +915,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn update_host_roles() {
         let server = test_server! {
             method = PUT,
@@ -940,7 +940,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn retire_host() {
         let server = test_server! {
             method = POST,
@@ -956,7 +956,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn retire_hosts() {
         let server = test_server! {
             method = POST,
@@ -1012,7 +1012,7 @@ mod client_tests {
             .statuses([HostStatus::Working, HostStatus::Standby, HostStatus::Maintenance]),
         "service=service0&role=role0&role=role1&role=role2&status=working&status=standby&status=maintenance",
     )]
-    #[async_std::test]
+    #[tokio::test]
     async fn list_hosts(
         #[case] list_hosts_params: impl Into<ListHostsParams>,
         #[case] query_params: &'static str,
@@ -1031,7 +1031,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_host_metric_names() {
         let server = test_server! {
             method = GET,
@@ -1064,7 +1064,7 @@ mod client_tests {
         );
     }
 
-    #[async_std::test]
+    #[tokio::test]
     async fn list_host_monitored_statuses() {
         let server = test_server! {
             method = GET,
