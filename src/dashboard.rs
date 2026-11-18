@@ -28,6 +28,20 @@ pub struct DashboardValue {
     #[builder(default)]
     pub memo: String,
     pub url_path: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub created_at: Option<DateTime<Utc>>,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub updated_at: Option<DateTime<Utc>>,
     #[builder(default)]
     #[serde(default)]
     pub widgets: Vec<DashboardWidget>,
@@ -48,6 +62,8 @@ pub enum DashboardWidget {
         value_range: Option<DashboardValueRange>,
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         reference_lines: Vec<DashboardReferenceLine>,
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        legend_list: Vec<String>,
         layout: DashboardLayout,
     },
     #[serde(rename_all = "camelCase")]
@@ -197,6 +213,8 @@ mod tests {
                     .title("This is a dashboard")
                     .memo("This is a dashboard memo.")
                     .url_path("example")
+                    .created_at(DateTime::from_timestamp(1630000000, 0).unwrap())
+                    .updated_at(DateTime::from_timestamp(1630003600, 0).unwrap())
                     .widgets([
                         DashboardWidget::Graph {
                             title: "Graph title".to_string(),
@@ -216,6 +234,10 @@ mod tests {
                                 label: "critical".to_owned(),
                                 value: 15.0,
                             }],
+                            legend_list: vec![
+                                "loadavg.loadavg1".to_string(),
+                                "loadavg.loadavg5".to_string(),
+                            ],
                             layout: DashboardLayout {
                                 x: 0,
                                 y: 0,
@@ -236,6 +258,7 @@ mod tests {
                             }),
                             value_range: None,
                             reference_lines: vec![],
+                            legend_list: vec![],
                             layout: DashboardLayout {
                                 x: 8,
                                 y: 0,
@@ -297,6 +320,8 @@ mod tests {
             "title": "This is a dashboard",
             "memo": "This is a dashboard memo.",
             "urlPath": "example",
+            "createdAt": 1630000000,
+            "updatedAt": 1630003600,
             "widgets": [
                 {
                     "type": "graph",
@@ -321,6 +346,7 @@ mod tests {
                             "value": 15.0,
                         },
                     ],
+                    "legendList": ["loadavg.loadavg1", "loadavg.loadavg5"],
                     "layout": {
                         "x": 0,
                         "y": 0,
@@ -678,6 +704,7 @@ mod client_tests {
                     label: "critical".to_owned(),
                     value: 15.0,
                 }],
+                legend_list: vec![],
                 layout: DashboardLayout {
                     x: 0,
                     y: 0,
