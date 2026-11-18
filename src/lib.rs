@@ -40,7 +40,7 @@ pub mod alert;
 pub mod alert_group_setting;
 pub mod aws_integration;
 pub mod channel;
-pub mod check_report;
+pub mod check;
 pub mod dashboard;
 pub mod downtime;
 pub mod graph_annotation;

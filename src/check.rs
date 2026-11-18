@@ -187,7 +187,7 @@ impl Client {
 mod client_tests {
     use serde_json::json;
 
-    use crate::check_report::*;
+    use crate::check::*;
     use crate::tests::*;
 
     #[tokio::test]
