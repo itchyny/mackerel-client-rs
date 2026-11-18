@@ -85,6 +85,8 @@ pub struct HostMonitor {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct ConnectivityMonitor {
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub name: String,
     #[builder(default)]
     #[serde(default, skip_serializing_if = "String::is_empty")]
@@ -305,6 +307,8 @@ pub struct QueryMonitor {
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub memo: String,
     pub query: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub legend: String,
     pub operator: MonitorOperator,
     #[builder(default, setter(!into, strip_option))]
@@ -514,8 +518,8 @@ pub enum ExternalMethod {
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 pub struct ExternalHeader {
-    name: String,
-    value: String,
+    pub name: String,
+    pub value: String,
 }
 
 /// IP version for external http monitor
@@ -815,6 +819,32 @@ mod tests {
         anomaly_detection_monitor_json_example()
     )]
     #[case(query_monitor_example(), query_monitor_json_example())]
+    #[case(
+        Monitor::builder()
+            .id("monitor8")
+            .value(ConnectivityMonitor::builder().build())
+            .build(),
+        json!({ "type": "connectivity", "id": "monitor8" }),
+    )]
+    #[case(
+        Monitor::builder()
+            .id("monitor9")
+            .value(
+                QueryMonitor::builder()
+                    .name("Example query monitor without legend")
+                    .query("container.cpu.utilization")
+                    .operator(MonitorOperator::GreaterThan)
+                    .build(),
+            )
+            .build(),
+        json!({
+            "type": "query",
+            "id": "monitor9",
+            "name": "Example query monitor without legend",
+            "query": "container.cpu.utilization",
+            "operator": ">",
+        }),
+    )]
     fn test_monitor_json(#[case] monitor: Monitor, #[case] json: serde_json::Value) {
         assert_eq!(serde_json::to_value(&monitor).unwrap(), json);
         assert_eq!(monitor, serde_json::from_value(json).unwrap());
