@@ -112,6 +112,7 @@ pub enum AWSServiceName {
     DocDB,
     CodeBuild,
     Athena,
+    MemoryDB,
     #[strum(default)]
     Unknown(String),
 }
@@ -265,6 +266,7 @@ mod tests {
     #[case(AWSServiceName::DocDB, "DocDB")]
     #[case(AWSServiceName::CodeBuild, "CodeBuild")]
     #[case(AWSServiceName::Athena, "Athena")]
+    #[case(AWSServiceName::MemoryDB, "MemoryDB")]
     fn test_aws_service(#[case] aws_service: AWSServiceName, #[case] aws_service_str: &str) {
         assert_eq!(aws_service.to_string(), aws_service_str);
         assert_eq!(aws_service, aws_service_str.parse().unwrap());
