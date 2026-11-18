@@ -11,6 +11,7 @@ pub(crate) struct TestServerConfig {
     pub query_params: &'static str,
     pub request: Value,
     pub status_code: StatusCode,
+    pub response_headers: Vec<(&'static str, &'static str)>,
     pub response: Value,
 }
 
@@ -65,9 +66,12 @@ macro_rules! test_server {
             ])
             .times(1..)
             .respond_with(
-                responders::status_code(config.status_code.as_u16())
-                    .append_header("Content-Type", "application/json")
-                    .body(::serde_json::to_string(&config.response).unwrap()),
+                config.response_headers.iter().fold(
+                    responders::status_code(config.status_code.as_u16())
+                        .append_header("Content-Type", "application/json"),
+                    |responder, (name, value)| responder.append_header(*name, *value),
+                )
+                .body(::serde_json::to_string(&config.response).unwrap()),
             ),
         );
         server

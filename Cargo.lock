@@ -982,6 +982,7 @@ dependencies = [
  "chrono",
  "fixedstr",
  "http",
+ "httpdate",
  "httptest",
  "percent-encoding",
  "pretty_env_logger",

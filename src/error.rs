@@ -1,12 +1,17 @@
 use http::StatusCode;
+use std::time::Duration;
 use thiserror::Error;
 
 /// Error represents the error type of the library.
 #[derive(Debug, Error)]
 #[non_exhaustive]
 pub enum Error {
-    #[error("status_code:{0}, message:{1}")]
-    ApiError(StatusCode, String),
+    #[error("status_code:{status_code}, message:{message}")]
+    ApiError {
+        status_code: StatusCode,
+        message: String,
+        retry_after: Option<Duration>,
+    },
 
     #[error(transparent)]
     RequestError(#[from] reqwest::Error),
@@ -17,11 +22,23 @@ pub enum Error {
 
 impl PartialEq for Error {
     fn eq(&self, other: &Self) -> bool {
-        matches!(
-            (self, other),
-            (Error::ApiError(status1, message1), Error::ApiError(status2, message2))
-                if status1 == status2 && message1 == message2
-        )
+        match (self, other) {
+            (
+                Error::ApiError {
+                    status_code: status_code1,
+                    message: message1,
+                    retry_after: retry_after1,
+                },
+                Error::ApiError {
+                    status_code: status_code2,
+                    message: message2,
+                    retry_after: retry_after2,
+                },
+            ) => {
+                status_code1 == status_code2 && message1 == message2 && retry_after1 == retry_after2
+            }
+            _ => false,
+        }
     }
 }
 

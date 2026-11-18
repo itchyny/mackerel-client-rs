@@ -1,6 +1,6 @@
 //! Mackerel API client
 use http::{header::*, Method};
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 use typed_builder::TypedBuilder;
 use url::Url;
 
@@ -134,25 +134,40 @@ impl Client {
     }
 
     async fn api_error(&self, response: reqwest::Response) -> Error {
-        let status = response.status();
+        let status_code = response.status();
+        let retry_after = response
+            .headers()
+            .get(RETRY_AFTER)
+            .and_then(|value| value.to_str().ok())
+            .and_then(parse_retry_after);
         let body = match response.text().await {
             Ok(text) => text,
             Err(err) => return err.into(),
         };
-        Error::ApiError(
-            status,
-            serde_json::from_str::<serde_json::Value>(&body)
-                .ok()
-                .and_then(|value: serde_json::Value| {
-                    value
-                        .get("error")
-                        .map(|err| err.get("message").unwrap_or(err))
-                        .and_then(serde_json::Value::as_str)
-                        .map(str::to_owned)
-                })
-                .unwrap_or(body),
-        )
+        let message = serde_json::from_str::<serde_json::Value>(&body)
+            .ok()
+            .and_then(|value: serde_json::Value| {
+                value
+                    .get("error")
+                    .map(|err| err.get("message").unwrap_or(err))
+                    .and_then(serde_json::Value::as_str)
+                    .map(str::to_owned)
+            })
+            .unwrap_or(body);
+        Error::ApiError {
+            status_code,
+            message,
+            retry_after,
+        }
     }
+}
+
+fn parse_retry_after(value: &str) -> Option<Duration> {
+    value.parse().map(Duration::from_secs).ok().or_else(|| {
+        httpdate::parse_http_date(value)
+            .ok()
+            .map(|time| time.duration_since(SystemTime::now()).unwrap_or_default())
+    })
 }
 
 macro_rules! query_params {
@@ -197,6 +212,34 @@ macro_rules! response_body {
     }};
 }
 pub(crate) use response_body;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("0", Some(Duration::ZERO))]
+    #[case("120", Some(Duration::from_secs(120)))]
+    #[case("Wed, 21 Oct 2015 07:28:00 GMT", Some(Duration::ZERO))]
+    #[case("", None)]
+    #[case("-1", None)]
+    #[case("invalid", None)]
+    fn test_parse_retry_after(#[case] value: &str, #[case] expected: Option<Duration>) {
+        assert_eq!(parse_retry_after(value), expected);
+    }
+
+    #[test]
+    fn test_parse_retry_after_future_date() {
+        let value = httpdate::fmt_http_date(SystemTime::now() + Duration::from_secs(3600));
+        let retry_after = parse_retry_after(&value).unwrap();
+        assert!(
+            Duration::from_secs(3590) < retry_after && retry_after <= Duration::from_secs(3600),
+            "unexpected retry_after: {:?}",
+            retry_after,
+        );
+    }
+}
 
 #[cfg(test)]
 mod client_tests {
@@ -274,10 +317,11 @@ mod client_tests {
             };
             assert_eq!(
                 test_client!(server).get().await,
-                Err(Error::ApiError(
-                    StatusCode::BAD_REQUEST,
-                    "This is an error message.".to_owned()
-                )),
+                Err(Error::ApiError {
+                    status_code: StatusCode::BAD_REQUEST,
+                    message: "This is an error message.".to_owned(),
+                    retry_after: None,
+                }),
             );
         }
         {
@@ -293,10 +337,11 @@ mod client_tests {
             };
             assert_eq!(
                 test_client!(server).get().await,
-                Err(Error::ApiError(
-                    StatusCode::NOT_FOUND,
-                    "This is an error message.".to_owned()
-                )),
+                Err(Error::ApiError {
+                    status_code: StatusCode::NOT_FOUND,
+                    message: "This is an error message.".to_owned(),
+                    retry_after: None,
+                }),
             );
         }
         {
@@ -308,12 +353,34 @@ mod client_tests {
             };
             assert_eq!(
                 test_client!(server).get().await,
-                Err(Error::ApiError(
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    r#""This is an error message.""#.to_owned()
-                )),
+                Err(Error::ApiError {
+                    status_code: StatusCode::INTERNAL_SERVER_ERROR,
+                    message: r#""This is an error message.""#.to_owned(),
+                    retry_after: None,
+                }),
             );
         }
+    }
+
+    #[tokio::test]
+    async fn retry_after() {
+        let server = test_server! {
+            method = GET,
+            path = "/api/v0/test",
+            status_code = 429,
+            response_headers = [("Retry-After", "30")],
+            response = json!({
+                "error": { "message": "Too many requests." },
+            }),
+        };
+        assert_eq!(
+            test_client!(server).get().await,
+            Err(Error::ApiError {
+                status_code: StatusCode::TOO_MANY_REQUESTS,
+                message: "Too many requests.".to_owned(),
+                retry_after: Some(Duration::from_secs(30)),
+            }),
+        );
     }
 
     #[tokio::test]
