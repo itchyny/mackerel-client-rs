@@ -6,6 +6,7 @@ use typed_builder::TypedBuilder;
 
 use crate::client::*;
 use crate::error::Result;
+use crate::service::ServiceName;
 
 /// A graph definition
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
@@ -172,6 +173,28 @@ impl Client {
         )
         .await
     }
+
+    /// Deletes a service graph definition.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/service-metrics#delete-graph-def>.
+    pub async fn delete_service_graph_definition(
+        &self,
+        service_name: impl Into<ServiceName>,
+        name: impl AsRef<str>,
+    ) -> Result<()> {
+        self.request(
+            Method::DELETE,
+            format!(
+                "/api/v0/services/{}/graph-defs/{}",
+                service_name.into(),
+                name.as_ref()
+            ),
+            query_params![],
+            request_body![],
+            response_body!(),
+        )
+        .await
+    }
 }
 
 #[cfg(test)]
@@ -239,6 +262,30 @@ mod client_tests {
         assert_eq!(
             test_client!(server)
                 .delete_graph_definition(String::from("custom.metric"))
+                .await,
+            Ok(()),
+        );
+    }
+
+    #[async_std::test]
+    async fn delete_service_graph_definition() {
+        let server = test_server! {
+            method = DELETE,
+            path = "/api/v0/services/service0/graph-defs/custom.metric",
+            response = json!({ "success": true }),
+        };
+        assert_eq!(
+            test_client!(server)
+                .delete_service_graph_definition("service0", "custom.metric")
+                .await,
+            Ok(()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .delete_service_graph_definition(
+                    ServiceName::from("service0"),
+                    String::from("custom.metric")
+                )
                 .await,
             Ok(()),
         );
