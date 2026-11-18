@@ -1,7 +1,7 @@
 use chrono::{DateTime, Duration, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_with::{skip_serializing_none, DurationSeconds};
+use serde_with::DurationSeconds;
 use std::borrow::Borrow;
 use typed_builder::TypedBuilder;
 
@@ -42,58 +42,130 @@ pub struct DashboardValue {
         skip_serializing_if = "Option::is_none"
     )]
     pub updated_at: Option<DateTime<Utc>>,
-    #[builder(default)]
+    #[builder(
+        default,
+        setter(transform = |widgets: impl IntoIterator<Item = impl Into<DashboardWidget>>| widgets
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
     #[serde(default)]
     pub widgets: Vec<DashboardWidget>,
 }
 
 /// A dashboard widget
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum DashboardWidget {
-    #[serde(rename_all = "camelCase")]
-    Graph {
-        title: String,
-        graph: DashboardGraph,
-        #[serde(rename = "range", default, skip_serializing_if = "Option::is_none")]
-        time_range: Option<DashboardTimeRange>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        value_range: Option<DashboardValueRange>,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        reference_lines: Vec<DashboardReferenceLine>,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        legend_list: Vec<String>,
-        layout: DashboardLayout,
-    },
-    #[serde(rename_all = "camelCase")]
-    Value {
-        title: String,
-        metric: DashboardMetric,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        fraction_size: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        suffix: Option<String>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_new_version: bool,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        shows_trend: bool,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        format_rules: Vec<DashboardFormatRule>,
-        layout: DashboardLayout,
-    },
-    #[serde(rename_all = "camelCase")]
-    Markdown {
-        title: String,
-        markdown: String,
-        layout: DashboardLayout,
-    },
-    #[serde(rename_all = "camelCase")]
-    AlertStatus {
-        title: String,
-        role_fullname: RoleFullname,
-        layout: DashboardLayout,
-    },
+    Graph(DashboardGraphWidget),
+    Value(DashboardValueWidget),
+    Markdown(DashboardMarkdownWidget),
+    AlertStatus(DashboardAlertStatusWidget),
+}
+
+/// A dashboard graph widget
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DashboardGraphWidget {
+    pub title: String,
+    pub graph: DashboardGraph,
+    #[builder(default, setter(strip_option))]
+    #[serde(rename = "range", default, skip_serializing_if = "Option::is_none")]
+    pub time_range: Option<DashboardTimeRange>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub value_range: Option<DashboardValueRange>,
+    #[builder(
+        default,
+        setter(transform = |reference_lines: impl IntoIterator<Item = DashboardReferenceLine>| reference_lines
+            .into_iter().collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub reference_lines: Vec<DashboardReferenceLine>,
+    #[builder(
+        default,
+        setter(transform = |legends: impl IntoIterator<Item = impl Into<String>>| legends
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub legend_list: Vec<String>,
+    pub layout: DashboardLayout,
+}
+
+/// A dashboard value widget
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DashboardValueWidget {
+    pub title: String,
+    pub metric: DashboardMetric,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub fraction_size: Option<u64>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suffix: Option<String>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_new_version: bool,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub shows_trend: bool,
+    #[builder(
+        default,
+        setter(transform = |format_rules: impl IntoIterator<Item = DashboardFormatRule>| format_rules
+            .into_iter().collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub format_rules: Vec<DashboardFormatRule>,
+    pub layout: DashboardLayout,
+}
+
+/// A dashboard markdown widget
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DashboardMarkdownWidget {
+    pub title: String,
+    pub markdown: String,
+    pub layout: DashboardLayout,
+}
+
+/// A dashboard alert status widget
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct DashboardAlertStatusWidget {
+    pub title: String,
+    pub role_fullname: RoleFullname,
+    pub layout: DashboardLayout,
+}
+
+impl From<DashboardGraphWidget> for DashboardWidget {
+    fn from(widget: DashboardGraphWidget) -> Self {
+        Self::Graph(widget)
+    }
+}
+
+impl From<DashboardValueWidget> for DashboardWidget {
+    fn from(widget: DashboardValueWidget) -> Self {
+        Self::Value(widget)
+    }
+}
+
+impl From<DashboardMarkdownWidget> for DashboardWidget {
+    fn from(widget: DashboardMarkdownWidget) -> Self {
+        Self::Markdown(widget)
+    }
+}
+
+impl From<DashboardAlertStatusWidget> for DashboardWidget {
+    fn from(widget: DashboardAlertStatusWidget) -> Self {
+        Self::AlertStatus(widget)
+    }
 }
 
 /// A dashboard graph
@@ -216,98 +288,102 @@ mod tests {
                     .created_at(DateTime::from_timestamp(1630000000, 0).unwrap())
                     .updated_at(DateTime::from_timestamp(1630003600, 0).unwrap())
                     .widgets([
-                        DashboardWidget::Graph {
-                            title: "Graph title".to_string(),
-                            graph: DashboardGraph::Host {
-                                host_id: "host1".into(),
-                                name: "loadavg5".to_string(),
-                            },
-                            time_range: Some(DashboardTimeRange::Relative {
-                                period: Duration::seconds(86400),
-                                offset: Duration::seconds(-3600),
-                            }),
-                            value_range: Some(DashboardValueRange {
-                                min: Some(0.0),
-                                max: Some(20.0),
-                            }),
-                            reference_lines: vec![DashboardReferenceLine {
-                                label: "critical".to_owned(),
-                                value: 15.0,
-                            }],
-                            legend_list: vec![
-                                "loadavg.loadavg1".to_string(),
-                                "loadavg.loadavg5".to_string(),
-                            ],
-                            layout: DashboardLayout {
-                                x: 0,
-                                y: 0,
-                                width: 8,
-                                height: 6,
-                            },
-                        },
-                        DashboardWidget::Graph {
-                            title: "Graph title".to_string(),
-                            graph: DashboardGraph::Role {
-                                role_fullname: "service:role".into(),
-                                name: "cpu.{user,iowait,system}".to_string(),
-                                is_stacked: true,
-                            },
-                            time_range: Some(DashboardTimeRange::Absolute {
-                                start: DateTime::from_timestamp(1630000000, 0).unwrap(),
-                                end: DateTime::from_timestamp(1630003600, 0).unwrap(),
-                            }),
-                            value_range: None,
-                            reference_lines: vec![],
-                            legend_list: vec![],
-                            layout: DashboardLayout {
-                                x: 8,
-                                y: 0,
-                                width: 8,
-                                height: 6,
-                            },
-                        },
-                        DashboardWidget::Value {
-                            title: "Metric value title".to_string(),
-                            metric: DashboardMetric::Host {
-                                host_id: "host2".into(),
-                                name: "cpu.user.percentage".to_string(),
-                            },
-                            fraction_size: Some(4),
-                            suffix: Some("%".to_string()),
-                            is_new_version: true,
-                            shows_trend: true,
-                            format_rules: vec![DashboardFormatRule {
-                                name: "heavy usage".to_owned(),
-                                threshold: 80.0,
-                                operator: MonitorOperator::GreaterThan,
-                            }],
-                            layout: DashboardLayout {
-                                x: 16,
-                                y: 0,
-                                width: 8,
-                                height: 6,
-                            },
-                        },
-                        DashboardWidget::Markdown {
-                            title: "Markdown title".to_string(),
-                            markdown: "# This is a markdown widget".to_string(),
-                            layout: DashboardLayout {
-                                x: 0,
-                                y: 6,
-                                width: 8,
-                                height: 6,
-                            },
-                        },
-                        DashboardWidget::AlertStatus {
-                            title: "Alert status title".to_string(),
-                            role_fullname: "service:role".into(),
-                            layout: DashboardLayout {
-                                x: 8,
-                                y: 6,
-                                width: 8,
-                                height: 6,
-                            },
-                        },
+                        DashboardWidget::Graph(
+                            DashboardGraphWidget::builder()
+                                .title("Graph title")
+                                .graph(DashboardGraph::Host {
+                                    host_id: "host1".into(),
+                                    name: "loadavg5".to_string(),
+                                })
+                                .time_range(DashboardTimeRange::Relative {
+                                    period: Duration::seconds(86400),
+                                    offset: Duration::seconds(-3600),
+                                })
+                                .value_range(DashboardValueRange {
+                                    min: Some(0.0),
+                                    max: Some(20.0),
+                                })
+                                .reference_lines([DashboardReferenceLine {
+                                    label: "critical".to_owned(),
+                                    value: 15.0,
+                                }])
+                                .legend_list(["loadavg.loadavg1", "loadavg.loadavg5"])
+                                .layout(DashboardLayout {
+                                    x: 0,
+                                    y: 0,
+                                    width: 8,
+                                    height: 6,
+                                })
+                                .build(),
+                        ),
+                        DashboardWidget::Graph(
+                            DashboardGraphWidget::builder()
+                                .title("Graph title")
+                                .graph(DashboardGraph::Role {
+                                    role_fullname: "service:role".into(),
+                                    name: "cpu.{user,iowait,system}".to_string(),
+                                    is_stacked: true,
+                                })
+                                .time_range(DashboardTimeRange::Absolute {
+                                    start: DateTime::from_timestamp(1630000000, 0).unwrap(),
+                                    end: DateTime::from_timestamp(1630003600, 0).unwrap(),
+                                })
+                                .layout(DashboardLayout {
+                                    x: 8,
+                                    y: 0,
+                                    width: 8,
+                                    height: 6,
+                                })
+                                .build(),
+                        ),
+                        DashboardWidget::Value(
+                            DashboardValueWidget::builder()
+                                .title("Metric value title")
+                                .metric(DashboardMetric::Host {
+                                    host_id: "host2".into(),
+                                    name: "cpu.user.percentage".to_string(),
+                                })
+                                .fraction_size(4)
+                                .suffix("%")
+                                .is_new_version(true)
+                                .shows_trend(true)
+                                .format_rules([DashboardFormatRule {
+                                    name: "heavy usage".to_owned(),
+                                    threshold: 80.0,
+                                    operator: MonitorOperator::GreaterThan,
+                                }])
+                                .layout(DashboardLayout {
+                                    x: 16,
+                                    y: 0,
+                                    width: 8,
+                                    height: 6,
+                                })
+                                .build(),
+                        ),
+                        DashboardWidget::Markdown(
+                            DashboardMarkdownWidget::builder()
+                                .title("Markdown title")
+                                .markdown("# This is a markdown widget")
+                                .layout(DashboardLayout {
+                                    x: 0,
+                                    y: 6,
+                                    width: 8,
+                                    height: 6,
+                                })
+                                .build(),
+                        ),
+                        DashboardWidget::AlertStatus(
+                            DashboardAlertStatusWidget::builder()
+                                .title("Alert status title")
+                                .role_fullname("service:role")
+                                .layout(DashboardLayout {
+                                    x: 8,
+                                    y: 6,
+                                    width: 8,
+                                    height: 6,
+                                })
+                                .build(),
+                        ),
                     ])
                     .build(),
             )
@@ -686,32 +762,31 @@ mod client_tests {
             .title("Example dashboard")
             .memo("This is a dashboard memo.")
             .url_path("example")
-            .widgets([DashboardWidget::Graph {
-                title: "Graph title".to_string(),
-                graph: DashboardGraph::Host {
+            .widgets([DashboardGraphWidget::builder()
+                .title("Graph title")
+                .graph(DashboardGraph::Host {
                     host_id: "host0".into(),
                     name: "loadavg5".to_string(),
-                },
-                time_range: Some(DashboardTimeRange::Relative {
+                })
+                .time_range(DashboardTimeRange::Relative {
                     period: Duration::seconds(86400),
                     offset: Duration::seconds(-3600),
-                }),
-                value_range: Some(DashboardValueRange {
+                })
+                .value_range(DashboardValueRange {
                     min: Some(0.0),
                     max: Some(20.0),
-                }),
-                reference_lines: vec![DashboardReferenceLine {
+                })
+                .reference_lines([DashboardReferenceLine {
                     label: "critical".to_owned(),
                     value: 15.0,
-                }],
-                legend_list: vec![],
-                layout: DashboardLayout {
+                }])
+                .layout(DashboardLayout {
                     x: 0,
                     y: 0,
                     width: 8,
                     height: 6,
-                },
-            }])
+                })
+                .build()])
             .build()
     }
 
