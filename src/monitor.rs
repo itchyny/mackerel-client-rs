@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use http::Method;
 use serde_derive::{Deserialize, Serialize};
-use serde_with::{skip_serializing_none, DeserializeFromStr, SerializeDisplay};
+use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::borrow::Borrow;
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
@@ -33,7 +33,6 @@ pub enum MonitorValue {
 }
 
 /// A host metric monitor
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
@@ -79,7 +78,6 @@ pub struct HostMonitor {
 }
 
 /// A host connectivity monitor
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
@@ -120,7 +118,6 @@ pub struct ConnectivityMonitor {
 }
 
 /// A service metric monitor
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
@@ -159,7 +156,6 @@ pub struct ServiceMonitor {
 }
 
 /// An external http monitor
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
@@ -228,7 +224,6 @@ pub struct ExternalMonitor {
 }
 
 /// An expression monitor
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
@@ -258,7 +253,6 @@ pub struct ExpressionMonitor {
 }
 
 /// An anomaly detection monitor
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
@@ -285,7 +279,11 @@ pub struct AnomalyDetectionMonitor {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_check_attempts: Option<u64>,
     #[builder(default, setter(strip_option))]
-    #[serde(default, with = "chrono::serde::ts_seconds_option")]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub training_period_from: Option<DateTime<Utc>>,
     #[builder(default, setter(!into, strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -296,7 +294,6 @@ pub struct AnomalyDetectionMonitor {
 }
 
 /// A query monitor
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
