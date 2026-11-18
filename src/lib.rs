@@ -38,6 +38,7 @@ pub(crate) mod tests;
 
 pub mod alert;
 pub mod alert_group_setting;
+pub mod apm;
 pub mod aws_integration;
 pub mod channel;
 pub mod check;
