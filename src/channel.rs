@@ -5,6 +5,7 @@ use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use strum::{Display, EnumString};
+use typed_builder::TypedBuilder;
 
 use crate::client::*;
 use crate::entity::{Entity, Id};
@@ -21,174 +22,370 @@ pub type ChannelId = Id<ChannelValue>;
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ChannelValue {
-    #[serde(rename_all = "camelCase")]
-    Email {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-        #[serde(default)]
-        emails: Vec<String>,
-        #[serde(default)]
-        user_ids: Vec<UserId>,
-        #[serde(default)]
-        events: Vec<NotificationEvent>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        add_to_default_notification_group: Option<bool>,
-    },
-    #[serde(rename_all = "camelCase")]
-    Slack {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-        url: String,
-        enabled_graph_image: bool,
-        mentions: HashMap<String, String>,
-        #[serde(default)]
-        events: Vec<NotificationEvent>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        add_to_default_notification_group: Option<bool>,
-    },
-    Line {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    Chatwork {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    Typetalk {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    Twilio {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    Pagerduty {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    Opsgenie {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    Yammer {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    MicrosoftTeams {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
-    #[serde(rename_all = "camelCase")]
-    Webhook {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-        url: String,
-        enabled_graph_image: bool,
-        #[serde(default)]
-        events: Vec<NotificationEvent>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        add_to_default_notification_group: Option<bool>,
-    },
-    AmazonEventBridge {
-        name: String,
-        #[serde(
-            default,
-            with = "chrono::serde::ts_seconds_option",
-            skip_serializing_if = "Option::is_none"
-        )]
-        suspended_at: Option<DateTime<Utc>>,
-    },
+    Email(EmailChannel),
+    Slack(SlackChannel),
+    Line(LineChannel),
+    Chatwork(ChatworkChannel),
+    Typetalk(TypetalkChannel),
+    Twilio(TwilioChannel),
+    Pagerduty(PagerdutyChannel),
+    Opsgenie(OpsgenieChannel),
+    Yammer(YammerChannel),
+    MicrosoftTeams(MicrosoftTeamsChannel),
+    Webhook(WebhookChannel),
+    AmazonEventBridge(AmazonEventBridgeChannel),
+}
+
+/// An email channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct EmailChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+    #[builder(
+        default,
+        setter(transform = |emails: impl IntoIterator<Item = impl Into<String>>| emails
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default)]
+    pub emails: Vec<String>,
+    #[builder(
+        default,
+        setter(transform = |user_ids: impl IntoIterator<Item = impl Into<UserId>>| user_ids
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default)]
+    pub user_ids: Vec<UserId>,
+    #[builder(
+        default,
+        setter(transform = |events: impl IntoIterator<Item = NotificationEvent>| events
+            .into_iter().collect::<Vec<_>>()),
+    )]
+    #[serde(default)]
+    pub events: Vec<NotificationEvent>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub add_to_default_notification_group: Option<bool>,
+}
+
+/// A Slack channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct SlackChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+    pub url: String,
+    #[builder(default)]
+    pub enabled_graph_image: bool,
+    #[builder(default)]
+    pub mentions: HashMap<String, String>,
+    #[builder(
+        default,
+        setter(transform = |events: impl IntoIterator<Item = NotificationEvent>| events
+            .into_iter().collect::<Vec<_>>()),
+    )]
+    #[serde(default)]
+    pub events: Vec<NotificationEvent>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub add_to_default_notification_group: Option<bool>,
+}
+
+/// A LINE channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct LineChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// A Chatwork channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct ChatworkChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// A Typetalk channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct TypetalkChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// A Twilio channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct TwilioChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// A PagerDuty channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct PagerdutyChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// An Opsgenie channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct OpsgenieChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// A Yammer channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct YammerChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// A Microsoft Teams channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct MicrosoftTeamsChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+/// A webhook channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct WebhookChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+    pub url: String,
+    #[builder(default)]
+    pub enabled_graph_image: bool,
+    #[builder(
+        default,
+        setter(transform = |events: impl IntoIterator<Item = NotificationEvent>| events
+            .into_iter().collect::<Vec<_>>()),
+    )]
+    #[serde(default)]
+    pub events: Vec<NotificationEvent>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub add_to_default_notification_group: Option<bool>,
+}
+
+/// An Amazon EventBridge channel
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct AmazonEventBridgeChannel {
+    pub name: String,
+    #[builder(default, setter(strip_option))]
+    #[serde(
+        default,
+        with = "chrono::serde::ts_seconds_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub suspended_at: Option<DateTime<Utc>>,
+}
+
+impl From<EmailChannel> for ChannelValue {
+    fn from(channel: EmailChannel) -> Self {
+        Self::Email(channel)
+    }
+}
+
+impl From<SlackChannel> for ChannelValue {
+    fn from(channel: SlackChannel) -> Self {
+        Self::Slack(channel)
+    }
+}
+
+impl From<LineChannel> for ChannelValue {
+    fn from(channel: LineChannel) -> Self {
+        Self::Line(channel)
+    }
+}
+
+impl From<ChatworkChannel> for ChannelValue {
+    fn from(channel: ChatworkChannel) -> Self {
+        Self::Chatwork(channel)
+    }
+}
+
+impl From<TypetalkChannel> for ChannelValue {
+    fn from(channel: TypetalkChannel) -> Self {
+        Self::Typetalk(channel)
+    }
+}
+
+impl From<TwilioChannel> for ChannelValue {
+    fn from(channel: TwilioChannel) -> Self {
+        Self::Twilio(channel)
+    }
+}
+
+impl From<PagerdutyChannel> for ChannelValue {
+    fn from(channel: PagerdutyChannel) -> Self {
+        Self::Pagerduty(channel)
+    }
+}
+
+impl From<OpsgenieChannel> for ChannelValue {
+    fn from(channel: OpsgenieChannel) -> Self {
+        Self::Opsgenie(channel)
+    }
+}
+
+impl From<YammerChannel> for ChannelValue {
+    fn from(channel: YammerChannel) -> Self {
+        Self::Yammer(channel)
+    }
+}
+
+impl From<MicrosoftTeamsChannel> for ChannelValue {
+    fn from(channel: MicrosoftTeamsChannel) -> Self {
+        Self::MicrosoftTeams(channel)
+    }
+}
+
+impl From<WebhookChannel> for ChannelValue {
+    fn from(channel: WebhookChannel) -> Self {
+        Self::Webhook(channel)
+    }
+}
+
+impl From<AmazonEventBridgeChannel> for ChannelValue {
+    fn from(channel: AmazonEventBridgeChannel) -> Self {
+        Self::AmazonEventBridge(channel)
+    }
 }
 
 impl ChannelValue {
     /// Returns the name of the channel.
     pub fn name(&self) -> String {
-        match *self {
-            Self::Email { ref name, .. } => name.clone(),
-            Self::Slack { ref name, .. } => name.clone(),
-            Self::Line { ref name, .. } => name.clone(),
-            Self::Chatwork { ref name, .. } => name.clone(),
-            Self::Typetalk { ref name, .. } => name.clone(),
-            Self::Twilio { ref name, .. } => name.clone(),
-            Self::Pagerduty { ref name, .. } => name.clone(),
-            Self::Opsgenie { ref name, .. } => name.clone(),
-            Self::Yammer { ref name, .. } => name.clone(),
-            Self::MicrosoftTeams { ref name, .. } => name.clone(),
-            Self::Webhook { ref name, .. } => name.clone(),
-            Self::AmazonEventBridge { ref name, .. } => name.clone(),
+        match self {
+            Self::Email(channel) => channel.name.clone(),
+            Self::Slack(channel) => channel.name.clone(),
+            Self::Line(channel) => channel.name.clone(),
+            Self::Chatwork(channel) => channel.name.clone(),
+            Self::Typetalk(channel) => channel.name.clone(),
+            Self::Twilio(channel) => channel.name.clone(),
+            Self::Pagerduty(channel) => channel.name.clone(),
+            Self::Opsgenie(channel) => channel.name.clone(),
+            Self::Yammer(channel) => channel.name.clone(),
+            Self::MicrosoftTeams(channel) => channel.name.clone(),
+            Self::Webhook(channel) => channel.name.clone(),
+            Self::AmazonEventBridge(channel) => channel.name.clone(),
         }
     }
 
     /// Returns the suspended_at of the channel.
     pub fn suspended_at(&self) -> Option<DateTime<Utc>> {
-        match *self {
-            Self::Email { suspended_at, .. } => suspended_at,
-            Self::Slack { suspended_at, .. } => suspended_at,
-            Self::Line { suspended_at, .. } => suspended_at,
-            Self::Chatwork { suspended_at, .. } => suspended_at,
-            Self::Typetalk { suspended_at, .. } => suspended_at,
-            Self::Twilio { suspended_at, .. } => suspended_at,
-            Self::Pagerduty { suspended_at, .. } => suspended_at,
-            Self::Opsgenie { suspended_at, .. } => suspended_at,
-            Self::Yammer { suspended_at, .. } => suspended_at,
-            Self::MicrosoftTeams { suspended_at, .. } => suspended_at,
-            Self::Webhook { suspended_at, .. } => suspended_at,
-            Self::AmazonEventBridge { suspended_at, .. } => suspended_at,
+        match self {
+            Self::Email(channel) => channel.suspended_at,
+            Self::Slack(channel) => channel.suspended_at,
+            Self::Line(channel) => channel.suspended_at,
+            Self::Chatwork(channel) => channel.suspended_at,
+            Self::Typetalk(channel) => channel.suspended_at,
+            Self::Twilio(channel) => channel.suspended_at,
+            Self::Pagerduty(channel) => channel.suspended_at,
+            Self::Opsgenie(channel) => channel.suspended_at,
+            Self::Yammer(channel) => channel.suspended_at,
+            Self::MicrosoftTeams(channel) => channel.suspended_at,
+            Self::Webhook(channel) => channel.suspended_at,
+            Self::AmazonEventBridge(channel) => channel.suspended_at,
         }
     }
 }
@@ -216,14 +413,16 @@ mod tests {
     fn email_channel_example() -> Channel {
         Channel::builder()
             .id("channel1")
-            .value(ChannelValue::Email {
-                name: "Example Email Channel".to_string(),
-                suspended_at: Some(DateTime::from_timestamp(1711360000, 0).unwrap()),
-                emails: vec!["test@example.com".to_string()],
-                user_ids: vec!["user0".into()],
-                events: vec![NotificationEvent::Alert],
-                add_to_default_notification_group: Some(true),
-            })
+            .value(
+                EmailChannel::builder()
+                    .name("Example Email Channel")
+                    .suspended_at(DateTime::from_timestamp(1711360000, 0).unwrap())
+                    .emails(["test@example.com"])
+                    .user_ids(["user0"])
+                    .events([NotificationEvent::Alert])
+                    .add_to_default_notification_group(true)
+                    .build(),
+            )
             .build()
     }
 
@@ -243,19 +442,23 @@ mod tests {
     fn slack_channel_example() -> Channel {
         Channel::builder()
             .id("channel2")
-            .value(ChannelValue::Slack {
-                name: "Example Slack Channel".to_string(),
-                suspended_at: Some(DateTime::from_timestamp(1711360000, 0).unwrap()),
-                url: "slack@example.com".to_string(),
-                enabled_graph_image: true,
-                mentions: HashMap::from([("critical".to_string(), "@channel".to_string())]),
-                events: vec![
-                    NotificationEvent::HostStatus,
-                    NotificationEvent::HostRegister,
-                    NotificationEvent::HostRetire,
-                ],
-                add_to_default_notification_group: None,
-            })
+            .value(
+                SlackChannel::builder()
+                    .name("Example Slack Channel")
+                    .suspended_at(DateTime::from_timestamp(1711360000, 0).unwrap())
+                    .url("slack@example.com")
+                    .enabled_graph_image(true)
+                    .mentions(HashMap::from([(
+                        "critical".to_string(),
+                        "@channel".to_string(),
+                    )]))
+                    .events([
+                        NotificationEvent::HostStatus,
+                        NotificationEvent::HostRegister,
+                        NotificationEvent::HostRetire,
+                    ])
+                    .build(),
+            )
             .build()
     }
 
@@ -275,10 +478,12 @@ mod tests {
     fn line_channel_example() -> Channel {
         Channel::builder()
             .id("channel3")
-            .value(ChannelValue::Line {
-                name: "Example Line Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                LineChannel::builder()
+                    .name("Example Line Channel")
+                    .suspended_at(DateTime::from_timestamp(1711360000, 0).unwrap())
+                    .build(),
+            )
             .build()
     }
 
@@ -287,16 +492,18 @@ mod tests {
             "id": "channel3",
             "type": "line",
             "name": "Example Line Channel",
+            "suspendedAt": 1711360000,
         })
     }
 
     fn chatwork_channel_example() -> Channel {
         Channel::builder()
             .id("channel4")
-            .value(ChannelValue::Chatwork {
-                name: "Example Chatwork Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                ChatworkChannel::builder()
+                    .name("Example Chatwork Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -311,10 +518,11 @@ mod tests {
     fn typetalk_channel_example() -> Channel {
         Channel::builder()
             .id("channel5")
-            .value(ChannelValue::Typetalk {
-                name: "Example Typetalk Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                TypetalkChannel::builder()
+                    .name("Example Typetalk Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -329,10 +537,11 @@ mod tests {
     fn twilio_channel_example() -> Channel {
         Channel::builder()
             .id("channel6")
-            .value(ChannelValue::Twilio {
-                name: "Example Twilio Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                TwilioChannel::builder()
+                    .name("Example Twilio Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -347,10 +556,11 @@ mod tests {
     fn pagerduty_channel_example() -> Channel {
         Channel::builder()
             .id("channel7")
-            .value(ChannelValue::Pagerduty {
-                name: "Example Pagerduty Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                PagerdutyChannel::builder()
+                    .name("Example Pagerduty Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -365,10 +575,11 @@ mod tests {
     fn opsgenie_channel_example() -> Channel {
         Channel::builder()
             .id("channel8")
-            .value(ChannelValue::Opsgenie {
-                name: "Example Opsgenie Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                OpsgenieChannel::builder()
+                    .name("Example Opsgenie Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -383,10 +594,11 @@ mod tests {
     fn yammer_channel_example() -> Channel {
         Channel::builder()
             .id("channel9")
-            .value(ChannelValue::Yammer {
-                name: "Example Yammer Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                YammerChannel::builder()
+                    .name("Example Yammer Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -401,10 +613,11 @@ mod tests {
     fn microsoft_teams_channel_example() -> Channel {
         Channel::builder()
             .id("channel10")
-            .value(ChannelValue::MicrosoftTeams {
-                name: "Example MicrosoftTeams Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                MicrosoftTeamsChannel::builder()
+                    .name("Example MicrosoftTeams Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -419,18 +632,18 @@ mod tests {
     fn webhook_channel_example() -> Channel {
         Channel::builder()
             .id("channel11")
-            .value(ChannelValue::Webhook {
-                name: "Example Webhook Channel".to_string(),
-                suspended_at: None,
-                url: "webhook@example.com".to_string(),
-                enabled_graph_image: true,
-                events: vec![
-                    NotificationEvent::Alert,
-                    NotificationEvent::AlertGroup,
-                    NotificationEvent::Monitor,
-                ],
-                add_to_default_notification_group: None,
-            })
+            .value(
+                WebhookChannel::builder()
+                    .name("Example Webhook Channel")
+                    .url("webhook@example.com")
+                    .enabled_graph_image(true)
+                    .events([
+                        NotificationEvent::Alert,
+                        NotificationEvent::AlertGroup,
+                        NotificationEvent::Monitor,
+                    ])
+                    .build(),
+            )
             .build()
     }
 
@@ -448,10 +661,11 @@ mod tests {
     fn amazon_event_bridge_channel_example() -> Channel {
         Channel::builder()
             .id("channel12")
-            .value(ChannelValue::AmazonEventBridge {
-                name: "Example AmazonEventBridge Channel".to_string(),
-                suspended_at: None,
-            })
+            .value(
+                AmazonEventBridgeChannel::builder()
+                    .name("Example AmazonEventBridge Channel")
+                    .build(),
+            )
             .build()
     }
 
@@ -604,14 +818,13 @@ mod client_tests {
     use crate::tests::*;
 
     fn value_example() -> ChannelValue {
-        ChannelValue::Email {
-            name: "Example Email Channel".to_string(),
-            suspended_at: None,
-            emails: vec!["mackerel@example.com".to_string()],
-            user_ids: vec!["user0".into()],
-            events: vec![NotificationEvent::Alert],
-            add_to_default_notification_group: None,
-        }
+        EmailChannel::builder()
+            .name("Example Email Channel")
+            .emails(["mackerel@example.com"])
+            .user_ids(["user0"])
+            .events([NotificationEvent::Alert])
+            .build()
+            .into()
     }
 
     fn entity_example() -> Channel {
