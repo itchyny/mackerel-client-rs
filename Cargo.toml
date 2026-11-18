@@ -14,6 +14,7 @@ edition = "2021"
 chrono = { version = "0.4.45", features = ["serde"] }
 fixedstr = { version = "0.5.11", features = ["serde"] }
 http = "1.5.0"
+percent-encoding = "2.3.2"
 reqwest = { version = "0.13.5", features = ["json"] }
 serde = "1.0.229"
 serde_derive = "1.0.229"

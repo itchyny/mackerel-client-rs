@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use http::Method;
+use percent_encoding::{utf8_percent_encode, AsciiSet, NON_ALPHANUMERIC};
 use serde_derive::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_with::{DeserializeFromStr, SerializeDisplay};
@@ -8,7 +9,6 @@ use std::collections::HashMap;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use strum::{Display, EnumString};
 use typed_builder::TypedBuilder;
-use url::form_urlencoded;
 
 use crate::alert::AlertStatus;
 use crate::client::*;
@@ -465,6 +465,12 @@ impl From<(ServiceName, RoleName)> for ListHostsParams {
     }
 }
 
+const PATH_SEGMENT: &AsciiSet = &NON_ALPHANUMERIC
+    .remove(b'-')
+    .remove(b'.')
+    .remove(b'_')
+    .remove(b'~');
+
 impl Client {
     /// Creates a new host.
     ///
@@ -505,8 +511,7 @@ impl Client {
             Method::GET,
             format!(
                 "/api/v0/hosts-by-custom-identifier/{}",
-                form_urlencoded::byte_serialize(custom_identifier.as_ref().as_bytes())
-                    .collect::<String>(),
+                utf8_percent_encode(custom_identifier.as_ref(), PATH_SEGMENT),
             ),
             query_params![],
             request_body![],
@@ -814,12 +819,12 @@ mod client_tests {
     async fn get_host_by_custom_identifier() {
         let server = test_server! {
             method = GET,
-            path = "/api/v0/hosts-by-custom-identifier/test%2Fcustom%3Fidentifier%26",
+            path = "/api/v0/hosts-by-custom-identifier/test%2Fcustom%3Fidentifier%26%20%25",
             response = json!({ "host": entity_json_example() }),
         };
         assert_eq!(
             test_client!(server)
-                .get_host_by_custom_identifier("test/custom?identifier&")
+                .get_host_by_custom_identifier("test/custom?identifier& %")
                 .await,
             Ok(Some(entity_example())),
         );

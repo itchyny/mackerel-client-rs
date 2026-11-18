@@ -1217,6 +1217,7 @@ dependencies = [
  "fixedstr",
  "http",
  "httptest",
+ "percent-encoding",
  "pretty_env_logger",
  "reqwest",
  "rstest",
