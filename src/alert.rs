@@ -319,7 +319,7 @@ impl Client {
             Method::GET,
             "/api/v0/alerts",
             query_params! {
-                withClosed = *with_closed,
+                withClosed = with_closed,
                 nextId = cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
                 limit = limit.to_string(),
             },
@@ -335,7 +335,7 @@ impl Client {
     pub async fn get_alert(&self, alert_id: impl Into<AlertId>) -> Result<Alert> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/alerts/{}", alert_id),
+            format!("/api/v0/alerts/{}", alert_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -353,7 +353,7 @@ impl Client {
     ) -> Result<()> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/alerts/{}", alert_id),
+            format!("/api/v0/alerts/{}", alert_id.into()),
             query_params![],
             request_body! { memo: String = memo.as_ref().to_owned() },
             response_body!(),
@@ -371,7 +371,7 @@ impl Client {
     ) -> Result<Alert> {
         self.request(
             Method::POST,
-            format_url!("/api/v0/alerts/{}/close", alert_id),
+            format!("/api/v0/alerts/{}/close", alert_id.into()),
             query_params![],
             request_body! { reason: String = reason.as_ref().to_owned() },
             response_body!(..),
@@ -390,9 +390,9 @@ impl Client {
     ) -> Result<(Vec<AlertLog>, Option<AlertLogId>)> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/alerts/{}/logs", alert_id),
+            format!("/api/v0/alerts/{}/logs", alert_id.into()),
             query_params! {
-                nextId = *cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
+                nextId = cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
                 limit = limit.to_string(),
             },
             request_body![],

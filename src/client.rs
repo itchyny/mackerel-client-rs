@@ -155,20 +155,13 @@ impl Client {
     }
 }
 
-macro_rules! format_url {
-    ( $format:expr, $( $args:expr ),+ $(,)? ) => {
-        format!($format, $( $args.into() ),+)
-    };
-}
-pub(crate) use format_url;
-
 macro_rules! query_params {
     [] => {
         &[] as &[(&str, &str); 0]
     };
-    { $( $field:ident = $value:expr ),+ $(,)? } => {{
-        &[ $( (stringify!($field), &$value) ),+ ]
-    }};
+    { $( $field:ident = $value:expr ),+ $(,)? } => {
+        &[ $( (stringify!($field), ::std::convert::AsRef::<str>::as_ref(&$value)) ),+ ]
+    };
 }
 pub(crate) use query_params;
 

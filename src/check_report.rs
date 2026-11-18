@@ -156,7 +156,7 @@ impl Client {
             Method::GET,
             "/api/v0/monitoring/checks",
             query_params! {
-                nextId = *cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
+                nextId = cursor_opt.map(Into::into).as_deref().unwrap_or_default(),
                 limit = limit.to_string(),
             },
             request_body![],
@@ -174,7 +174,7 @@ impl Client {
     ) -> Result<CheckMonitor> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/monitoring/checks/{}", monitor_id),
+            format!("/api/v0/monitoring/checks/{}", monitor_id.into()),
             query_params![],
             request_body![],
             response_body! { check: CheckMonitor },

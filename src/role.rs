@@ -185,7 +185,7 @@ impl Client {
     pub async fn list_roles(&self, service_name: impl Into<ServiceName>) -> Result<Vec<Role>> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/services/{}/roles", service_name),
+            format!("/api/v0/services/{}/roles", service_name.into()),
             query_params![],
             request_body![],
             response_body! { roles: Vec<Role> },
@@ -203,7 +203,7 @@ impl Client {
     ) -> Result<Role> {
         self.request(
             Method::POST,
-            format_url!("/api/v0/services/{}/roles", service_name),
+            format!("/api/v0/services/{}/roles", service_name.into()),
             query_params![],
             request_body!(role.borrow()),
             response_body!(..),
@@ -221,7 +221,11 @@ impl Client {
     ) -> Result<Role> {
         self.request(
             Method::DELETE,
-            format_url!("/api/v0/services/{}/roles/{}", service_name, role_name),
+            format!(
+                "/api/v0/services/{}/roles/{}",
+                service_name.into(),
+                role_name.into()
+            ),
             query_params![],
             request_body![],
             response_body!(..),

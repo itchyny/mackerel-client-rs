@@ -1045,7 +1045,7 @@ impl Client {
     pub async fn get_monitor(&self, monitor_id: impl Into<MonitorId>) -> Result<Monitor> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/monitors/{}", monitor_id),
+            format!("/api/v0/monitors/{}", monitor_id.into()),
             query_params![],
             request_body![],
             response_body! { monitor: Monitor },
@@ -1063,7 +1063,7 @@ impl Client {
     ) -> Result<Monitor> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/monitors/{}", monitor_id),
+            format!("/api/v0/monitors/{}", monitor_id.into()),
             query_params![],
             request_body!(monitor_value.borrow()),
             response_body!(..),
@@ -1077,7 +1077,7 @@ impl Client {
     pub async fn delete_monitor(&self, monitor_id: impl Into<MonitorId>) -> Result<Monitor> {
         self.request(
             Method::DELETE,
-            format_url!("/api/v0/monitors/{}", monitor_id),
+            format!("/api/v0/monitors/{}", monitor_id.into()),
             query_params![],
             request_body![],
             response_body!(..),

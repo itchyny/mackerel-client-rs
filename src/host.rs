@@ -492,7 +492,7 @@ impl Client {
     pub async fn get_host(&self, host_id: impl Into<HostId>) -> Result<Host> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/hosts/{}", host_id),
+            format!("/api/v0/hosts/{}", host_id.into()),
             query_params![],
             request_body![],
             response_body! { host: Host },
@@ -530,7 +530,7 @@ impl Client {
     ) -> Result<()> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/hosts/{}", host_id),
+            format!("/api/v0/hosts/{}", host_id.into()),
             query_params![],
             request_body!(host_value.borrow()),
             response_body!(),
@@ -548,7 +548,7 @@ impl Client {
     ) -> Result<()> {
         self.request(
             Method::POST,
-            format_url!("/api/v0/hosts/{}/status", host_id),
+            format!("/api/v0/hosts/{}/status", host_id.into()),
             query_params![],
             request_body! { status: HostStatus = host_status },
             response_body!(),
@@ -590,7 +590,7 @@ impl Client {
     ) -> Result<()> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/hosts/{}/role-fullnames", host_id),
+            format!("/api/v0/hosts/{}/role-fullnames", host_id.into()),
             query_params![],
             request_body! {
                 roleFullnames: Vec<RoleFullname> = role_fullnames
@@ -609,7 +609,7 @@ impl Client {
     pub async fn retire_host(&self, host_id: impl Into<HostId>) -> Result<()> {
         self.request(
             Method::POST,
-            format_url!("/api/v0/hosts/{}/retire", host_id),
+            format!("/api/v0/hosts/{}/retire", host_id.into()),
             query_params![],
             request_body![],
             response_body!(),
@@ -704,7 +704,7 @@ impl Client {
     pub async fn list_host_metric_names(&self, host_id: impl Into<HostId>) -> Result<Vec<String>> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/hosts/{}/metric-names", host_id),
+            format!("/api/v0/hosts/{}/metric-names", host_id.into()),
             query_params![],
             request_body![],
             response_body! { names: Vec<String> },
@@ -721,7 +721,7 @@ impl Client {
     ) -> Result<Vec<MonitoredStatus>> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/hosts/{}/monitored-statuses", host_id),
+            format!("/api/v0/hosts/{}/monitored-statuses", host_id.into()),
             query_params![],
             request_body![],
             response_body! { monitoredStatuses: Vec<MonitoredStatus> },

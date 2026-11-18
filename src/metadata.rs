@@ -89,7 +89,7 @@ impl Client {
     pub async fn list_host_metadata(&self, host_id: impl Into<HostId>) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/hosts/{}/metadata", host_id),
+            format!("/api/v0/hosts/{}/metadata", host_id.into()),
             query_params![],
             request_body![],
             response_body! { metadata: Vec<Metadata> },
@@ -173,7 +173,7 @@ impl Client {
     ) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/services/{}/metadata", service_name),
+            format!("/api/v0/services/{}/metadata", service_name.into()),
             query_params![],
             request_body![],
             response_body! { metadata: Vec<Metadata> },
@@ -264,10 +264,10 @@ impl Client {
     ) -> Result<Vec<Metadata>> {
         self.request(
             Method::GET,
-            format_url!(
+            format!(
                 "/api/v0/services/{}/roles/{}/metadata",
-                service_name,
-                role_name,
+                service_name.into(),
+                role_name.into()
             ),
             query_params![],
             request_body![],

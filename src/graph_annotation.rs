@@ -159,7 +159,7 @@ impl Client {
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/graph-annotations/{}", graph_annotation_id),
+            format!("/api/v0/graph-annotations/{}", graph_annotation_id.into()),
             query_params![],
             request_body!(graph_annotation_value.borrow()),
             response_body!(..),
@@ -176,7 +176,7 @@ impl Client {
     ) -> Result<GraphAnnotation> {
         self.request(
             Method::DELETE,
-            format_url!("/api/v0/graph-annotations/{}", graph_annotation_id),
+            format!("/api/v0/graph-annotations/{}", graph_annotation_id.into()),
             query_params![],
             request_body![],
             response_body!(..),

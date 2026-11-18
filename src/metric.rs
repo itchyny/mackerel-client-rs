@@ -130,9 +130,9 @@ impl Client {
     ) -> Result<Vec<MetricValue>> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/hosts/{}/metrics", host_id),
+            format!("/api/v0/hosts/{}/metrics", host_id.into()),
             query_params! {
-                name = metric_name.as_ref().to_owned(),
+                name = metric_name.as_ref(),
                 from = from.into().timestamp().to_string(),
                 to = to.into().timestamp().to_string(),
             },
@@ -178,7 +178,7 @@ impl Client {
     ) -> Result<()> {
         self.request(
             Method::POST,
-            format_url!("/api/v0/services/{}/tsdb", service_name),
+            format!("/api/v0/services/{}/tsdb", service_name.into()),
             query_params![],
             request_body!(service_metric_values.into_iter().collect::<Vec<_>>()),
             response_body!(),
@@ -198,9 +198,9 @@ impl Client {
     ) -> Result<Vec<MetricValue>> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/services/{}/metrics", service_name),
+            format!("/api/v0/services/{}/metrics", service_name.into()),
             query_params! {
-                name = metric_name.as_ref().to_owned(),
+                name = metric_name.as_ref(),
                 from = from.into().timestamp().to_string(),
                 to = to.into().timestamp().to_string(),
             },

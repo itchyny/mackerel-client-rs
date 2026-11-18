@@ -317,7 +317,7 @@ impl Client {
     ) -> Result<AWSIntegration> {
         self.request(
             Method::GET,
-            format_url!("/api/v0/aws-integrations/{}", aws_integration_id),
+            format!("/api/v0/aws-integrations/{}", aws_integration_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
@@ -335,7 +335,7 @@ impl Client {
     ) -> Result<AWSIntegration> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/aws-integrations/{}", aws_integration_id),
+            format!("/api/v0/aws-integrations/{}", aws_integration_id.into()),
             query_params![],
             request_body!(aws_integration_value.borrow()),
             response_body!(..),
@@ -352,7 +352,7 @@ impl Client {
     ) -> Result<AWSIntegration> {
         self.request(
             Method::DELETE,
-            format_url!("/api/v0/aws-integrations/{}", aws_integration_id),
+            format!("/api/v0/aws-integrations/{}", aws_integration_id.into()),
             query_params![],
             request_body![],
             response_body!(..),

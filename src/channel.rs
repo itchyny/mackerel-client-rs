@@ -750,7 +750,7 @@ impl Client {
     ) -> Result<Channel> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/channels/{}", channel_id),
+            format!("/api/v0/channels/{}", channel_id.into()),
             query_params![],
             request_body!(channel_value.borrow()),
             response_body!(..),
@@ -764,7 +764,7 @@ impl Client {
     pub async fn delete_channel(&self, channel_id: impl Into<ChannelId>) -> Result<Channel> {
         self.request(
             Method::DELETE,
-            format_url!("/api/v0/channels/{}", channel_id),
+            format!("/api/v0/channels/{}", channel_id.into()),
             query_params![],
             request_body![],
             response_body!(..),

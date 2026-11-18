@@ -313,7 +313,7 @@ impl Client {
     ) -> Result<Downtime> {
         self.request(
             Method::PUT,
-            format_url!("/api/v0/downtimes/{}", downtime_id),
+            format!("/api/v0/downtimes/{}", downtime_id.into()),
             query_params![],
             request_body!(downtime_value.borrow()),
             response_body!(..),
@@ -327,7 +327,7 @@ impl Client {
     pub async fn delete_downtime(&self, downtime_id: impl Into<DowntimeId>) -> Result<Downtime> {
         self.request(
             Method::DELETE,
-            format_url!("/api/v0/downtimes/{}", downtime_id),
+            format!("/api/v0/downtimes/{}", downtime_id.into()),
             query_params![],
             request_body![],
             response_body!(..),
