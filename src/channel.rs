@@ -742,6 +742,9 @@ impl Client {
 
     /// Updates a channel.
     ///
+    /// The channel type cannot be changed, and `add_to_default_notification_group`
+    /// cannot be set on update.
+    ///
     /// See <https://mackerel.io/api-docs/entry/channels#update>.
     pub async fn update_channel(
         &self,
