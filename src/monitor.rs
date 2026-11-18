@@ -20,213 +20,389 @@ pub type Monitor = Entity<MonitorValue>;
 pub type MonitorId = Id<MonitorValue>;
 
 /// A monitor value
-#[skip_serializing_none]
 #[derive(PartialEq, Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum MonitorValue {
-    #[serde(rename_all = "camelCase")]
-    Host {
-        name: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        memo: String,
-        duration: u64,
-        metric: String,
-        operator: MonitorOperator,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        warning: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        critical: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        max_check_attempts: Option<u64>,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        scopes: Vec<MonitorScope>,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        exclude_scopes: Vec<MonitorScope>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        notification_interval: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_mute: bool,
-    },
-    #[serde(rename_all = "camelCase")]
-    Connectivity {
-        name: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        memo: String,
-        #[serde(
-            default = "AlertStatus::critical",
-            skip_serializing_if = "AlertStatus::is_critical"
-        )]
-        alert_status_on_gone: AlertStatus,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        scopes: Vec<MonitorScope>,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        exclude_scopes: Vec<MonitorScope>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        notification_interval: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_mute: bool,
-    },
-    #[serde(rename_all = "camelCase")]
-    Service {
-        name: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        memo: String,
-        service: ServiceName,
-        duration: u64,
-        metric: String,
-        operator: MonitorOperator,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        warning: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        critical: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        max_check_attempts: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        missing_duration_warning: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        missing_duration_critical: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        notification_interval: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_mute: bool,
-    },
-    #[serde(rename_all = "camelCase")]
-    External {
-        name: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        memo: String,
-        url: String,
-        #[serde(default)]
-        method: ExternalMethod,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        headers: Option<Vec<ExternalHeader>>,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        request_body: String,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        follow_redirect: bool,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        expected_status_code: Option<u16>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        service: Option<ServiceName>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        response_time_duration: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        response_time_warning: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        response_time_critical: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        contains_string: Option<String>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        max_check_attempts: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        certification_expiration_warning: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        certification_expiration_critical: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        skip_certificate_verification: bool,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        dualstack: Option<ExternalDualstack>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        notification_interval: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_mute: bool,
-    },
-    #[serde(rename_all = "camelCase")]
-    Expression {
-        name: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        memo: String,
-        expression: String,
-        operator: MonitorOperator,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        warning: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        critical: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        evaluate_backward_minutes: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        notification_interval: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_mute: bool,
-    },
-    #[serde(rename_all = "camelCase")]
-    AnomalyDetection {
-        name: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        memo: String,
-        #[serde(default, skip_serializing_if = "Vec::is_empty")]
-        scopes: Vec<MonitorScope>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        warning_sensitivity: Option<AnomalyDetectionSensitivity>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        critical_sensitivity: Option<AnomalyDetectionSensitivity>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        max_check_attempts: Option<u64>,
-        #[serde(default, with = "chrono::serde::ts_seconds_option")]
-        training_period_from: Option<DateTime<Utc>>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        notification_interval: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_mute: bool,
-    },
-    #[serde(rename_all = "camelCase")]
-    Query {
-        name: String,
-        #[serde(default, skip_serializing_if = "String::is_empty")]
-        memo: String,
-        query: String,
-        legend: String,
-        operator: MonitorOperator,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        warning: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        critical: Option<f64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        evaluate_backward_minutes: Option<u64>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        notification_interval: Option<u64>,
-        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-        is_mute: bool,
-    },
+    Host(HostMonitor),
+    Connectivity(ConnectivityMonitor),
+    Service(ServiceMonitor),
+    External(ExternalMonitor),
+    Expression(ExpressionMonitor),
+    AnomalyDetection(AnomalyDetectionMonitor),
+    Query(QueryMonitor),
+}
+
+/// A host metric monitor
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct HostMonitor {
+    pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+    #[builder(setter(!into))]
+    pub duration: u64,
+    pub metric: String,
+    pub operator: MonitorOperator,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warning: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub critical: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_check_attempts: Option<u64>,
+    #[builder(
+        default,
+        setter(transform = |scopes: impl IntoIterator<Item = impl Into<MonitorScope>>| scopes
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub scopes: Vec<MonitorScope>,
+    #[builder(
+        default,
+        setter(transform = |scopes: impl IntoIterator<Item = impl Into<MonitorScope>>| scopes
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub exclude_scopes: Vec<MonitorScope>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notification_interval: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_mute: bool,
+}
+
+/// A host connectivity monitor
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct ConnectivityMonitor {
+    pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+    #[builder(default = AlertStatus::Critical)]
+    #[serde(
+        default = "AlertStatus::critical",
+        skip_serializing_if = "AlertStatus::is_critical"
+    )]
+    pub alert_status_on_gone: AlertStatus,
+    #[builder(
+        default,
+        setter(transform = |scopes: impl IntoIterator<Item = impl Into<MonitorScope>>| scopes
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub scopes: Vec<MonitorScope>,
+    #[builder(
+        default,
+        setter(transform = |scopes: impl IntoIterator<Item = impl Into<MonitorScope>>| scopes
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub exclude_scopes: Vec<MonitorScope>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notification_interval: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_mute: bool,
+}
+
+/// A service metric monitor
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct ServiceMonitor {
+    pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+    pub service: ServiceName,
+    #[builder(setter(!into))]
+    pub duration: u64,
+    pub metric: String,
+    pub operator: MonitorOperator,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warning: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub critical: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_check_attempts: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub missing_duration_warning: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub missing_duration_critical: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notification_interval: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_mute: bool,
+}
+
+/// An external http monitor
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct ExternalMonitor {
+    pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+    pub url: String,
+    #[builder(default)]
+    #[serde(default)]
+    pub method: ExternalMethod,
+    #[builder(
+        default,
+        setter(transform = |headers: impl IntoIterator<Item = ExternalHeader>| Some(headers
+            .into_iter().collect::<Vec<_>>())),
+    )]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub headers: Option<Vec<ExternalHeader>>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub request_body: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub follow_redirect: bool,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expected_status_code: Option<u16>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub service: Option<ServiceName>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_time_duration: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_time_warning: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_time_critical: Option<f64>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contains_string: Option<String>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_check_attempts: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub certification_expiration_warning: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub certification_expiration_critical: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub skip_certificate_verification: bool,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dualstack: Option<ExternalDualstack>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notification_interval: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_mute: bool,
+}
+
+/// An expression monitor
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct ExpressionMonitor {
+    pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+    pub expression: String,
+    pub operator: MonitorOperator,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warning: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub critical: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evaluate_backward_minutes: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notification_interval: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_mute: bool,
+}
+
+/// An anomaly detection monitor
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct AnomalyDetectionMonitor {
+    pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+    #[builder(
+        default,
+        setter(transform = |scopes: impl IntoIterator<Item = impl Into<MonitorScope>>| scopes
+            .into_iter().map(Into::into).collect::<Vec<_>>()),
+    )]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub scopes: Vec<MonitorScope>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warning_sensitivity: Option<AnomalyDetectionSensitivity>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub critical_sensitivity: Option<AnomalyDetectionSensitivity>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_check_attempts: Option<u64>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, with = "chrono::serde::ts_seconds_option")]
+    pub training_period_from: Option<DateTime<Utc>>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notification_interval: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_mute: bool,
+}
+
+/// A query monitor
+#[skip_serializing_none]
+#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
+#[builder(field_defaults(setter(into)))]
+#[serde(rename_all = "camelCase")]
+#[non_exhaustive]
+pub struct QueryMonitor {
+    pub name: String,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub memo: String,
+    pub query: String,
+    pub legend: String,
+    pub operator: MonitorOperator,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub warning: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub critical: Option<f64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evaluate_backward_minutes: Option<u64>,
+    #[builder(default, setter(!into, strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notification_interval: Option<u64>,
+    #[builder(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub is_mute: bool,
+}
+
+impl From<HostMonitor> for MonitorValue {
+    fn from(monitor: HostMonitor) -> Self {
+        Self::Host(monitor)
+    }
+}
+
+impl From<ConnectivityMonitor> for MonitorValue {
+    fn from(monitor: ConnectivityMonitor) -> Self {
+        Self::Connectivity(monitor)
+    }
+}
+
+impl From<ServiceMonitor> for MonitorValue {
+    fn from(monitor: ServiceMonitor) -> Self {
+        Self::Service(monitor)
+    }
+}
+
+impl From<ExternalMonitor> for MonitorValue {
+    fn from(monitor: ExternalMonitor) -> Self {
+        Self::External(monitor)
+    }
+}
+
+impl From<ExpressionMonitor> for MonitorValue {
+    fn from(monitor: ExpressionMonitor) -> Self {
+        Self::Expression(monitor)
+    }
+}
+
+impl From<AnomalyDetectionMonitor> for MonitorValue {
+    fn from(monitor: AnomalyDetectionMonitor) -> Self {
+        Self::AnomalyDetection(monitor)
+    }
+}
+
+impl From<QueryMonitor> for MonitorValue {
+    fn from(monitor: QueryMonitor) -> Self {
+        Self::Query(monitor)
+    }
 }
 
 impl MonitorValue {
     /// Returns the `name` of the monitor.
     pub fn name(&self) -> String {
-        match *self {
-            Self::Host { ref name, .. } => name.clone(),
-            Self::Connectivity { ref name, .. } => name.clone(),
-            Self::Service { ref name, .. } => name.clone(),
-            Self::External { ref name, .. } => name.clone(),
-            Self::Expression { ref name, .. } => name.clone(),
-            Self::AnomalyDetection { ref name, .. } => name.clone(),
-            Self::Query { ref name, .. } => name.clone(),
+        match self {
+            Self::Host(monitor) => monitor.name.clone(),
+            Self::Connectivity(monitor) => monitor.name.clone(),
+            Self::Service(monitor) => monitor.name.clone(),
+            Self::External(monitor) => monitor.name.clone(),
+            Self::Expression(monitor) => monitor.name.clone(),
+            Self::AnomalyDetection(monitor) => monitor.name.clone(),
+            Self::Query(monitor) => monitor.name.clone(),
         }
     }
 
     /// Returns the `memo` of the monitor.
     pub fn memo(&self) -> String {
-        match *self {
-            Self::Host { ref memo, .. } => memo.clone(),
-            Self::Connectivity { ref memo, .. } => memo.clone(),
-            Self::Service { ref memo, .. } => memo.clone(),
-            Self::External { ref memo, .. } => memo.clone(),
-            Self::Expression { ref memo, .. } => memo.clone(),
-            Self::AnomalyDetection { ref memo, .. } => memo.clone(),
-            Self::Query { ref memo, .. } => memo.clone(),
+        match self {
+            Self::Host(monitor) => monitor.memo.clone(),
+            Self::Connectivity(monitor) => monitor.memo.clone(),
+            Self::Service(monitor) => monitor.memo.clone(),
+            Self::External(monitor) => monitor.memo.clone(),
+            Self::Expression(monitor) => monitor.memo.clone(),
+            Self::AnomalyDetection(monitor) => monitor.memo.clone(),
+            Self::Query(monitor) => monitor.memo.clone(),
         }
     }
 
     /// Returns the `is_mute` of the monitor.
     pub fn is_mute(&self) -> bool {
-        match *self {
-            Self::Host { is_mute, .. } => is_mute,
-            Self::Connectivity { is_mute, .. } => is_mute,
-            Self::Service { is_mute, .. } => is_mute,
-            Self::External { is_mute, .. } => is_mute,
-            Self::Expression { is_mute, .. } => is_mute,
-            Self::AnomalyDetection { is_mute, .. } => is_mute,
-            Self::Query { is_mute, .. } => is_mute,
+        match self {
+            Self::Host(monitor) => monitor.is_mute,
+            Self::Connectivity(monitor) => monitor.is_mute,
+            Self::Service(monitor) => monitor.is_mute,
+            Self::External(monitor) => monitor.is_mute,
+            Self::Expression(monitor) => monitor.is_mute,
+            Self::AnomalyDetection(monitor) => monitor.is_mute,
+            Self::Query(monitor) => monitor.is_mute,
         }
     }
 }
@@ -373,20 +549,21 @@ mod tests {
     fn host_monitor_example() -> Monitor {
         Monitor::builder()
             .id("monitor1")
-            .value(MonitorValue::Host {
-                name: "Example host monitor".to_string(),
-                memo: "Monitor memo".to_string(),
-                duration: 5,
-                metric: "custom.foo.bar".to_string(),
-                operator: MonitorOperator::GreaterThan,
-                warning: Some(10.0),
-                critical: Some(20.0),
-                max_check_attempts: Some(5),
-                scopes: vec!["service0".into()],
-                exclude_scopes: vec!["service0:role3".into()],
-                notification_interval: Some(30),
-                is_mute: false,
-            })
+            .value(
+                HostMonitor::builder()
+                    .name("Example host monitor")
+                    .memo("Monitor memo")
+                    .duration(5)
+                    .metric("custom.foo.bar")
+                    .operator(MonitorOperator::GreaterThan)
+                    .warning(10.0)
+                    .critical(20.0)
+                    .max_check_attempts(5)
+                    .scopes(["service0"])
+                    .exclude_scopes(["service0:role3"])
+                    .notification_interval(30)
+                    .build(),
+            )
             .build()
     }
 
@@ -411,15 +588,13 @@ mod tests {
     fn connectivity_monitor_example() -> Monitor {
         Monitor::builder()
             .id("monitor2")
-            .value(MonitorValue::Connectivity {
-                name: "Example connectivity monitor".to_string(),
-                memo: "Monitor memo".to_string(),
-                alert_status_on_gone: AlertStatus::Warning,
-                scopes: vec![],
-                exclude_scopes: vec![],
-                notification_interval: None,
-                is_mute: false,
-            })
+            .value(
+                ConnectivityMonitor::builder()
+                    .name("Example connectivity monitor")
+                    .memo("Monitor memo")
+                    .alert_status_on_gone(AlertStatus::Warning)
+                    .build(),
+            )
             .build()
     }
 
@@ -436,21 +611,22 @@ mod tests {
     fn service_monitor_example() -> Monitor {
         Monitor::builder()
             .id("monitor3")
-            .value(MonitorValue::Service {
-                name: "Example service monitor".to_string(),
-                memo: "Monitor memo".to_string(),
-                service: "service1".into(),
-                duration: 5,
-                metric: "custom.service.count".to_string(),
-                operator: MonitorOperator::GreaterThan,
-                warning: Some(100.0),
-                critical: Some(200.0),
-                max_check_attempts: Some(10),
-                missing_duration_warning: Some(60),
-                missing_duration_critical: Some(120),
-                notification_interval: Some(30),
-                is_mute: false,
-            })
+            .value(
+                ServiceMonitor::builder()
+                    .name("Example service monitor")
+                    .memo("Monitor memo")
+                    .service("service1")
+                    .duration(5)
+                    .metric("custom.service.count")
+                    .operator(MonitorOperator::GreaterThan)
+                    .warning(100.0)
+                    .critical(200.0)
+                    .max_check_attempts(10)
+                    .missing_duration_warning(60)
+                    .missing_duration_critical(120)
+                    .notification_interval(30)
+                    .build(),
+            )
             .build()
     }
 
@@ -476,31 +652,33 @@ mod tests {
     fn external_monitor_example() -> Monitor {
         Monitor::builder()
             .id("monitor4")
-            .value(MonitorValue::External {
-                name: "Example external monitor".to_string(),
-                memo: "Monitor memo".to_string(),
-                url: "https://example.com".to_string(),
-                method: ExternalMethod::Get,
-                headers: Some(vec![ExternalHeader::builder()
-                    .name("Cache-Control")
-                    .value("no-cache")
-                    .build()]),
-                request_body: "Request Body".to_owned(),
-                follow_redirect: true,
-                expected_status_code: Some(200),
-                service: Some("service1".into()),
-                response_time_duration: Some(5),
-                response_time_warning: Some(3000.0),
-                response_time_critical: Some(5000.0),
-                contains_string: Some("Example Domain".to_string()),
-                max_check_attempts: Some(5),
-                certification_expiration_warning: Some(1200),
-                certification_expiration_critical: Some(60),
-                skip_certificate_verification: true,
-                dualstack: Some(ExternalDualstack::Auto),
-                notification_interval: Some(60),
-                is_mute: true,
-            })
+            .value(
+                ExternalMonitor::builder()
+                    .name("Example external monitor")
+                    .memo("Monitor memo")
+                    .url("https://example.com")
+                    .method(ExternalMethod::Get)
+                    .headers([ExternalHeader::builder()
+                        .name("Cache-Control")
+                        .value("no-cache")
+                        .build()])
+                    .request_body("Request Body")
+                    .follow_redirect(true)
+                    .expected_status_code(200)
+                    .service("service1")
+                    .response_time_duration(5)
+                    .response_time_warning(3000.0)
+                    .response_time_critical(5000.0)
+                    .contains_string("Example Domain")
+                    .max_check_attempts(5)
+                    .certification_expiration_warning(1200)
+                    .certification_expiration_critical(60)
+                    .skip_certificate_verification(true)
+                    .dualstack(ExternalDualstack::Auto)
+                    .notification_interval(60)
+                    .is_mute(true)
+                    .build(),
+            )
             .build()
     }
 
@@ -534,17 +712,17 @@ mod tests {
     fn expression_monitor_example() -> Monitor {
         Monitor::builder()
             .id("monitor5")
-            .value(MonitorValue::Expression {
-                name: "Example expression monitor".to_string(),
-                memo: "Monitor memo".to_string(),
-                expression: "min(role(\"foo:bar\", \"custom.foo.bar\"))".to_string(),
-                operator: MonitorOperator::LessThan,
-                warning: Some(10.0),
-                critical: None,
-                evaluate_backward_minutes: Some(5),
-                notification_interval: None,
-                is_mute: true,
-            })
+            .value(
+                ExpressionMonitor::builder()
+                    .name("Example expression monitor")
+                    .memo("Monitor memo")
+                    .expression("min(role(\"foo:bar\", \"custom.foo.bar\"))")
+                    .operator(MonitorOperator::LessThan)
+                    .warning(10.0)
+                    .evaluate_backward_minutes(5)
+                    .is_mute(true)
+                    .build(),
+            )
             .build()
     }
 
@@ -565,17 +743,18 @@ mod tests {
     fn anomaly_detection_monitor_example() -> Monitor {
         Monitor::builder()
             .id("monitor6")
-            .value(MonitorValue::AnomalyDetection {
-                name: "Example anomaly detection monitor".to_string(),
-                memo: "Monitor memo".to_string(),
-                scopes: vec!["service0:role0".into()],
-                warning_sensitivity: Some(AnomalyDetectionSensitivity::Normal),
-                critical_sensitivity: Some(AnomalyDetectionSensitivity::Insensitive),
-                max_check_attempts: Some(3),
-                training_period_from: Some(DateTime::from_timestamp(1580000000, 0).unwrap()),
-                notification_interval: None,
-                is_mute: true,
-            })
+            .value(
+                AnomalyDetectionMonitor::builder()
+                    .name("Example anomaly detection monitor")
+                    .memo("Monitor memo")
+                    .scopes(["service0:role0"])
+                    .warning_sensitivity(AnomalyDetectionSensitivity::Normal)
+                    .critical_sensitivity(AnomalyDetectionSensitivity::Insensitive)
+                    .max_check_attempts(3)
+                    .training_period_from(DateTime::from_timestamp(1580000000, 0).unwrap())
+                    .is_mute(true)
+                    .build(),
+            )
             .build()
     }
 
@@ -597,18 +776,17 @@ mod tests {
     fn query_monitor_example() -> Monitor {
         Monitor::builder()
             .id("monitor7")
-            .value(MonitorValue::Query {
-                name: "Example query monitor".to_string(),
-                memo: "Monitor memo".to_string(),
-                query: "container.cpu.utilization{label=\"value\"}".to_string(),
-                legend: "cpu.utilization {{k8s.node.name}}".to_string(),
-                operator: MonitorOperator::GreaterThan,
-                warning: Some(75.0),
-                critical: Some(90.0),
-                evaluate_backward_minutes: None,
-                notification_interval: None,
-                is_mute: false,
-            })
+            .value(
+                QueryMonitor::builder()
+                    .name("Example query monitor")
+                    .memo("Monitor memo")
+                    .query("container.cpu.utilization{label=\"value\"}")
+                    .legend("cpu.utilization {{k8s.node.name}}")
+                    .operator(MonitorOperator::GreaterThan)
+                    .warning(75.0)
+                    .critical(90.0)
+                    .build(),
+            )
             .build()
     }
 
@@ -886,15 +1064,11 @@ mod client_tests {
     use crate::tests::*;
 
     fn value_example() -> MonitorValue {
-        MonitorValue::Connectivity {
-            name: "Example connectivity monitor".to_string(),
-            memo: "Monitor memo".to_string(),
-            alert_status_on_gone: AlertStatus::Critical,
-            scopes: vec![],
-            exclude_scopes: vec![],
-            notification_interval: None,
-            is_mute: false,
-        }
+        ConnectivityMonitor::builder()
+            .name("Example connectivity monitor")
+            .memo("Monitor memo")
+            .build()
+            .into()
     }
 
     fn entity_example() -> Monitor {
