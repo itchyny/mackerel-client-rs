@@ -30,6 +30,9 @@ pub struct AWSIntegrationValue {
     pub key: Option<String>,
     #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub secret_key: Option<String>,
+    #[builder(default, setter(strip_option))]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub role_arn: Option<String>,
     #[builder(default, setter(strip_option))]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -126,6 +129,7 @@ mod tests {
                 AWSIntegrationValue::builder()
                     .name("AWS integration setting")
                     .key("aws-access-key")
+                    .secret_key("aws-secret-key")
                     .region("ap-northeast-1")
                     .build(),
             )
@@ -138,6 +142,7 @@ mod tests {
             "name": "AWS integration setting",
             "memo": "",
             "key": "aws-access-key",
+            "secretKey": "aws-secret-key",
             "region": "ap-northeast-1",
             "includedTags": "",
             "excludedTags": "",
