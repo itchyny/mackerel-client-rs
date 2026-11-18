@@ -1007,6 +1007,7 @@ mod client_tests {
             .statuses([HostStatus::Working, HostStatus::Standby, HostStatus::Maintenance]),
         "service=service0&role=role0&role=role1&role=role2&status=working&status=standby&status=maintenance",
     )]
+    #[async_std::test]
     async fn list_hosts(
         #[case] list_hosts_params: impl Into<ListHostsParams>,
         #[case] query_params: &'static str,

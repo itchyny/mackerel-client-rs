@@ -1,20 +1,24 @@
-use derivative::Derivative;
 use http::StatusCode;
 use thiserror::Error;
 
 /// Error represents the error type of the library.
-#[derive(Debug, Derivative, Error)]
-#[derivative(PartialEq)]
+#[derive(Debug, Error)]
 pub enum Error {
     #[error("status_code:{0}, message:{1}")]
     ApiError(StatusCode, String),
 
     #[error(transparent)]
-    RequestError(
-        #[from]
-        #[derivative(PartialEq = "ignore")]
-        reqwest::Error,
-    ),
+    RequestError(#[from] reqwest::Error),
+}
+
+impl PartialEq for Error {
+    fn eq(&self, other: &Self) -> bool {
+        matches!(
+            (self, other),
+            (Error::ApiError(status1, message1), Error::ApiError(status2, message2))
+                if status1 == status2 && message1 == message2
+        )
+    }
 }
 
 /// Result alias where the error type is [`crate::Error`].

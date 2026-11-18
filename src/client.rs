@@ -48,7 +48,7 @@ pub struct Client {
                 (ACCEPT, HeaderValue::from_static("application/json")),
             ]))
             .redirect(::reqwest::redirect::Policy::none())
-            .timeout(timeout)
+            .timeout(*timeout)
             .build()
             .unwrap_or_else(|err| panic!("{}", err)),
         setter(skip),
