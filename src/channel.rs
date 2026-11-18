@@ -36,6 +36,8 @@ pub enum ChannelValue {
         user_ids: Vec<UserId>,
         #[serde(default)]
         events: Vec<NotificationEvent>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        add_to_default_notification_group: Option<bool>,
     },
     #[serde(rename_all = "camelCase")]
     Slack {
@@ -51,6 +53,8 @@ pub enum ChannelValue {
         mentions: HashMap<String, String>,
         #[serde(default)]
         events: Vec<NotificationEvent>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        add_to_default_notification_group: Option<bool>,
     },
     Line {
         name: String,
@@ -137,6 +141,8 @@ pub enum ChannelValue {
         enabled_graph_image: bool,
         #[serde(default)]
         events: Vec<NotificationEvent>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        add_to_default_notification_group: Option<bool>,
     },
     AmazonEventBridge {
         name: String,
@@ -216,6 +222,7 @@ mod tests {
                 emails: vec!["test@example.com".to_string()],
                 user_ids: vec!["user0".into()],
                 events: vec![NotificationEvent::Alert],
+                add_to_default_notification_group: Some(true),
             })
             .build()
     }
@@ -229,6 +236,7 @@ mod tests {
             "emails": ["test@example.com"],
             "userIds": ["user0"],
             "events": ["alert"],
+            "addToDefaultNotificationGroup": true,
         })
     }
 
@@ -246,6 +254,7 @@ mod tests {
                     NotificationEvent::HostRegister,
                     NotificationEvent::HostRetire,
                 ],
+                add_to_default_notification_group: None,
             })
             .build()
     }
@@ -420,6 +429,7 @@ mod tests {
                     NotificationEvent::AlertGroup,
                     NotificationEvent::Monitor,
                 ],
+                add_to_default_notification_group: None,
             })
             .build()
     }
@@ -553,6 +563,24 @@ impl Client {
         .await
     }
 
+    /// Updates a channel.
+    ///
+    /// See <https://mackerel.io/api-docs/entry/channels#update>.
+    pub async fn update_channel(
+        &self,
+        channel_id: impl Into<ChannelId>,
+        channel_value: impl Borrow<ChannelValue>,
+    ) -> Result<Channel> {
+        self.request(
+            Method::PUT,
+            format_url!("/api/v0/channels/{}", channel_id),
+            query_params![],
+            request_body!(channel_value.borrow()),
+            response_body!(..),
+        )
+        .await
+    }
+
     /// Deletes a channel.
     ///
     /// See <https://mackerel.io/api-docs/entry/channels#delete>.
@@ -582,6 +610,7 @@ mod client_tests {
             emails: vec!["mackerel@example.com".to_string()],
             user_ids: vec!["user0".into()],
             events: vec![NotificationEvent::Alert],
+            add_to_default_notification_group: None,
         }
     }
 
@@ -637,6 +666,28 @@ mod client_tests {
         );
         assert_eq!(
             test_client!(server).create_channel(&value_example()).await,
+            Ok(entity_example()),
+        );
+    }
+
+    #[async_std::test]
+    async fn update_channel() {
+        let server = test_server! {
+            method = PUT,
+            path = "/api/v0/channels/channel0",
+            request = value_json_example(),
+            response = entity_json_example(),
+        };
+        assert_eq!(
+            test_client!(server)
+                .update_channel("channel0", value_example())
+                .await,
+            Ok(entity_example()),
+        );
+        assert_eq!(
+            test_client!(server)
+                .update_channel(ChannelId::from("channel0"), &value_example())
+                .await,
             Ok(entity_example()),
         );
     }
