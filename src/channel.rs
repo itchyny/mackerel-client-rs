@@ -24,13 +24,12 @@ pub type ChannelId = Id<ChannelValue>;
 pub enum ChannelValue {
     Email(EmailChannel),
     Slack(SlackChannel),
-    Line(LineChannel),
+    EmailBroadcast(EmailBroadcastChannel),
     Chatwork(ChatworkChannel),
-    Typetalk(TypetalkChannel),
+    JiraServiceManagement(JiraServiceManagementChannel),
     Twilio(TwilioChannel),
     Pagerduty(PagerdutyChannel),
     Opsgenie(OpsgenieChannel),
-    Yammer(YammerChannel),
     MicrosoftTeams(MicrosoftTeamsChannel),
     Webhook(WebhookChannel),
     AmazonEventBridge(AmazonEventBridgeChannel),
@@ -107,12 +106,12 @@ pub struct SlackChannel {
     pub add_to_default_notification_group: Option<bool>,
 }
 
-/// A LINE channel
+/// An email broadcast channel
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
-pub struct LineChannel {
+pub struct EmailBroadcastChannel {
     pub name: String,
     #[builder(default, setter(strip_option))]
     #[serde(
@@ -139,12 +138,12 @@ pub struct ChatworkChannel {
     pub suspended_at: Option<DateTime<Utc>>,
 }
 
-/// A Typetalk channel
+/// A Jira Service Management channel
 #[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
 #[builder(field_defaults(setter(into)))]
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
-pub struct TypetalkChannel {
+pub struct JiraServiceManagementChannel {
     pub name: String,
     #[builder(default, setter(strip_option))]
     #[serde(
@@ -193,22 +192,6 @@ pub struct PagerdutyChannel {
 #[serde(rename_all = "camelCase")]
 #[non_exhaustive]
 pub struct OpsgenieChannel {
-    pub name: String,
-    #[builder(default, setter(strip_option))]
-    #[serde(
-        default,
-        with = "chrono::serde::ts_seconds_option",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub suspended_at: Option<DateTime<Utc>>,
-}
-
-/// A Yammer channel
-#[derive(PartialEq, Clone, Debug, TypedBuilder, Serialize, Deserialize)]
-#[builder(field_defaults(setter(into)))]
-#[serde(rename_all = "camelCase")]
-#[non_exhaustive]
-pub struct YammerChannel {
     pub name: String,
     #[builder(default, setter(strip_option))]
     #[serde(
@@ -292,9 +275,9 @@ impl From<SlackChannel> for ChannelValue {
     }
 }
 
-impl From<LineChannel> for ChannelValue {
-    fn from(channel: LineChannel) -> Self {
-        Self::Line(channel)
+impl From<EmailBroadcastChannel> for ChannelValue {
+    fn from(channel: EmailBroadcastChannel) -> Self {
+        Self::EmailBroadcast(channel)
     }
 }
 
@@ -304,9 +287,9 @@ impl From<ChatworkChannel> for ChannelValue {
     }
 }
 
-impl From<TypetalkChannel> for ChannelValue {
-    fn from(channel: TypetalkChannel) -> Self {
-        Self::Typetalk(channel)
+impl From<JiraServiceManagementChannel> for ChannelValue {
+    fn from(channel: JiraServiceManagementChannel) -> Self {
+        Self::JiraServiceManagement(channel)
     }
 }
 
@@ -325,12 +308,6 @@ impl From<PagerdutyChannel> for ChannelValue {
 impl From<OpsgenieChannel> for ChannelValue {
     fn from(channel: OpsgenieChannel) -> Self {
         Self::Opsgenie(channel)
-    }
-}
-
-impl From<YammerChannel> for ChannelValue {
-    fn from(channel: YammerChannel) -> Self {
-        Self::Yammer(channel)
     }
 }
 
@@ -358,13 +335,12 @@ impl ChannelValue {
         match self {
             Self::Email(channel) => channel.name.clone(),
             Self::Slack(channel) => channel.name.clone(),
-            Self::Line(channel) => channel.name.clone(),
+            Self::EmailBroadcast(channel) => channel.name.clone(),
             Self::Chatwork(channel) => channel.name.clone(),
-            Self::Typetalk(channel) => channel.name.clone(),
+            Self::JiraServiceManagement(channel) => channel.name.clone(),
             Self::Twilio(channel) => channel.name.clone(),
             Self::Pagerduty(channel) => channel.name.clone(),
             Self::Opsgenie(channel) => channel.name.clone(),
-            Self::Yammer(channel) => channel.name.clone(),
             Self::MicrosoftTeams(channel) => channel.name.clone(),
             Self::Webhook(channel) => channel.name.clone(),
             Self::AmazonEventBridge(channel) => channel.name.clone(),
@@ -376,13 +352,12 @@ impl ChannelValue {
         match self {
             Self::Email(channel) => channel.suspended_at,
             Self::Slack(channel) => channel.suspended_at,
-            Self::Line(channel) => channel.suspended_at,
+            Self::EmailBroadcast(channel) => channel.suspended_at,
             Self::Chatwork(channel) => channel.suspended_at,
-            Self::Typetalk(channel) => channel.suspended_at,
+            Self::JiraServiceManagement(channel) => channel.suspended_at,
             Self::Twilio(channel) => channel.suspended_at,
             Self::Pagerduty(channel) => channel.suspended_at,
             Self::Opsgenie(channel) => channel.suspended_at,
-            Self::Yammer(channel) => channel.suspended_at,
             Self::MicrosoftTeams(channel) => channel.suspended_at,
             Self::Webhook(channel) => channel.suspended_at,
             Self::AmazonEventBridge(channel) => channel.suspended_at,
@@ -475,23 +450,23 @@ mod tests {
         })
     }
 
-    fn line_channel_example() -> Channel {
+    fn email_broadcast_channel_example() -> Channel {
         Channel::builder()
             .id("channel3")
             .value(
-                LineChannel::builder()
-                    .name("Example Line Channel")
+                EmailBroadcastChannel::builder()
+                    .name("Example Email Broadcast Channel")
                     .suspended_at(DateTime::from_timestamp(1711360000, 0).unwrap())
                     .build(),
             )
             .build()
     }
 
-    fn line_channel_json_example() -> serde_json::Value {
+    fn email_broadcast_channel_json_example() -> serde_json::Value {
         json!({
             "id": "channel3",
-            "type": "line",
-            "name": "Example Line Channel",
+            "type": "email-broadcast",
+            "name": "Example Email Broadcast Channel",
             "suspendedAt": 1711360000,
         })
     }
@@ -515,22 +490,22 @@ mod tests {
         })
     }
 
-    fn typetalk_channel_example() -> Channel {
+    fn jira_service_management_channel_example() -> Channel {
         Channel::builder()
             .id("channel5")
             .value(
-                TypetalkChannel::builder()
-                    .name("Example Typetalk Channel")
+                JiraServiceManagementChannel::builder()
+                    .name("Example Jira Service Management Channel")
                     .build(),
             )
             .build()
     }
 
-    fn typetalk_channel_json_example() -> serde_json::Value {
+    fn jira_service_management_channel_json_example() -> serde_json::Value {
         json!({
             "id": "channel5",
-            "type": "typetalk",
-            "name": "Example Typetalk Channel",
+            "type": "jira-service-management",
+            "name": "Example Jira Service Management Channel",
         })
     }
 
@@ -588,25 +563,6 @@ mod tests {
             "id": "channel8",
             "type": "opsgenie",
             "name": "Example Opsgenie Channel",
-        })
-    }
-
-    fn yammer_channel_example() -> Channel {
-        Channel::builder()
-            .id("channel9")
-            .value(
-                YammerChannel::builder()
-                    .name("Example Yammer Channel")
-                    .build(),
-            )
-            .build()
-    }
-
-    fn yammer_channel_json_example() -> serde_json::Value {
-        json!({
-            "id": "channel9",
-            "type": "yammer",
-            "name": "Example Yammer Channel",
         })
     }
 
@@ -680,13 +636,18 @@ mod tests {
     #[rstest]
     #[case(email_channel_example(), email_channel_json_example())]
     #[case(slack_channel_example(), slack_channel_json_example())]
-    #[case(line_channel_example(), line_channel_json_example())]
+    #[case(
+        email_broadcast_channel_example(),
+        email_broadcast_channel_json_example()
+    )]
     #[case(chatwork_channel_example(), chatwork_channel_json_example())]
-    #[case(typetalk_channel_example(), typetalk_channel_json_example())]
+    #[case(
+        jira_service_management_channel_example(),
+        jira_service_management_channel_json_example()
+    )]
     #[case(twilio_channel_example(), twilio_channel_json_example())]
     #[case(pagerduty_channel_example(), pagerduty_channel_json_example())]
     #[case(opsgenie_channel_example(), opsgenie_channel_json_example())]
-    #[case(yammer_channel_example(), yammer_channel_json_example())]
     #[case(
         microsoft_teams_channel_example(),
         microsoft_teams_channel_json_example()
@@ -704,13 +665,15 @@ mod tests {
     #[rstest]
     #[case(email_channel_example(), "Example Email Channel")]
     #[case(slack_channel_example(), "Example Slack Channel")]
-    #[case(line_channel_example(), "Example Line Channel")]
+    #[case(email_broadcast_channel_example(), "Example Email Broadcast Channel")]
     #[case(chatwork_channel_example(), "Example Chatwork Channel")]
-    #[case(typetalk_channel_example(), "Example Typetalk Channel")]
+    #[case(
+        jira_service_management_channel_example(),
+        "Example Jira Service Management Channel"
+    )]
     #[case(twilio_channel_example(), "Example Twilio Channel")]
     #[case(pagerduty_channel_example(), "Example Pagerduty Channel")]
     #[case(opsgenie_channel_example(), "Example Opsgenie Channel")]
-    #[case(yammer_channel_example(), "Example Yammer Channel")]
     #[case(microsoft_teams_channel_example(), "Example MicrosoftTeams Channel")]
     #[case(webhook_channel_example(), "Example Webhook Channel")]
     #[case(
